@@ -1,28 +1,61 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import { innovaApi } from "../../services/http";
 
+export const loginUser = createAsyncThunk(
+  "user/login",
+  async (loginCredentials, { rejectWithValue }) => {
+    try {
+      const response = await innovaApi.post("/user/login", loginCredentials);
+      localStorage.setItem("user", JSON.stringify(response.data));
+      return response.data;
+    } catch (error) {
+      if (error.response && error.response.data) {
+        return rejectWithValue(error.response.data);
+      } else {
+        return rejectWithValue(error.message);
+      }
+    }
+  }
+);
 const userSlicer = createSlice({
   name: "user",
   initialState: {
-    name: "",
-    email: "",
-    avatar: "",
+    user: null,
     token: null,
+    loading: false,
+    error: null,
   },
   reducers: {
     setUser: (state, action) => {
-      state.name = action.payload.name;
-      state.email = action.payload.email;
-      state.avatar = action.payload.avatar;
-      state.role = action.payload.role;
+      state.user = action.payload.user;
       state.token = action.payload.token;
     },
     logoutUser: (state) => {
-      state.name = "";
-      state.email = "";
-      state.avatar = "";
-      state.role = "";
+      state.user = null;
       state.token = null;
     },
+  },
+  extraReducers: (builder) => {
+    builder
+      .addCase(loginUser.pending, (state) => {
+        state.user = null;
+        state.token = null;
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(loginUser.fulfilled, (state, action) => {
+        state.user = action.payload.user;
+        state.token = action.payload.token;
+        state.loading = false;
+        state.error = null;
+      })
+      .addCase(loginUser.rejected, (state, action) => {
+        console.error("Login failed:", action.payload);
+        state.user = null;
+        state.token = null;
+        state.loading = false;
+        state.error = action.payload;
+      });
   },
 });
 

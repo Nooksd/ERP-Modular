@@ -31,11 +31,14 @@ class UserController {
 
       const token = JWT.generateToken(user);
 
+      const userObject = user.toObject();
+      delete userObject.password;
+
       res.status(200).json({
         message: "Autenticado com sucesso",
         token,
+        user: userObject,
         status: true,
-        user,
       });
     } catch (e) {
       res.status(500).json({
