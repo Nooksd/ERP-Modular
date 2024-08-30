@@ -1,10 +1,12 @@
+// jsonwebtoken.js
+
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";	
 
 dotenv.config();
 
 class JWT {
-  static validateToken(req, res, next) {
+  static validateAccessToken(req, res, next) {
     const token = req.headers["authorization"];
 
     if (!token) {
@@ -26,10 +28,22 @@ class JWT {
     });
   }
 
-  static generateToken(user) {
-    return jwt.sign({ user }, process.env.JWT_KEY, {
-      expiresIn: "5d",
-    });
+  static generateAccessToken(user) {
+    return jwt.sign({ user }, process.env.JWT_KEY, { expiresIn: "15m" });
+  }
+
+  static generateRefreshToken(user, longLife = false) {
+    const expiresIn = longLife ? "10d" : "1d";
+    return jwt.sign({ user }, process.env.JWT_REFRESH_KEY, { expiresIn });
+  }
+
+  static async validateRefreshToken(token) {
+    try {
+      const decoded = jwt.verify(token, process.env.JWT_REFRESH_KEY);
+      return decoded.user;
+    } catch (err) {
+      throw new Error("Token de refresh inválido");
+    }
   }
 }
 

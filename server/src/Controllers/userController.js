@@ -7,7 +7,7 @@ import JWT from "../Middlewares/jsonwebtoken.js";
 class UserController {
   static async Login(req, res) {
     try {
-      const { email, password } = req.body;
+      const { email, password, keepConnection } = req.body;
 
       if (!email || !password) {
         return res.status(400).json({
@@ -29,15 +29,50 @@ class UserController {
         });
       }
 
-      const token = JWT.generateToken(user);
+      const accessToken = JWT.generateAccessToken(user);
+      const refreshToken = JWT.generateRefreshToken(user, keepConnection);
 
       const userObject = user.toObject();
       delete userObject.password;
 
       res.status(200).json({
         message: "Autenticado com sucesso",
-        token,
+        accessToken,
+        refreshToken,
         user: userObject,
+        status: true,
+      });
+    } catch (e) {
+      res.status(500).json({
+        message: "Erro interno do servidor",
+        status: false,
+      });
+    }
+  }
+
+  static async refreshToken(req, res) {
+    try {
+      const { token } = req.body;
+      if (!token) {
+        return res.status(401).json({
+          message: "RefreshToken é obrigatório",
+          status: false,
+        });
+      }
+
+      const user = await JWT.validateRefreshToken(token);
+
+      if (!user) {
+        return res.status(403).json({
+          message: "RefreshToken inválido",
+          status: false,
+        });
+      }
+
+      const newAccessToken = JWT.generateAccessToken(user);
+
+      res.status(200).json({
+        accessToken: newAccessToken,
         status: true,
       });
     } catch (e) {

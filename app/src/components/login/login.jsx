@@ -14,6 +14,7 @@ import { SVGWarning } from "../../shared/icons/Warning_icon.jsx";
 export const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [keepConnection, setkeepConnection] = useState(false);
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [ErrorMessage, setErrorMessage] = useState(null);
   const [emailError, setEmailError] = useState("");
@@ -28,7 +29,7 @@ export const Login = () => {
   const validateEmail = (email) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-    if (email === undefined || email === null || email.trim() === "") {
+    if (!email || email.trim() === "") {
       setEmailError("Campo de email não pode estar vazio");
       return false;
     } else if (!emailRegex.test(email)) {
@@ -41,8 +42,7 @@ export const Login = () => {
   };
 
   const validatePassword = (password) => {
-      console.log(password);
-    if (password === undefined || password === null || password.trim() === "") {
+    if (!password || password.trim() === "") {
       setPasswordError("Campo de senha não pode estar vazio");
       return false;
     } else if (password.length < 5) {
@@ -57,8 +57,8 @@ export const Login = () => {
   const handleLoginEvent = (e) => {
     e.preventDefault();
 
-    const isEmailValid = validateEmail();
-    const isPasswordValid = validatePassword();
+    const isEmailValid = validateEmail(email);
+    const isPasswordValid = validatePassword(password);
 
     if (emailError || passwordError) {
       return;
@@ -69,13 +69,15 @@ export const Login = () => {
     const loginCredentials = {
       email: email.trim(),
       password: password.trim(),
+      keepConnection,
     };
     dispatch(loginUser(loginCredentials)).then((result) => {
-      if (result.payload.status) {
-        console.log(result.payload.status);
+      if (result.payload && result.payload.status) {
         setEmail("");
         setPassword("");
         navigate("/dashboard");
+      } else if (result.error) {
+        setErrorMessage(result.error.message);
       }
     });
   };
@@ -97,19 +99,23 @@ export const Login = () => {
   };
 
   useEffect(() => {
-    setErrorMessage(error);
+    if (error) {
+      setErrorMessage(error);
+      setEmailError("Email ou senha inválida");
+      setPasswordError("Email ou senha inválida");
 
-    if (errorTimerRef.current) {
-      clearTimeout(errorTimerRef.current);
+      if (errorTimerRef.current) {
+        clearTimeout(errorTimerRef.current);
+      }
+
+      errorTimerRef.current = setTimeout(() => {
+        setErrorMessage(null);
+      }, 2000);
+
+      return () => {
+        clearTimeout(errorTimerRef.current);
+      };
     }
-
-    errorTimerRef.current = setTimeout(() => {
-      setErrorMessage(null);
-    }, 2000);
-
-    return () => {
-      clearTimeout(errorTimerRef.current);
-    };
   }, [error]);
 
   return (
@@ -167,15 +173,28 @@ export const Login = () => {
             </styled.FormDiv>
             <styled.FormDiv>
               <styled.keepLoggedDiv>
-                <styled.HiddenCheckbox id="checkbox" />
+                <styled.HiddenCheckbox
+                  id="checkbox"
+                  checked={keepConnection}
+                  onChange={() => setkeepConnection((prev) => !prev)}
+                />
                 <styled.StyledCheckbox htmlFor="checkbox" />
                 <styled.KeepLoggedLabel htmlFor="checkbox">
                   Manter conectado
                 </styled.KeepLoggedLabel>
               </styled.keepLoggedDiv>
-              <styled.forgotPassP>Problemas com o Login?</styled.forgotPassP>
+              <a
+                href="https://api.whatsapp.com/send/?phone=%2B5534999232388&text=Ol%C3%A1%2C+tudo+bem%3F+Estou+com+problemas+para+fazer+login&type=phone_number&app_absent=0"
+                target="_blank"
+              >
+                <styled.forgotPassP>Problemas com o Login?</styled.forgotPassP>
+              </a>
             </styled.FormDiv>
-            <styled.LoginButton>
+            <styled.LoginButton
+              $notAllowed={
+                emailError || passwordError || loading ? false : true
+              }
+            >
               {loading ? "loading..." : "Login"}
             </styled.LoginButton>
           </styled.LoginForm>

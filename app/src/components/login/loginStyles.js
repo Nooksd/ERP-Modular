@@ -233,7 +233,7 @@ export const LoginButton = styled.button`
   color: ${(props) => props.theme.fonts.color};
   font-size: 16px;
   font-weight: 500;
-  cursor: pointer;
+  cursor: ${(props) => (props.$notAllowed ? "pointer" : "not-allowed")};
 `;
 
 export const ErrorMessage = styled.div`

@@ -9,9 +9,9 @@ import {
 const userRoutes = express.Router();
 
 userRoutes.post("/login", userLoginCheck, userValidator, UserController.Login);
-userRoutes.post("/create-user", JWT.validateToken, UserController.createUser);
-userRoutes.get("/get-all-users", JWT.validateToken, UserController.getAllUsers);
-userRoutes.get("/:userId", JWT.validateToken, UserController.getUserById);
-userRoutes.put("/:userId", JWT.validateToken, UserController.updateUser);
+userRoutes.post("/create-user", JWT.validateAccessToken, UserController.createUser);
+userRoutes.get("/get-all-users", JWT.validateAccessToken, UserController.getAllUsers);
+userRoutes.get("/:userId", JWT.validateAccessToken, UserController.getUserById);
+userRoutes.put("/:userId", JWT.validateAccessToken, UserController.updateUser);
 
 export default userRoutes;
