@@ -1,4 +1,3 @@
-import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { Provider, useSelector } from "react-redux";
 import { ThemeProvider } from "styled-components";
@@ -20,9 +19,7 @@ const ThemedApp = () => {
 };
 
 createRoot(document.getElementById("root")).render(
-  <StrictMode>
-    <Provider store={store}>
-      <ThemedApp />
-    </Provider>
-  </StrictMode>
+  <Provider store={store}>
+    <ThemedApp />
+  </Provider>
 );

@@ -7,7 +7,7 @@ dotenv.config();
 
 class JWT {
   static validateAccessToken(req, res, next) {
-    const token = req.headers["authorization"];
+    const token = req.cookies.accessToken;
 
     if (!token) {
       return res.status(403).json({

@@ -5,6 +5,32 @@ import User from "../Models/userModel.js";
 import JWT from "../Middlewares/jsonwebtoken.js";
 
 class UserController {
+  static async getProfile(req, res) {
+    try {
+      const userId = req.user.id;
+
+      const user = await User.findById(userId).select("-password").exec();
+
+      if (!user) {
+        return res.status(404).json({
+          message: "Usuário não encontrado",
+          status: false,
+        });
+      }
+
+      res.status(200).json({
+        message: "Perfil do usuário encontrado com sucesso",
+        user,
+        status: true,
+      });
+    } catch (e) {
+      res.status(500).json({
+        message: "Erro interno do servidor",
+        status: false,
+      });
+    }
+  }
+  
   static async Login(req, res) {
     try {
       const { email, password, keepConnection } = req.body;
@@ -29,16 +55,26 @@ class UserController {
         });
       }
 
-      const accessToken = JWT.generateAccessToken(user);
-      const refreshToken = JWT.generateRefreshToken(user, keepConnection);
-
       const userObject = user.toObject();
       delete userObject.password;
 
+      const accessToken = JWT.generateAccessToken(user);
+      const refreshToken = JWT.generateRefreshToken(user, keepConnection);
+
+      res.cookie("accessToken", accessToken, {
+        httpOnly: true,
+        secure: true,
+        sameSite: "Strict",
+      });
+
+      res.cookie("refreshToken", refreshToken, {
+        httpOnly: true,
+        secure: true,
+        sameSite: "Strict",
+      });
+
       res.status(200).json({
         message: "Autenticado com sucesso",
-        accessToken,
-        refreshToken,
         user: userObject,
         status: true,
       });
@@ -52,10 +88,10 @@ class UserController {
 
   static async refreshToken(req, res) {
     try {
-      const { token } = req.body;
+      const { token } = req.cookies;
       if (!token) {
         return res.status(401).json({
-          message: "RefreshToken é obrigatório",
+          message: "Não Autorizado",
           status: false,
         });
       }
@@ -71,9 +107,10 @@ class UserController {
 
       const newAccessToken = JWT.generateAccessToken(user);
 
-      res.status(200).json({
-        accessToken: newAccessToken,
-        status: true,
+      res.cookie("accessToken", newAccessToken, {
+        httpOnly: true,
+        secure: true,
+        sameSite: "Strict",
       });
     } catch (e) {
       res.status(500).json({
