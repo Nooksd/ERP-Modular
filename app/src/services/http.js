@@ -10,6 +10,7 @@ export const innovaApi = axios.create({
 innovaApi.interceptors.response.use(
   (response) => response,
   async (error) => {
+    console.log("teste");
     const originalRequest = error.config;
     if (error.response.status === 403 && !originalRequest._retry) {
       originalRequest._retry = true;

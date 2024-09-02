@@ -20,7 +20,13 @@ export const loginUser = createAsyncThunk(
 
 export const refreshAccessToken = createAsyncThunk(
   "user/refreshToken",
-  async (_, { rejectWithValue }) => {
+  async (_, { getState, rejectWithValue }) => {
+    const { isAuthenticated } = getState().user;
+
+    if (!isAuthenticated) {
+      return rejectWithValue("Usuário não autenticado.");
+    }
+
     try {
       const response = await innovaApi.post("/user/refresh-token");
 
@@ -38,6 +44,12 @@ export const refreshAccessToken = createAsyncThunk(
 export const setUserFromStorage = createAsyncThunk(
   "user/setUserSaved",
   async (_, { rejectWithValue }) => {
+    const isAuthenticated = localStorage.getItem("isAuthenticated");
+
+    if (isAuthenticated === "false") {
+      return rejectWithValue("Usuário não autenticado.");
+    }
+
     try {
       const response = await innovaApi.get("/user/profile");
       return response.data;
@@ -51,31 +63,35 @@ const userSlicer = createSlice({
   name: "user",
   initialState: {
     user: null,
+    isAuthenticated: localStorage.getItem("isAuthenticated") === "true",
     loading: false,
     error: null,
   },
   reducers: {
-    setUser: (state, action) => {
-      state.user = action.payload.user;
-    },
     logoutUser: (state) => {
       state.user = null;
+      state.isAuthenticated = false;
+      state.loading = false;
+      state.error = null;
     },
   },
   extraReducers: (builder) => {
     builder
       .addCase(loginUser.pending, (state) => {
-        state.user = null;
         state.loading = true;
         state.error = null;
       })
       .addCase(loginUser.fulfilled, (state, action) => {
         state.user = action.payload.user;
+        state.isAuthenticated = true;
+        localStorage.setItem("isAuthenticated", "true");
         state.loading = false;
         state.error = null;
       })
       .addCase(loginUser.rejected, (state, action) => {
         state.user = null;
+        state.isAuthenticated = false;
+        localStorage.setItem("isAuthenticated", "false");
         state.loading = false;
         state.error = action.payload;
       });
@@ -87,11 +103,15 @@ const userSlicer = createSlice({
       })
       .addCase(setUserFromStorage.fulfilled, (state, action) => {
         state.user = action.payload.user;
+        state.isAuthenticated = true;
+        localStorage.setItem("isAuthenticated", "true");
         state.loading = false;
         state.error = null;
       })
       .addCase(setUserFromStorage.rejected, (state, action) => {
         state.user = null;
+        state.isAuthenticated = false;
+        localStorage.setItem("isAuthenticated", "false");
         state.loading = false;
         state.error = action.payload;
       });
