@@ -7,7 +7,7 @@ import JWT from "../Middlewares/jsonwebtoken.js";
 class UserController {
   static async getProfile(req, res) {
     try {
-      const userId = req.user.id;
+      const userId = req.user.user._id;
 
       const user = await User.findById(userId).select("-password").exec();
 
@@ -63,13 +63,13 @@ class UserController {
 
       res.cookie("accessToken", accessToken, {
         httpOnly: true,
-        secure: true,
+        secure: process.env.NODE_ENV === 'production',
         sameSite: "Strict",
       });
 
       res.cookie("refreshToken", refreshToken, {
         httpOnly: true,
-        secure: true,
+        secure: process.env.NODE_ENV === 'production',
         sameSite: "Strict",
       });
 
@@ -88,7 +88,8 @@ class UserController {
 
   static async refreshToken(req, res) {
     try {
-      const { token } = req.cookies;
+      const token = req.cookies.refreshToken;
+
       if (!token) {
         return res.status(401).json({
           message: "Não Autorizado",
@@ -100,7 +101,7 @@ class UserController {
 
       if (!user) {
         return res.status(403).json({
-          message: "RefreshToken inválido",
+          message: "Token inválido",
           status: false,
         });
       }
@@ -109,8 +110,12 @@ class UserController {
 
       res.cookie("accessToken", newAccessToken, {
         httpOnly: true,
-        secure: true,
+        secure: process.env.NODE_ENV === 'production',
         sameSite: "Strict",
+      });
+      res.status(200).json({
+        message: "Token atualizado com sucesso",
+        status: true,
       });
     } catch (e) {
       res.status(500).json({

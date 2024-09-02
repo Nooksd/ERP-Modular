@@ -2,6 +2,7 @@ import express from 'express';
 import userRoutes from './src/Routes/UserRoutes.js';
 import dotenv from 'dotenv';
 import cors from 'cors';
+import cookieParser from 'cookie-parser';
 
 dotenv.config();
 
@@ -10,9 +11,17 @@ const port = 3000;
 
 import './db/database.js'
 
+app.use(cors({
+  origin: process.env.CLIENT_URL,
+  credentials: true,
+  methods: 'GET, POST, PUT, DELETE',
+  allowedHeaders: ['Origin', 'X-Requested-With', 'Content-Type', 'Access-Control-Allow-Credentials'],
+  exposedHeaders: ['Access-Control-Allow-Credentials']
+}));
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(cors());
+app.use(cookieParser());
 
 app.use('/api/user', userRoutes);
 

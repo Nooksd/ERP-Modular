@@ -6,7 +6,7 @@ export const loginUser = createAsyncThunk(
   async (loginCredentials, { rejectWithValue }) => {
     try {
       const response = await innovaApi.post("/user/login", loginCredentials);
-      
+
       return response.data;
     } catch (error) {
       if (error.response && error.response.data) {
@@ -23,7 +23,7 @@ export const refreshAccessToken = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const response = await innovaApi.post("/user/refresh-token");
-      
+
       return response.data;
     } catch (error) {
       if (error.response && error.response.data) {
@@ -36,10 +36,10 @@ export const refreshAccessToken = createAsyncThunk(
 );
 
 export const setUserFromStorage = createAsyncThunk(
-  "user/setUserFromStorage",
+  "user/setUserSaved",
   async (_, { rejectWithValue }) => {
     try {
-      const response = await innovaApi.get("/user/profile"); 
+      const response = await innovaApi.get("/user/profile");
       return response.data;
     } catch (error) {
       return rejectWithValue(error.message);
@@ -51,52 +51,48 @@ const userSlicer = createSlice({
   name: "user",
   initialState: {
     user: null,
-    accessToken: null,
-    refreshToken: null,
     loading: false,
     error: null,
   },
   reducers: {
     setUser: (state, action) => {
       state.user = action.payload.user;
-      state.accessToken = action.payload.accessToken;
-      state.refreshToken = action.payload.refreshToken;
     },
     logoutUser: (state) => {
       state.user = null;
-      state.accessToken = null;
-      state.refreshToken = null;
     },
   },
   extraReducers: (builder) => {
     builder
       .addCase(loginUser.pending, (state) => {
         state.user = null;
-        state.accessToken = null;
-        state.refreshToken = null;
         state.loading = true;
         state.error = null;
       })
       .addCase(loginUser.fulfilled, (state, action) => {
         state.user = action.payload.user;
-        state.accessToken = action.payload.accessToken;
-        state.refreshToken = action.payload.refreshToken;
         state.loading = false;
         state.error = null;
       })
       .addCase(loginUser.rejected, (state, action) => {
         state.user = null;
-        state.accessToken = null;
-        state.refreshToken = null;
         state.loading = false;
         state.error = action.payload;
       });
-    
+
     builder
-      .addCase(refreshAccessToken.fulfilled, (state, action) => {
-        state.accessToken = action.payload.accessToken;
+      .addCase(setUserFromStorage.pending, (state) => {
+        state.loading = true;
+        state.error = null;
       })
-      .addCase(refreshAccessToken.rejected, (state, action) => {
+      .addCase(setUserFromStorage.fulfilled, (state, action) => {
+        state.user = action.payload.user;
+        state.loading = false;
+        state.error = null;
+      })
+      .addCase(setUserFromStorage.rejected, (state, action) => {
+        state.user = null;
+        state.loading = false;
         state.error = action.payload;
       });
   },
