@@ -2,9 +2,7 @@ import * as styled from "./SVGStyles.js";
 
 const SVGPerson = ({ ...props }) => {
   return (
-    <styled.LockSVG
-      width="800px"
-      height="800px"
+    <styled.SVG
       viewBox="0 0 24 24"
       fill="none"
       {...props}
@@ -23,7 +21,7 @@ const SVGPerson = ({ ...props }) => {
         strokeLinecap="round"
         strokeLinejoin="round"
       />
-    </styled.LockSVG>
+    </styled.SVG>
   );
 };
 

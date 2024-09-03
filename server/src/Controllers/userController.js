@@ -30,7 +30,7 @@ class UserController {
       });
     }
   }
-  
+
   static async Login(req, res) {
     try {
       const { email, password, keepConnection } = req.body;
@@ -63,13 +63,13 @@ class UserController {
 
       res.cookie("accessToken", accessToken, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
+        secure: process.env.NODE_ENV === "production",
         sameSite: "Strict",
       });
 
       res.cookie("refreshToken", refreshToken, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
+        secure: process.env.NODE_ENV === "production",
         sameSite: "Strict",
       });
 
@@ -110,7 +110,7 @@ class UserController {
 
       res.cookie("accessToken", newAccessToken, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
+        secure: process.env.NODE_ENV === "production",
         sameSite: "Strict",
       });
       res.status(200).json({

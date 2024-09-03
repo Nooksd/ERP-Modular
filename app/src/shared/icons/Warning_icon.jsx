@@ -3,8 +3,6 @@ import * as styled from "./SVGStyles.js";
 export const SVGWarning = ({ ...props }) => {
   return (
     <styled.warningSVG
-      xmlns="http://www.w3.org/2000/svg"
-      height="20px"
       viewBox="0 -960 960 960"
       width="20px"
       {...props}

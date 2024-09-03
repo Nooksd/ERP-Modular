@@ -75,7 +75,7 @@ export const Login = () => {
       if (result.payload && result.payload.status) {
         setEmail("");
         setPassword("");
-        navigate("/dashboard");
+        navigate("/home");
       } else if (result.error) {
         setErrorMessage(result.error.message);
       }

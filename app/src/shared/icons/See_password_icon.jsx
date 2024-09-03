@@ -4,8 +4,6 @@ export const SVGSeePassword = ({ show, ...props}) => {
   return (
     <>
       <styled.seePasswordSVG
-        width="800px"
-        height="800px"
         viewBox="0 0 24 24"
         fill="none"
         {...props}

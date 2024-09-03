@@ -1,6 +1,6 @@
 import styled from "styled-components";
 
-export const LockSVG = styled.svg`
+export const SVG = styled.svg`
   position: absolute;
   z-index: 2;
   top: 50%;
