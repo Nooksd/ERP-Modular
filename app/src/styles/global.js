@@ -22,3 +22,14 @@ export const Loading = styled.div`
   background-size: 200%;
   animation: ${loadingAnimation} 1.5s infinite linear;
 `;
+
+export const NavbarMenuContentContainer = styled.div`
+  width: 100%;
+  height: 100%;
+  display: flex;
+`;
+
+export const NavbarContentContainer = styled.div`
+  width: 100%;
+  height: 100%;
+`;

@@ -67,6 +67,7 @@ const userSlicer = createSlice({
   name: "user",
   initialState: {
     user: null,
+    isAuthenticated: false,
     loading: false,
     error: null,
   },
@@ -78,11 +79,13 @@ const userSlicer = createSlice({
       })
       .addCase(loginUser.fulfilled, (state, action) => {
         state.user = action.payload.user;
+        state.isAuthenticated = true;
         state.loading = false;
         state.error = null;
       })
       .addCase(loginUser.rejected, (state, action) => {
         state.user = null;
+        state.isAuthenticated = false;
         state.loading = false;
         state.error = action.payload;
       });
@@ -94,11 +97,13 @@ const userSlicer = createSlice({
       })
       .addCase(setUserFromStorage.fulfilled, (state, action) => {
         state.user = action.payload.user;
+        state.isAuthenticated = true;
         state.loading = false;
         state.error = null;
       })
       .addCase(setUserFromStorage.rejected, (state, action) => {
         state.user = null;
+        state.isAuthenticated = false;
         state.loading = false;
         state.error = action.payload;
       });
@@ -110,6 +115,7 @@ const userSlicer = createSlice({
       })
       .addCase(logoutUser.fulfilled, (state) => {
         state.user = null;
+        state.isAuthenticated = false;
         state.loading = false;
         state.error = null;
       })

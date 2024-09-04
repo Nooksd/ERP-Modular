@@ -6,10 +6,14 @@ import { setUserFromStorage } from "../../store/slicers/userSlicer";
 const ProtectedRoute = ({ children }) => {
   const [isLoading, setIsLoading] = useState(true);
   const dispatch = useDispatch();
-  const { user, loading } = useSelector((state) => state.user);
+  const { user, loading, isAuthenticated } = useSelector((state) => state.user);
 
   useEffect(() => {
     const checkAuthStatus = async () => {
+      if(isAuthenticated === true) {
+        setIsLoading(false);
+        return;
+      }
       try {
         dispatch(setUserFromStorage());
       } finally {

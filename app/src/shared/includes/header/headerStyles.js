@@ -2,6 +2,7 @@ import styled from "styled-components";
 
 export const NavBar = styled.nav`
   width: 100%;
+  float: right;
   height: 75px;
   display: flex;
   align-items: center;
