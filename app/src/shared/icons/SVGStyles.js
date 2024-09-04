@@ -1,5 +1,13 @@
 import styled from "styled-components";
 
+export const ColorSVG = styled.svg`
+  fill: ${(props) => props.theme.colors.primary_dark};
+  path {
+    stroke: ${(props) => props.theme.colors.primary_dark};
+    fill: ${(props) => props.theme.colors.primary_dark};
+  }
+`;
+
 export const SVG = styled.svg`
   position: absolute;
   z-index: 2;

@@ -30,11 +30,18 @@ export const NavItem2 = styled.div`
   align-items: center;
 `;
 
+export const NavTitle = styled.h1`
+  color: ${(props) => props.theme.fonts.color};
+  font-size: 26px;
+  font-weight: 700;
+  margin-left: 15px;
+`;
+
 export const Division = styled.nav`
   width: 1px;
   height: 100%;
   margin: 0 15px;
-  background-color: #fff;
+  background-color: ${(props) => props.theme.fonts.color};
 `;
 
 export const RoundButton = styled.button`
@@ -45,7 +52,7 @@ export const RoundButton = styled.button`
   align-items: center;
   justify-content: center;
   margin: 0 5px;
-  background-color: #fff;
+  background-color: ${(props) => props.theme.fonts.color};
   cursor: pointer;
 `;
 
@@ -68,10 +75,44 @@ export const Name = styled.h2`
   min-width: 200px;
   min-height: 20px;
   overflow: hidden;
-  color: #fff;
+  color: ${(props) => props.theme.fonts.color};
 `;
 
 export const openMenu = styled.div`
   position: relative;
   cursor: pointer;
+`;
+
+export const Menu = styled.div`
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background-color: #fff;
+  width: auto;
+  border-radius: 5px;
+  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+  z-index: 10;
+  transition: display 0.3s ease;
+  flex-direction: column;
+  overflow: hidden;
+  display: ${(props) => (props.$show ? "flex" : "none")};
+`;
+
+export const MenuItem = styled.div`
+  padding: 10px;
+  width: 100%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  color: ${(props) => props.theme.colors.primary_dark};
+  border-bottom: 1px solid ${(props) => props.theme.colors.primary_dark};
+  
+  &:hover {
+    background-color: #f5f5f5;
+  }
+  &:last-child {
+    border-bottom: none;
+  }
+  }
 `;

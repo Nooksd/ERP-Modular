@@ -1,14 +1,17 @@
 import Hamburguer from "../../shared/includes/hamburguer/hamburguer";
 import Header from "../../shared/includes/header/header";
-import SVGEngine from "../../shared/icons/Engine_icon";
+
+import SVGHome from "../../shared/icons/home/Home_icon";
 
 export const Home = () => {
   return (
-    <div>
-      <Header page="Home" icon={SVGEngine} />
+    <>
+      <Header page="Home" logged={true}>
+        <SVGHome width="40" height="40"/>
+      </Header>
       <Hamburguer />
       <h1>Home</h1>
       <p>Bem-vindo à nossa página inicial</p>
-    </div>
+    </>
   );
 };

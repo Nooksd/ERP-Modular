@@ -1,6 +1,6 @@
-import * as styled from "./SVGStyles.js";
+import * as styled from "../SVGStyles.js";
 
-export const SVGWarning = ({ ...props }) => {
+const SVGWarning = ({ ...props }) => {
   return (
     <styled.warningSVG
       viewBox="0 -960 960 960"
@@ -14,3 +14,5 @@ export const SVGWarning = ({ ...props }) => {
     </styled.warningSVG>
   );
 };
+
+export default SVGWarning;

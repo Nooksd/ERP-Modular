@@ -6,10 +6,10 @@ import { useNavigate } from "react-router-dom";
 import * as styled from "./loginStyles.js";
 
 import SVGlogowhite from "../../shared/logo/innova_logo_white.jsx";
-import SVGLock from "../../shared/icons/Lock_icon.jsx";
-import SVGPerson from "../../shared/icons/Person_icon.jsx";
-import { SVGSeePassword } from "../../shared/icons/See_password_icon.jsx";
-import { SVGWarning } from "../../shared/icons/Warning_icon.jsx";
+import SVGLock from "../../shared/icons/login/Lock_icon.jsx";
+import SVGPerson from "../../shared/icons/login/Person_icon.jsx";
+import SVGSeePassword from "../../shared/icons/login/See_password_icon.jsx";
+import SVGWarning from "../../shared/icons/login/Warning_icon.jsx";
 
 export const Login = () => {
   const [email, setEmail] = useState("");

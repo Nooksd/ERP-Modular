@@ -86,6 +86,23 @@ class UserController {
     }
   }
 
+  static logout(req, res) {
+    try {
+      res.clearCookie("accessToken");
+      res.clearCookie("refreshToken");
+
+      res.status(200).json({
+        message: "Sessão encerrada com sucesso",
+        status: true,
+      });
+    } catch (e) {
+      res.status(500).json({
+        message: "Erro interno do servidor",
+        status: false,
+      });
+    }
+  }
+
   static async refreshToken(req, res) {
     try {
       const token = req.cookies.refreshToken;

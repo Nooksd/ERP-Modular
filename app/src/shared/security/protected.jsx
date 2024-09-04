@@ -12,8 +12,6 @@ const ProtectedRoute = ({ children }) => {
     const checkAuthStatus = async () => {
       try {
         dispatch(setUserFromStorage());
-      } catch (error) {
-        console.error("Failed to load user:", error);
       } finally {
         setIsLoading(false);
       }

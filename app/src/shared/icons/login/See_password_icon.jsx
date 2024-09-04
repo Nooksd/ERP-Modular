@@ -1,6 +1,6 @@
-import * as styled from "./SVGStyles.js";
+import * as styled from "../SVGStyles.js";
 
-export const SVGSeePassword = ({ show, ...props}) => {
+const SVGSeePassword = ({ show, ...props}) => {
   return (
     <>
       <styled.seePasswordSVG
@@ -44,3 +44,5 @@ export const SVGSeePassword = ({ show, ...props}) => {
     </>
   );
 };
+
+export default SVGSeePassword;

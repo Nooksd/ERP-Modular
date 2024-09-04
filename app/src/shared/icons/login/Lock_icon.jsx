@@ -1,4 +1,4 @@
-import * as styled from "./SVGStyles.js";
+import * as styled from "../SVGStyles.js";
 
 const SVGLock = ({ ...props }) => {
   return (

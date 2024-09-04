@@ -76,7 +76,7 @@ export const BlueLoginBlockAfter = styled.div`
 
 export const LoginTitle = styled.h1`
   text-align: center;
-  color: #fff;
+  color: ${(props) => props.theme.fonts.color};
   font-size: 20px;
   font-weight: bold;
   margin-top: 50px;

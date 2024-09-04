@@ -47,21 +47,28 @@ export const setUserFromStorage = createAsyncThunk(
   }
 );
 
+export const logoutUser = createAsyncThunk(
+  "user/logout",
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await innovaApi.post("/user/logout");
+      console.log(response.data);
+      return response.data;
+    } catch (error) {
+      if (error.response && error.response.data) {
+        return rejectWithValue(error.response.data);
+      } else {
+        return rejectWithValue(error.message);
+      }
+    }
+  }
+);
 const userSlicer = createSlice({
   name: "user",
   initialState: {
     user: null,
-    isAuthenticated: false,
     loading: false,
     error: null,
-  },
-  reducers: {
-    logoutUser: (state) => {
-      state.user = null;
-      state.isAuthenticated = false;
-      state.loading = false;
-      state.error = null;
-    },
   },
   extraReducers: (builder) => {
     builder
@@ -71,13 +78,11 @@ const userSlicer = createSlice({
       })
       .addCase(loginUser.fulfilled, (state, action) => {
         state.user = action.payload.user;
-        state.isAuthenticated = true;
         state.loading = false;
         state.error = null;
       })
       .addCase(loginUser.rejected, (state, action) => {
         state.user = null;
-        state.isAuthenticated = false;
         state.loading = false;
         state.error = action.payload;
       });
@@ -89,18 +94,30 @@ const userSlicer = createSlice({
       })
       .addCase(setUserFromStorage.fulfilled, (state, action) => {
         state.user = action.payload.user;
-        state.isAuthenticated = true;
         state.loading = false;
         state.error = null;
       })
       .addCase(setUserFromStorage.rejected, (state, action) => {
         state.user = null;
-        state.isAuthenticated = false;
+        state.loading = false;
+        state.error = action.payload;
+      });
+
+    builder
+      .addCase(logoutUser.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(logoutUser.fulfilled, (state) => {
+        state.user = null;
+        state.loading = false;
+        state.error = null;
+      })
+      .addCase(logoutUser.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       });
   },
 });
 
-export const { setUser, logoutUser } = userSlicer.actions;
 export default userSlicer.reducer;

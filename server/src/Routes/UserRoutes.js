@@ -9,6 +9,7 @@ import {
 const userRoutes = express.Router();
 
 userRoutes.post("/login", userLoginCheck, userValidator, UserController.Login);
+userRoutes.post("/logout", JWT.validateAccessToken, UserController.logout);
 userRoutes.get("/refresh-token", UserController.refreshToken);
 userRoutes.get("/profile", JWT.validateAccessToken, UserController.getProfile);
 userRoutes.post(
