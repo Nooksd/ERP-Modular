@@ -1,4 +1,13 @@
-import styled from "styled-components";
+import styled, { keyframes } from "styled-components";
+
+const rotateAnimation = keyframes`
+  0% {
+    transform: rotate(0deg);
+  }
+    to {
+    transform: rotate(360deg);
+  }
+    `;
 
 export const NavBar = styled.nav`
   width: 100%;
@@ -55,6 +64,11 @@ export const RoundButton = styled.button`
   margin: 0 5px;
   background-color: ${(props) => props.theme.fonts.color};
   cursor: pointer;
+
+  &:hover {
+    transform: scale(1.1);
+    animation: ${rotateAnimation} 0.5s linear;
+  }
 `;
 
 export const ProfilePicture = styled.div`

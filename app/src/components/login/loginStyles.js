@@ -2,7 +2,7 @@
 
 import styled, { keyframes } from "styled-components";
 
-const progressBarAnimation = keyframes`
+const ProgressBarAnimation = keyframes`
   0% {
     width: 100%;
   }
@@ -20,7 +20,7 @@ export const LoginContainer = styled.div`
   align-items: center;
 `;
 
-export const greenLoginBlock = styled.div`
+export const GreenLoginBlock = styled.div`
   width: 1147px;
   height: 527px;
   border-radius: 40px;
@@ -32,7 +32,7 @@ export const greenLoginBlock = styled.div`
   );
 `;
 
-export const blueLoginBlock = styled.div`
+export const BlueLoginBlock = styled.div`
   width: 533px;
   height: 753px;
   position: absolute;
@@ -142,7 +142,7 @@ export const FormDiv = styled.div`
   }
 `;
 
-export const seePasswordDiv = styled.div`
+export const SeePasswordDiv = styled.div`
   position: absolute;
   display: flex;
   justify-content: center;
@@ -155,7 +155,7 @@ export const seePasswordDiv = styled.div`
   cursor: pointer;
 `;
 
-export const forgotPassP = styled.p`
+export const ForgotPassP = styled.p`
   font-size: 14px;
   text-align: end;
   color: ${(props) => props.theme.fonts.color};
@@ -168,11 +168,11 @@ export const forgotPassP = styled.p`
   }
 `;
 
-export const keepLoggedDiv = styled.div`
+export const KeepLoggedDiv = styled.div`
   display: flex;
   align-items: center;
 `;
-export const keepLoggedInput = styled.input.attrs({ type: "checkbox" })`
+export const KeepLoggedInput = styled.input.attrs({ type: "checkbox" })`
   margin: 0 10px;
   width: 15px;
   height: 15px;
@@ -258,6 +258,25 @@ export const ErrorMessage = styled.div`
     width: 100%;
     height: 5px;
     background-color: white; 
-    animation: ${progressBarAnimation} 2s linear forwards; 
+    animation: ${ProgressBarAnimation} 2s linear forwards; 
     border-radius: 0 0 10px 10px; 
+`;
+
+export const SkipButton = styled.button`
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  width: 40px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  height: 40px;
+  background-color: ${(props) => props.theme.colors.primary_2};
+  transform: rotate(270deg);
+
+  &:hover {
+    padding-top: 5px;
+  }
 `;

@@ -200,7 +200,7 @@ class UserController {
       }
 
       const { userId } = req.params;
-      const { name, cpf, email, password, avatar } = req.body;
+      const { name, cpf, email, password, avatar, pages } = req.body;
 
       if (!name && !cpf && !email && !password && !avatar) {
         return res.status(400).json({
@@ -218,10 +218,11 @@ class UserController {
       if (email) updateData.email = email;
       if (password) updateData.password = hashedPassword;
       if (avatar) updateData.avatar;
+      if (pages && Array.isArray(pages)) updateData.pages = pages;
 
       const user = await User.findByIdAndUpdate(userId, {
         $set: updateData,
-      }).exec();
+      }, { new: true }).exec();
 
       if (!user) {
         return res.status(404).json({

@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { loginUser } from "../../store/slicers/userSlicer.js";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 import * as styled from "./loginStyles.js";
 
@@ -10,6 +10,7 @@ import SVGLock from "../../shared/icons/login/Lock_icon.jsx";
 import SVGPerson from "../../shared/icons/login/Person_icon.jsx";
 import SVGSeePassword from "../../shared/icons/login/See_password_icon.jsx";
 import SVGWarning from "../../shared/icons/login/Warning_icon.jsx";
+import SVGArrowDown from "../../shared/icons/header/Arrow_icon.jsx";
 
 export const Login = () => {
   const [email, setEmail] = useState("");
@@ -120,9 +121,14 @@ export const Login = () => {
 
   return (
     <styled.LoginContainer>
-      <styled.greenLoginBlock>
+      <styled.GreenLoginBlock>
         <styled.BlueLoginBlockBefore />
-        <styled.blueLoginBlock>
+        <styled.BlueLoginBlock>
+          <Link to="/home">
+            <styled.SkipButton>
+              <SVGArrowDown width="25" height="25" open={false} fill="white" />
+            </styled.SkipButton>
+          </Link>
           <SVGlogowhite fill="white" width="220px" />
           <styled.LoginTitle>Login</styled.LoginTitle>
           <styled.LoginForm onSubmit={handleLoginEvent}>
@@ -161,7 +167,7 @@ export const Login = () => {
                   {passwordError}
                 </styled.ErrorOnInputField>
               )}
-              <styled.seePasswordDiv
+              <styled.SeePasswordDiv
                 onClick={() => setIsPasswordVisible((prevState) => !prevState)}
               >
                 <SVGSeePassword
@@ -169,10 +175,10 @@ export const Login = () => {
                   width="20"
                   height="20"
                 />
-              </styled.seePasswordDiv>
+              </styled.SeePasswordDiv>
             </styled.FormDiv>
             <styled.FormDiv>
-              <styled.keepLoggedDiv>
+              <styled.KeepLoggedDiv>
                 <styled.HiddenCheckbox
                   id="checkbox"
                   checked={keepConnection}
@@ -182,12 +188,12 @@ export const Login = () => {
                 <styled.KeepLoggedLabel htmlFor="checkbox">
                   Manter conectado
                 </styled.KeepLoggedLabel>
-              </styled.keepLoggedDiv>
+              </styled.KeepLoggedDiv>
               <a
                 href="https://api.whatsapp.com/send/?phone=%2B5534999232388&text=Ol%C3%A1%2C+tudo+bem%3F+Estou+com+problemas+para+fazer+login&type=phone_number&app_absent=0"
                 target="_blank"
               >
-                <styled.forgotPassP>Problemas com o Login?</styled.forgotPassP>
+                <styled.ForgotPassP>Problemas com o Login?</styled.ForgotPassP>
               </a>
             </styled.FormDiv>
             <styled.LoginButton
@@ -203,9 +209,9 @@ export const Login = () => {
               Acesso negado! credenciais inválidas.
             </styled.ErrorMessage>
           )}
-        </styled.blueLoginBlock>
+        </styled.BlueLoginBlock>
         <styled.BlueLoginBlockAfter />
-      </styled.greenLoginBlock>
+      </styled.GreenLoginBlock>
     </styled.LoginContainer>
   );
 };
