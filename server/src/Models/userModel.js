@@ -1,15 +1,17 @@
 import mongoose from "mongoose";
 import bcrypt from "bcrypt";
 
+import Employee from "./employeesModel.js";
+
 const userSchema = new mongoose.Schema({
   name: {
-    type: String,
+    type: "string",
     required: true,
   },
-  cpf: {
-    type: String,
+  employeeId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Employee",
     required: true,
-    unique: true,
   },
   email: {
     type: String,
@@ -22,10 +24,8 @@ const userSchema = new mongoose.Schema({
   },
   avatar: {
     type: String,
-  },
-  isActive: {
-    type: Boolean,
-    default: true,
+    default:
+      "https://relevium.com.br/wp-content/uploads/2015/09/default-avatar-300x300.png",
   },
   isManager: {
     type: Boolean,
@@ -35,16 +35,29 @@ const userSchema = new mongoose.Schema({
     type: [String],
     default: [],
   },
+  allowedProjects: {
+    type: [mongoose.Schema.Types.ObjectId],
+    ref: "Work",
+  },
 });
 
-userSchema.statics.isUnique = async function (cpf, email) {
+userSchema.pre("save", async function (next) {
+  if (this.isModified("employeeId")) {
+    const employee = await Employee.findById(this.employeeId);
+    if (employee) {
+      this.name = employee.name;
+    }
+  }
+  next();
+});
+
+userSchema.statics.isUnique = async function (email) {
   try {
-    if (!email || !cpf) throw new Error("Dados inválidos");
+    if (!email) throw new Error("Dados inválidos");
 
     const emailInDatabase = await this.findOne({ email });
-    const cpfInDatabase = await this.findOne({ cpf });
 
-    if (emailInDatabase || cpfInDatabase) return false;
+    if (emailInDatabase) return false;
     return true;
   } catch (err) {
     console.log("Erro ao verificar dados", err.message);

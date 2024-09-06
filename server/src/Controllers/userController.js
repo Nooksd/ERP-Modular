@@ -151,16 +151,16 @@ class UserController {
         });
       }
 
-      const { name, cpf, email, password } = req.body;
+      const { name, email, password } = req.body;
 
-      if (!name || !cpf || !email || !password) {
+      if (!name || !email || !password) {
         return res.status(400).json({
           message: "Todos os campos são obrigatórios",
           status: false,
         });
       }
 
-      const isUnique = await User.isUnique(cpf, email);
+      const isUnique = await User.isUnique(email);
 
       if (!isUnique) {
         return res.status(409).json({
@@ -173,7 +173,6 @@ class UserController {
 
       User.create({
         name,
-        cpf,
         email,
         password: hashedPassword,
       });
@@ -200,9 +199,25 @@ class UserController {
       }
 
       const { userId } = req.params;
-      const { name, cpf, email, password, avatar, pages } = req.body;
+      const {
+        employeeId,
+        email,
+        password,
+        avatar,
+        pages,
+        isManager,
+        allowedProjects,
+      } = req.body;
 
-      if (!name && !cpf && !email && !password && !avatar) {
+      if (
+        !employeeId &&
+        !email &&
+        !password &&
+        !avatar &&
+        !pages &&
+        !isManager &&
+        !allowedProjects
+      ) {
         return res.status(400).json({
           message: "Nenhum dado para atualizar",
           status: false,
@@ -213,16 +228,22 @@ class UserController {
       if (password) hashedPassword = bcrypt.hashSync(password, 10);
 
       const updateData = {};
-      if (name) updateData.name = name;
-      if (cpf) updateData.cpf = cpf;
+      if (employeeId) updateData.name = employeeId;
       if (email) updateData.email = email;
       if (password) updateData.password = hashedPassword;
-      if (avatar) updateData.avatar;
+      if (avatar) updateData.avatar = avatar;
+      if (isManager === true || isManager === false) updateData.isManager = isManager;
       if (pages && Array.isArray(pages)) updateData.pages = pages;
 
-      const user = await User.findByIdAndUpdate(userId, {
-        $set: updateData,
-      }, { new: true }).exec();
+      console.log(updateData)
+
+      const user = await User.findByIdAndUpdate(
+        userId,
+        {
+          $set: updateData,
+        },
+        { new: true }
+      ).exec();
 
       if (!user) {
         return res.status(404).json({

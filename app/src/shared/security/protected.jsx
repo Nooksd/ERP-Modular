@@ -53,8 +53,8 @@ const ProtectedRoute = ({ children }) => {
     if (normalizedComponentName === "home") {
       return children;
     }
-    
-    if (normalizedComponentName === "usuarios" &&  user.isManager) {
+
+    if (normalizedComponentName === "usuarios" && user.isManager) {
       return children;
     }
   }
