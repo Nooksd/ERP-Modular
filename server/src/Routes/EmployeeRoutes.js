@@ -19,7 +19,6 @@ EmployeeRoutes.get(
   JWT.validateAccessToken,
   EmployeeController.getAllEmployees
 );
-EmployeeRoutes.put("/toggle-activiy", JWT.validateAccessToken, EmployeeController.toggleActiviy);
 EmployeeRoutes.put(
   "/:employeeId",
   JWT.validateAccessToken,

@@ -35,10 +35,6 @@ const userSchema = new mongoose.Schema({
     type: [String],
     default: [],
   },
-  allowedProjects: {
-    type: [mongoose.Schema.Types.ObjectId],
-    ref: "Work",
-  },
 });
 
 userSchema.pre("save", async function (next) {

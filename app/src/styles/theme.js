@@ -8,6 +8,7 @@ const generalColors = {
   secundary_1: "#95C11F",
   secundary_2: "#B0D159",
   secundary_3: "#F3F9E6",
+  grey: "#E6E6E6",
 
   danger: "#cc3333",
   dangerText: "#87141f",

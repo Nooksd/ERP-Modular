@@ -4,6 +4,35 @@ import WorkController from "../Controllers/workController.js";
 
 const WorkRoutes = express.Router();
 
-WorkRoutes.get("/teste", WorkController.teste);
+WorkRoutes.get(
+  "/get-one/:workId",
+  JWT.validateAccessToken,
+  WorkController.getWork
+);
+WorkRoutes.get(
+  "/get-user-works",
+  JWT.validateAccessToken,
+  WorkController.getUserWorks
+);
+WorkRoutes.post(
+  "/add-work",
+  JWT.validateAccessToken,
+  WorkController.createWork
+);
+WorkRoutes.get(
+  "/get-all-works",
+  JWT.validateAccessToken,
+  WorkController.getAllWorks
+);
+WorkRoutes.put(
+  "/:workId",
+  JWT.validateAccessToken,
+  WorkController.updateWork
+);
+WorkRoutes.delete(
+  "/delete/:workId",
+  JWT.validateAccessToken,
+  WorkController.deleteWork
+);
 
 export default WorkRoutes;

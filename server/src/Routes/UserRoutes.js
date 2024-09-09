@@ -24,5 +24,6 @@ userRoutes.get(
 );
 userRoutes.get("/:userId", JWT.validateAccessToken, UserController.getUserById);
 userRoutes.put("/:userId", JWT.validateAccessToken, UserController.updateUser);
+userRoutes.delete("/delete/:userId", JWT.validateAccessToken, UserController.deleteUser);
 
 export default userRoutes;

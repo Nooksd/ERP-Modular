@@ -1,8 +1,37 @@
 import Employee from "../Models/employeesModel.js";
 
 class EmployeeController {
-  static getEmployee(req, res) {
-    res.json("Hello World!");
+  static async getEmployee(req, res) {
+    try {
+      if (!req.user.user.isManager) {
+        return res.status(403).json({
+          message: "Sem permissão",
+          status: false,
+        });
+      }
+
+      const { employeeId } = req.params;
+
+      const employee = await Employee.findById(employeeId).exec();
+
+      if (!employee) {
+        return res.status(404).json({
+          message: "Funcionário não encontrado",
+          status: false,
+        });
+      }
+
+      res.status(200).json({
+        message: "Funcionário encontrado com sucesso",
+        employee,
+        status: true,
+      });
+    } catch (e) {
+      res.status(500).json({
+        message: "Erro interno do servidor",
+        status: false,
+      });
+    }
   }
   static async createEmployee(req, res) {
     try {
@@ -41,7 +70,7 @@ class EmployeeController {
       });
 
       res.status(201).json({
-        message: "Usuário criado com sucesso",
+        message: "Funcionário criado com sucesso",
         status: true,
       });
     } catch (e) {
@@ -51,17 +80,137 @@ class EmployeeController {
       });
     }
   }
-  static getAllEmployees(req, res) {
-    res.json("Hello World!");
+  static async getAllEmployees(req, res) {
+    try {
+      if (!req.user.user.isManager) {
+        return res.status(403).json({
+          message: "Sem permissão",
+          status: false,
+        });
+      }
+
+      const { page = 1, limit = 10 } = req.query;
+
+      const employees = await Employee.find()
+        .limit(limit * 1)
+        .skip((page - 1) * limit)
+        .exec();
+
+      res.status(200).json({
+        message: "Funcionários listados com sucesso",
+        employees,
+        status: true,
+      });
+    } catch (e) {
+      res.status(500).json({
+        message: "Erro interno do servidor",
+        status: false,
+      });
+    }
   }
-  static updateEmployee(req, res) {
-    res.json("Hello World!");
+  static async updateEmployee(req, res) {
+    try {
+      if (!req.user.user.isManager) {
+        return res.status(403).json({
+          message: "Sem permissão",
+          status: false,
+        });
+      }
+
+      const { employeeId } = req.params;
+      const {
+        name,
+        cpf,
+        email,
+        position,
+        department,
+        startDate,
+        isActive,
+        managerId,
+      } = req.body;
+
+      if (
+        !name &&
+        !email &&
+        !cpf &&
+        !position &&
+        !department &&
+        !startDate &&
+        isActive !== true &&
+        isActive !== false &&
+        !managerId
+      ) {
+        return res.status(400).json({
+          message: "Nenhum dado para atualizar",
+          status: false,
+        });
+      }
+
+      const updateData = {};
+      if (name) updateData.name = name;
+      if (email) updateData.email = email;
+      if (cpf) updateData.cpf = cpf;
+      if (position) updateData.position = position;
+      if (department) updateData.department = department;
+      if (startDate) updateData.startDate = startDate;
+      if (isActive === true || isActive === false)
+        updateData.isActive = isActive;
+      if (managerId && Array.isArray(managerId))
+        updateData.managerId = managerId;
+
+      const employee = await Employee.findByIdAndUpdate(
+        employeeId,
+        {
+          $set: updateData,
+        },
+        { new: true }
+      ).exec();
+
+      if (!employee) {
+        return res.status(404).json({
+          message: "Funcionário não encontrado",
+          status: false,
+        });
+      }
+
+      res.status(200).json({
+        message: "Funcionário atualizado com sucesso",
+        employee,
+        status: true,
+      });
+    } catch (e) {
+      res.status(500).json({
+        message: "Erro interno do servidor",
+        status: false,
+      });
+    }
   }
-  static toggleActiviy(req, res) {
-    res.json("Hello World!");
-  }
-  static deleteEmployee(req, res) {
-    res.json("Hello World!");
+  static async deleteEmployee(req, res) {
+    try {
+      if (!req.user.user.isManager) {
+        return res.status(403).json({
+          message: "Sem permissão",
+          status: false,
+        });
+      }
+      const { employeeId } = req.params;
+      const employee = await Employee.findByIdAndDelete(employeeId).exec();
+      if (!employee) {
+        return res.status(404).json({
+          message: "Funcionário não encontrado",
+          status: false,
+        });
+      }
+      res.status(200).json({
+        message: "Funcionário excluído com sucesso",
+        status: true,
+      });
+    } catch (e) {
+      res.status(500).json({
+        message: "Erro interno do servidor",
+        status: false,
+      });
+    }
   }
 }
 

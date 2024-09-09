@@ -1,21 +1,40 @@
-import Hamburguer from "../../shared/includes/hamburguer/hamburguer";
-import Header from "../../shared/includes/header/header";
+import { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchUserWorks } from "../../store/slicers/worksSlicer";
 
-import SVGHHControll from "../../shared/icons/hamburguer/HHControll_icon";
-
-import { NavbarMenuContentContainer, NavbarContentContainer } from "../../styles/global";
+import * as styled from "./controleHHStyles.js";
 
 export const ControleHH = () => {
+  const works = useSelector((state) => state.works);
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    if (!works || works.status !== "succeeded") {
+      dispatch(fetchUserWorks());
+    }
+  }, [dispatch]);
+
   return (
-    <NavbarMenuContentContainer>
-      <Hamburguer />
-      <NavbarContentContainer>
-      <Header page="Controle HH" logged={true}>
-        <SVGHHControll width="40" height="40" />
-      </Header>
-      <h1>Controle de HH</h1>
-      <p>Bem-vindo ao controle de HH</p>
-      </NavbarContentContainer>
-    </NavbarMenuContentContainer>
+    <styled.controllContainer>
+      <styled.contentDiv>
+        <styled.titleDiv>Usinas</styled.titleDiv>
+        {works.status === "loading" && <p>Carregando...</p>}
+        {works.status === "succeeded" && (
+          <ul>
+            {works.works.userWorks.map((work) => (
+              <li key={work._id}>{work.name}</li>
+            ))}
+          </ul>
+        )}
+        {works.status === "failed" && <p>Erro ao carregar as usinas.</p>}
+      </styled.contentDiv>
+      <styled.contentDiv>
+        <styled.titleDiv
+          style={{ justifyContent: "start", paddingLeft: "55px" }}
+        >
+          Controle diário da usina
+        </styled.titleDiv>
+      </styled.contentDiv>
+    </styled.controllContainer>
   );
 };

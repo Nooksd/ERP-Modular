@@ -3,7 +3,7 @@ import styled, { keyframes, css } from "styled-components";
 const slideIn = keyframes`
   from {
     opacity: 0;
-    transform: translateX(-20px);
+    transform: translateX(-50px);
   }
   to {
     opacity: 1;
@@ -18,7 +18,7 @@ const slideOut = keyframes`
   }
   to {
     opacity: 0;
-    transform: translateX(-20px);
+    transform: translateX(-50px);
   }
 `;
 
@@ -75,6 +75,9 @@ export const MenuIten = styled.div`
   align-items: center;
   justify-content: center;
   cursor: pointer;
+
+  border-right: ${(props) => (props.$isActive ? "4px solid #fff" : "none")}; 
+  transition: border-right 0.3s ease, background-color 0.3s ease; 
 `;
 
 export const ItenText = styled.span`

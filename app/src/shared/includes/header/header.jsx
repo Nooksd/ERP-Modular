@@ -14,7 +14,7 @@ import SVGArrowDown from "../../icons/header/Arrow_icon.jsx";
 import SVGExit from "../../icons/header/Exit_icon.jsx";
 import SVGProfile from "../../icons/header/Profile_icon.jsx";
 
-const Header = ({ logged, page, children }) => {
+const Header = ({ logged, page, icon }) => {
   const { user } = useSelector((state) => state.user);
   const [avatar, setAvatar] = useState("");
   const [open, setOpen] = useState(false);
@@ -42,7 +42,7 @@ const Header = ({ logged, page, children }) => {
   return (
     <styled.NavBar>
       <styled.NavItem1>
-        {children}
+        {icon}
         <styled.NavTitle>{page}</styled.NavTitle>
       </styled.NavItem1>
       <styled.NavItem2>

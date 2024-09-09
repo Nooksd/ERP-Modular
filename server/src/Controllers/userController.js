@@ -215,7 +215,8 @@ class UserController {
         !password &&
         !avatar &&
         !pages &&
-        !isManager &&
+        isManager !== true &&
+        isManager !== false &&
         !allowedProjects
       ) {
         return res.status(400).json({
@@ -228,14 +229,13 @@ class UserController {
       if (password) hashedPassword = bcrypt.hashSync(password, 10);
 
       const updateData = {};
-      if (employeeId) updateData.name = employeeId;
+      if (employeeId) updateData.employeeId = employeeId;
       if (email) updateData.email = email;
       if (password) updateData.password = hashedPassword;
       if (avatar) updateData.avatar = avatar;
-      if (isManager === true || isManager === false) updateData.isManager = isManager;
+      if (isManager === true || isManager === false)
+        updateData.isManager = isManager;
       if (pages && Array.isArray(pages)) updateData.pages = pages;
-
-      console.log(updateData)
 
       const user = await User.findByIdAndUpdate(
         userId,
@@ -318,6 +318,38 @@ class UserController {
       res.status(200).json({
         message: "Usuários listados com sucesso",
         users,
+        status: true,
+      });
+    } catch (e) {
+      res.status(500).json({
+        message: "Erro interno do servidor",
+        status: false,
+      });
+    }
+  }
+
+  static async deleteUser(req, res) {
+    try {
+      if (!req.user.user.isManager) {
+        return res.status(403).json({
+          message: "Sem permissão",
+          status: false,
+        });
+      }
+
+      const { userId } = req.params;
+
+      const user = await User.findByIdAndDelete(userId).exec();
+
+      if (!user) {
+        return res.status(404).json({
+          message: "Usuário não encontrado",
+          status: false,
+        });
+      }
+
+      res.status(200).json({
+        message: "Usuário excluído com sucesso",
         status: true,
       });
     } catch (e) {
