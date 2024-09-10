@@ -64,8 +64,6 @@ export const IconsDiv = styled.div`
   width: 100%;
   display: flex;
   flex-direction: column;
-  justify-content: start;
-  align-items: center;
   gap: 23px;
 `;
 
@@ -76,7 +74,7 @@ export const MenuIten = styled.div`
   justify-content: center;
   cursor: pointer;
 
-  border-right: ${(props) => (props.$isActive ? "4px solid #fff" : "none")}; 
+  border-right: ${(props) => (props.$isActive ? "4px solid" + props.theme.colors.secundary_1 : "none")}; 
   transition: border-right 0.3s ease, background-color 0.3s ease; 
 `;
 

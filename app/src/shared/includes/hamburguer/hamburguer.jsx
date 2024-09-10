@@ -48,7 +48,7 @@ const Hamburguer = ({ user }) => {
           );
         })}
         {user.isManager && (
-          <Link to="/usuarios">
+          <Link to="/usuarios" style={{ "width": "100%"}}>
             <styled.MenuIten $isActive={location.pathname === "/usuarios"}>
               <styled.IconWrapper>
                 <SVGUsers />

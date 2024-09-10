@@ -19,23 +19,6 @@ const hhrecordSchema = new mongoose.Schema(
     hhrecord: {
       type: [
         {
-          worked: [
-            {
-              role: {
-                type: String,
-                required: true,
-              },
-              quantity: {
-                type: Number,
-                required: true,
-                default: 1,
-              },
-              hours: {
-                type: Number,
-                required: true,
-              },
-            },
-          ],
           area: {
             type: String,
             required: true,
@@ -52,6 +35,23 @@ const hhrecordSchema = new mongoose.Schema(
             type: String,
             default: "",
           },
+          roles: [
+            {
+              role: {
+                type: String,
+                required: true,
+              },
+              quantity: {
+                type: Number,
+                required: true,
+                default: 1,
+              },
+              hours: {
+                type: Number,
+                required: true,
+              },
+            },
+          ],
         },
       ],
       validate: {
