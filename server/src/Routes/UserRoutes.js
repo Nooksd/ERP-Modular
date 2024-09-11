@@ -6,24 +6,24 @@ import {
   userValidator,
 } from "../Middlewares/validateCredentials.js";
 
-const userRoutes = express.Router();
+const UserRoutes = express.Router();
 
-userRoutes.post("/login", userLoginCheck, userValidator, UserController.Login);
-userRoutes.post("/logout", JWT.validateAccessToken, UserController.logout);
-userRoutes.get("/refresh-token", UserController.refreshToken);
-userRoutes.get("/profile", JWT.validateAccessToken, UserController.getProfile);
-userRoutes.post(
+UserRoutes.post("/login", userLoginCheck, userValidator, UserController.Login);
+UserRoutes.post("/logout", JWT.validateAccessToken, UserController.logout);
+UserRoutes.get("/refresh-token", UserController.refreshToken);
+UserRoutes.get("/profile", JWT.validateAccessToken, UserController.getProfile);
+UserRoutes.post(
   "/create-user",
   JWT.validateAccessToken,
   UserController.createUser
 );
-userRoutes.get(
+UserRoutes.get(
   "/get-all-users",
   JWT.validateAccessToken,
   UserController.getAllUsers
 );
-userRoutes.get("/:userId", JWT.validateAccessToken, UserController.getUserById);
-userRoutes.put("/:userId", JWT.validateAccessToken, UserController.updateUser);
-userRoutes.delete("/delete/:userId", JWT.validateAccessToken, UserController.deleteUser);
+UserRoutes.get("/:userId", JWT.validateAccessToken, UserController.getUserById);
+UserRoutes.put("/:userId", JWT.validateAccessToken, UserController.updateUser);
+UserRoutes.delete("/delete/:userId", JWT.validateAccessToken, UserController.deleteUser);
 
-export default userRoutes;
+export default UserRoutes;

@@ -14,6 +14,8 @@ export const contentDiv = styled.div`
   width: 100%;
   height: 100%;
   position: relative;
+  display: flex;
+  flex-direction: column;
   border: 3px solid ${(props) => props.theme.colors.grey};
 `;
 
@@ -27,6 +29,7 @@ export const titleDiv = styled.div`
   border-bottom: 3px solid ${(props) => props.theme.colors.grey};
   font-size: 20px;
   font-weight: 600;
+  position: relative;
   color: ${(props) => props.theme.colors.primary_dark};
 `;
 
@@ -52,7 +55,7 @@ export const work = styled.li`
     props.$isSelected ? props.theme.colors.secundary_2 : "transparent"};
 
   &:hover {
-    background-color: ${(props) => props.theme.colors.secundary_2};
+    background-color: ${(props) => props.theme.colors.secundary_1};
     color: ${(props) => props.theme.fonts.color};
     transition: background-color 0.1s ease;
   }
@@ -68,17 +71,49 @@ export const calendarContainer = styled.div`
   left: 100%;
 `;
 
+export const placeAndDateDiv = styled.div`
+  position: absolute;
+  top: 50%;
+  right: 50%;
+  transform: translateY(-50%);
+  font-size: 12px;
+  font-style: italic;
+  font-weight: 400;
+`;
+
+export const getLastHHRecordButton = styled.div`
+  position: absolute;
+  top: 50%;
+  right: 20px;
+  transform: translateY(-50%);
+  width: 30px;
+  height: 30px;
+  background-color: ${(props) => props.theme.colors.secundary_2};
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &:hover {
+    background-color: ${(props) => props.theme.colors.secundary_1};
+    transition: background-color 0.1s ease;
+  }
+`;
+
 export const hhRecordDiv = styled.div`
   width: 100%;
-  height: 720px;
+  height: 100%;
+  max-height: calc(${(props) => props.$windowHeight}px - 253px);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: start;
   gap: 15px;
   padding: 20px;
-  margin: 10px 1px;
+  margin: 10px 1px 0 0;
   overflow-y: scroll;
+  border-bottom: 3px solid ${(props) => props.theme.colors.grey};
 
   &::-webkit-scrollbar {
     width: 8px;
@@ -112,13 +147,18 @@ export const visibleActivityDiv = styled.div`
   width: 100%;
   height: 45px;
   display: flex;
-  gap: 20px;
   align-items: center;
   justify-content: start;
 `;
 
+export const ActivitySelect = styled.select`
+  width: min-content;
+  padding: 0 10px;
+  height: 100%;
+`;
+
 export const hiddenActivityDiv = styled.div`
-  width: 85%;
+  width: 80%;
   min-height: 45px;
   display: flex;
   flex-direction: column;
@@ -139,11 +179,18 @@ export const openActivityButton = styled.button`
   color: ${(props) => props.theme.colors.secundary_2};
   cursor: pointer;
   font-size: 26px;
+
+  &:hover {
+    border-color: ${(props) => props.theme.colors.secundary_1};
+    color: ${(props) => props.theme.colors.secundary_1};
+    transition: background-color 0.1s ease;
+  }
 `;
 
 export const activityInputDiv = styled.div`
   width: 100%;
   height: 45px;
+  padding: 0 20px;
   border: 3px solid ${(props) => props.theme.colors.grey};
   border-radius: 10px;
   display: flex;
@@ -164,6 +211,7 @@ export const deleteButton = styled.button`
   cursor: pointer;
   background: none;
   border: 3px solid ${(props) => props.theme.colors.danger};
+  opacity: 0.9;
 
   &:hover {
     background: ${(props) => props.theme.colors.danger};
@@ -189,4 +237,26 @@ export const addOneMoreButton = styled.button`
   border-radius: 10px;
   color: ${(props) => props.theme.fonts.color};
   font-size: 32px;
+  cursor: pointer;
+
+  &:hover {
+    background-color: ${(props) => props.theme.colors.secundary_1};
+    transition: background-color 0.1s ease;
+  }
+`;
+
+export const finalCheckDiv = styled.div`
+  width: 100%;
+  height: 100px;
+  display: flex;
+  align-items: center;
+  padding-right: 50px;
+  justify-content: end;
+  position: relative;
+`;
+
+export const summaryDiv = styled.div`
+  font-size: 12px;
+  font-style: italic;
+  font-weight: 400;
 `;

@@ -16,7 +16,7 @@ const hhrecordSchema = new mongoose.Schema(
       type: Date,
       required: true,
     },
-    hhrecord: {
+    hhRecords: {
       type: [
         {
           area: {

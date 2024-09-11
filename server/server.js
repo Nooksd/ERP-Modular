@@ -9,10 +9,11 @@ const app = express();
 const port = 3000;
 
 import "./db/database.js";
-import userRoutes from "./src/Routes/UserRoutes.js";
-import hhControllerRoutes from "./src/Routes/ControleHHRoutes.js";
+import UserRoutes from "./src/Routes/UserRoutes.js";
+import HHControllerRoutes from "./src/Routes/ControleHHRoutes.js";
 import WorkRoutes from "./src/Routes/WorkRoutes.js";
 import EmployeeRoutes from "./src/Routes/EmployeeRoutes.js";
+import ActivityRoutes from "./src/Routes/activityRoutes.js";
 
 app.use(
   cors({
@@ -33,10 +34,11 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
-app.use("/api/user", userRoutes);
-app.use("/api/hhcontroll", hhControllerRoutes);
+app.use("/api/user", UserRoutes);
+app.use("/api/hhcontroll", HHControllerRoutes);
 app.use("/api/work", WorkRoutes);
 app.use("/api/employee", EmployeeRoutes);
+app.use("/api/activity", ActivityRoutes);
 
 app.use("/*", (req, res) => {
   res.status(404).json({
