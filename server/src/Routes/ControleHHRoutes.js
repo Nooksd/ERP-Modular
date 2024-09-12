@@ -4,6 +4,6 @@ import HHControllController from "../Controllers/hhControllController.js";
 
 const HHControllerRoutes = express.Router();
 
-HHControllerRoutes.get("/teste", HHControllController.teste);
+HHControllerRoutes.get("/sendHH", HHControllController.sendHH);
 
 export default HHControllerRoutes;

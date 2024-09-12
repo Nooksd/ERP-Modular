@@ -33,6 +33,10 @@ const hhrecordSchema = new mongoose.Schema(
           },
           workDescription: {
             type: String,
+            required: true,
+          },
+          indicative: {
+            type: Number,
             default: "",
           },
           roles: [

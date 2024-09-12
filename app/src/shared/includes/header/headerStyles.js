@@ -15,6 +15,7 @@ export const NavBar = styled.nav`
   height: 75px;
   display: flex;
   align-items: center;
+  z-index: 9999;
   justify-content: space-between;
   padding: 10px 27px;
   background-image: linear-gradient(

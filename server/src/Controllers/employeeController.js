@@ -42,9 +42,9 @@ class EmployeeController {
         });
       }
 
-      const { name, cpf, position, department, email, startDate } = req.body;
+      const { name, cpf, position, email, startDate } = req.body;
 
-      if (!name || !cpf || !position || !department) {
+      if (!name || !cpf || !position) {
         return res.status(400).json({
           message: "Todos os campos são obrigatórios",
           status: false,
@@ -64,7 +64,6 @@ class EmployeeController {
         name,
         cpf,
         position,
-        department,
         email,
         startDate,
       });
@@ -123,7 +122,6 @@ class EmployeeController {
         cpf,
         email,
         position,
-        department,
         startDate,
         isActive,
         managerId,
@@ -134,7 +132,6 @@ class EmployeeController {
         !email &&
         !cpf &&
         !position &&
-        !department &&
         !startDate &&
         isActive !== true &&
         isActive !== false &&
@@ -151,7 +148,6 @@ class EmployeeController {
       if (email) updateData.email = email;
       if (cpf) updateData.cpf = cpf;
       if (position) updateData.position = position;
-      if (department) updateData.department = department;
       if (startDate) updateData.startDate = startDate;
       if (isActive === true || isActive === false)
         updateData.isActive = isActive;

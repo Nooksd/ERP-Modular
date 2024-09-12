@@ -1,5 +1,17 @@
 import mongoose from "mongoose";
 
+const subActivitySchema = new mongoose.Schema({
+  subactivity: {
+    type: String,
+    required: true,
+  },
+  haveIndicative: {
+    type: Boolean,
+    default: false,
+    required: true,
+  },
+});
+
 const activitySchema = new mongoose.Schema({
   area: {
     type: String,
@@ -14,8 +26,9 @@ const activitySchema = new mongoose.Schema({
           required: true,
         },
         subactivities: {
-          type: [String],
+          type: [subActivitySchema], 
           required: true,
+          default: [],
         },
       },
     ],

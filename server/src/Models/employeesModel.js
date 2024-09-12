@@ -17,12 +17,9 @@ const employeeSchema = new mongoose.Schema(
       type: String,
       default: "",
     },
-    position: {
-      type: String,
-      required: true,
-    },
-    department: {
-      type: String,
+    Role: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Role",
       required: true,
     },
     startDate: {

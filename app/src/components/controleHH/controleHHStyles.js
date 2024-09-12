@@ -150,11 +150,36 @@ export const visibleActivityDiv = styled.div`
   align-items: center;
   justify-content: start;
 `;
-
 export const ActivitySelect = styled.select`
-  width: min-content;
-  padding: 0 10px;
+  width: 400px;
   height: 100%;
+`;
+
+export const ActivityCommentInput = styled.input`
+  width: 100%;
+  height: 100%;
+  padding: 5px 10px;
+  border-left: 3px solid ${(props) => props.theme.colors.grey};
+
+  &::-webkit-outer-spin-button,
+  &::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+`;
+
+export const ActivityIndicativeInput = styled.input`
+  width: 45px;
+  height: 100%;
+  text-align: center;
+  border-left: 3px solid ${(props) => props.theme.colors.grey};
+  border-right: 3px solid ${(props) => props.theme.colors.grey};
+
+  &::-webkit-outer-spin-button,
+  &::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
 `;
 
 export const hiddenActivityDiv = styled.div`
@@ -190,8 +215,11 @@ export const openActivityButton = styled.button`
 export const activityInputDiv = styled.div`
   width: 100%;
   height: 45px;
-  padding: 0 20px;
-  border: 3px solid ${(props) => props.theme.colors.grey};
+  padding: 0 50px 0 20px;
+
+  border: 3px solid
+    ${(props) =>
+      props.$error ? props.theme.colors.danger : props.theme.colors.grey};
   border-radius: 10px;
   display: flex;
   position: relative;

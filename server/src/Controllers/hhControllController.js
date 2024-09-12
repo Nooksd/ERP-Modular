@@ -1,5 +1,7 @@
+import HHrecords from "../Models/hhrecordsModel.js";
+
 class HHControllController {
-  static teste(req, res) {
+  static sendHH(req, res) {
     res.send("Hello World!");
   }
 }

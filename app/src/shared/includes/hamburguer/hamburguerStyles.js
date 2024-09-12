@@ -29,6 +29,7 @@ export const Hamburger = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: start;
+  z-index: 9999;
   align-items: center;
   height: 100dvh;
   background-image: linear-gradient(

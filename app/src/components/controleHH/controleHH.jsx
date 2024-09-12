@@ -5,6 +5,7 @@ import { useEffect, useState, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchUserWorks } from "../../store/slicers/worksSlicer";
 import { fetchActivities } from "../../store/slicers/activitySlicer.js";
+import { fetchFieldRoles } from "../../store/slicers/fieldRoleSlicer.js";
 
 // -imports Componentes- >
 import Calendar from "../../shared/includes/calendar/calendar.jsx";
@@ -31,6 +32,7 @@ export const ControleHH = () => {
   // -Declaracoes da página- >
   const works = useSelector((state) => state.works);
   const activities = useSelector((state) => state.activity);
+  const fieldRoles = useSelector((state) => state.fieldRoles);
   const dispatch = useDispatch();
   const date = new Date();
 
@@ -52,6 +54,7 @@ export const ControleHH = () => {
   });
 
   const emptyRole = {
+    error: false,
     role: "",
     quantity: "",
     hours: "",
@@ -59,10 +62,12 @@ export const ControleHH = () => {
 
   const emptyActivity = {
     open: false,
+    error: false,
     area: "",
     activity: "",
-    subActivity: "",
+    subactivity: "",
     workDescription: "",
+    indicative: "",
     roles: [{ ...emptyRole }],
   };
 
@@ -81,6 +86,12 @@ export const ControleHH = () => {
   useEffect(() => {
     if (works.status == "succeeded" && activities.status !== "succeeded") {
       dispatch(fetchActivities());
+    }
+  }, [dispatch, works.status]);
+
+  useEffect(() => {
+    if (works.status == "succeeded" && fieldRoles.status !== "succeeded") {
+      dispatch(fetchFieldRoles());
     }
   }, [dispatch, works.status]);
 
@@ -127,19 +138,24 @@ export const ControleHH = () => {
   useEffect(() => {
     const totalHours = hhRecords.reduce((total, activity) => {
       const validRoles = activity.roles.filter(
-        (role) => role.hours.trim() !== "" && !isNaN(parseFloat(role.hours))
+        (role) => role.hours !== "" && !isNaN(parseFloat(role.hours))
       );
       return (
         total +
         validRoles.reduce((roleTotal, role) => {
-          return roleTotal + parseFloat(role.hours);
+          const hours = parseFloat(role.hours);
+          const quantity = parseInt(role.quantity, 10);
+
+          const totalRoleHours = hours * (isNaN(quantity) ? 0 : quantity);
+
+          return roleTotal + totalRoleHours;
         }, 0)
       );
     }, 0);
 
     const totalRoles = hhRecords.reduce((total, activity) => {
       const validRolesSum = activity.roles.reduce((sum, role) => {
-        const quantity = parseFloat(role.quantity.trim());
+        const quantity = parseInt(role.quantity);
         return sum + (isNaN(quantity) ? 0 : quantity);
       }, 0);
       return total + validRolesSum;
@@ -149,7 +165,7 @@ export const ControleHH = () => {
       (activity) =>
         activity.area.trim() !== "" &&
         activity.activity.trim() !== "" &&
-        activity.subActivity.trim() !== "" &&
+        activity.subactivity.trim() !== "" &&
         activity.workDescription.trim() !== ""
     ).length;
 
@@ -214,6 +230,9 @@ export const ControleHH = () => {
         return {
           ...activity,
           area: value,
+          error: false,
+          activity: "",
+          subactivity: "",
         };
       } else {
         return activity;
@@ -229,6 +248,136 @@ export const ControleHH = () => {
         return {
           ...activity,
           activity: value,
+          error: false,
+          subactivity: "",
+        };
+      } else {
+        return activity;
+      }
+    });
+
+    setHHRecords(newHHRecords);
+  };
+
+  const handleSelectSubactivity = (index, value) => {
+    const newHHRecords = hhRecords.map((activity, i) => {
+      if (i === index) {
+        return {
+          ...activity,
+          error: false,
+          subactivity: value,
+        };
+      } else {
+        return activity;
+      }
+    });
+
+    setHHRecords(newHHRecords);
+  };
+
+  const handleInputComment = (index, value) => {
+    const newHHRecords = hhRecords.map((activity, i) => {
+      if (i === index) {
+        return {
+          ...activity,
+          error: false,
+          workDescription: value,
+        };
+      } else {
+        return activity;
+      }
+    });
+
+    setHHRecords(newHHRecords);
+  };
+  const handleInputIndicative = (index, value) => {
+    const newHHRecords = hhRecords.map((activity, i) => {
+      if (i === index) {
+        return {
+          ...activity,
+          error: false,
+          indicative: value,
+        };
+      } else {
+        return activity;
+      }
+    });
+
+    setHHRecords(newHHRecords);
+  };
+
+  const handleSelectRole = (index, roleIndex, value) => {
+    const newHHRecords = hhRecords.map((activity, i) => {
+      if (i === index) {
+        return {
+          ...activity,
+          error: false,
+          roles: activity.roles.map((role, j) => {
+            if (j === roleIndex) {
+              return { ...role, role: value, error: false };
+            }
+            return role;
+          }),
+        };
+      } else {
+        return activity;
+      }
+    });
+
+    setHHRecords(newHHRecords);
+  };
+
+  const handleInputQuantity = (index, roleIndex, value) => {
+    let quantity = parseInt(value.replace(/[^0-9]/g, ""), 10);
+
+    if (isNaN(quantity) || quantity < 0) quantity = "";
+    if (quantity > 100) quantity = 100;
+
+    const newHHRecords = hhRecords.map((activity, i) => {
+      if (i === index) {
+        return {
+          ...activity,
+          error: false,
+          roles: activity.roles.map((role, j) => {
+            if (j === roleIndex) {
+              return {
+                ...role,
+                error: false,
+                quantity: quantity,
+              };
+            }
+            return role;
+          }),
+        };
+      } else {
+        return activity;
+      }
+    });
+
+    setHHRecords(newHHRecords);
+  };
+
+  const handleInputHours = (index, roleIndex, value) => {
+    let hours = parseInt(value.replace(/[^0-9]/g, ""), 10);
+
+    if (isNaN(hours) || hours < 0) hours = "";
+    if (hours > 24) hours = 24;
+
+    const newHHRecords = hhRecords.map((activity, i) => {
+      if (i === index) {
+        return {
+          ...activity,
+          error: false,
+          roles: activity.roles.map((role, j) => {
+            if (j === roleIndex) {
+              return {
+                ...role,
+                error: false,
+                hours: hours,
+              };
+            }
+            return role;
+          }),
         };
       } else {
         return activity;
@@ -239,8 +388,57 @@ export const ControleHH = () => {
   };
 
   const handleSendHHRecord = () => {
-    alert("Sending HH Record");
+    const isValid = validateHHRecord();
+
+    if (isValid) {
+      alert("Sending HH Record");
+    }
   };
+
+  // -Funções de uso interno- >
+  function validateHHRecord() {
+    let isValid = true;
+
+    const newHHRecords = hhRecords.map((activity) => {
+      let hasError = false;
+      let hasRoleError = false;
+
+      if (
+        activity.area.trim() === "" ||
+        activity.activity.trim() === "" ||
+        activity.subactivity.trim() === "" ||
+        activity.workDescription.trim() === ""
+      ) {
+        hasError = true;
+        isValid = false;
+      }
+
+      const newRoles = activity.roles.map((role) => {
+        const roleHasError =
+          role.role.trim() === "" || role.quantity === "" || role.hours === "";
+
+        if (roleHasError) {
+          hasRoleError = true;
+          isValid = false;
+        }
+
+        return {
+          ...role,
+          error: roleHasError,
+        };
+      });
+
+      return {
+        ...activity,
+        open: hasRoleError ? true : activity.open,
+        roles: newRoles,
+        error: hasError,
+      };
+    });
+
+    setHHRecords(newHHRecords);
+    return isValid;
+  }
 
   // -Dinamic page Content Renders- >
   const renderWorks = () => {
@@ -294,47 +492,67 @@ export const ControleHH = () => {
                 >
                   {hhRecords[index].open ? "-" : "+"}
                 </styled.openActivityButton>
-                <styled.activityInputDiv style={{ marginLeft: 20 }}>
+                <styled.activityInputDiv
+                  style={{ marginLeft: 20 }}
+                  $error={hhRecords[index].error}
+                >
                   <styled.ActivitySelect
+                    value={activity.area}
+                    name="area"
                     onChange={(e) => handleSelectArea(index, e.target.value)}
                   >
-                    <option value="">Área</option>
+                    <option value="">Selecionar Área</option>
                     {activities &&
                       activities.activities.map((activity) => (
-                        <option key={activity._id} value={activity._id}>
+                        <option key={activity._id} value={activity.area}>
                           {activity.area}
                         </option>
                       ))}
                   </styled.ActivitySelect>
                   <styled.ActivitySelect
+                    value={activity.activity}
+                    name="activity"
                     onChange={(e) =>
                       handleSelectActivity(index, e.target.value)
                     }
                   >
-                    <option value="">Atividades</option>
+                    <option value="">Selecionar Atividade</option>
                     {hhRecords[index].area &&
                       activities.activities.map((area) => {
-                        if (area._id === hhRecords[index].area) {
+                        if (area.area === hhRecords[index].area) {
                           return area.activities.map((activity) => (
-                            <option key={activity._id} value={activity._id}>
+                            <option
+                              key={activity._id}
+                              value={activity.activity}
+                            >
                               {activity.activity}
                             </option>
                           ));
                         }
                       })}
                   </styled.ActivitySelect>
-                  <styled.ActivitySelect>
-                    <option value="">Subatividades</option>
+                  <styled.ActivitySelect
+                    value={activity.subactivity}
+                    name="subactivity"
+                    onChange={(e) =>
+                      handleSelectSubactivity(index, e.target.value)
+                    }
+                  >
+                    <option value="">Selecionar Subatividade</option>
                     {hhRecords[index].area &&
                       activities.activities.map((area) => {
-                        if (area._id === hhRecords[index].area) {
+                        if (area.area === hhRecords[index].area) {
                           return area.activities.map((activity) => {
-                            console.log(activity);
-                            if (activity._id === hhRecords[index].activity) {
+                            if (
+                              activity.activity === hhRecords[index].activity
+                            ) {
                               return activity.subactivities.map(
                                 (subactivity) => (
-                                  <option key={subactivity} value={subactivity}>
-                                    {subactivity}
+                                  <option
+                                    key={subactivity._id}
+                                    value={subactivity.subactivity}
+                                  >
+                                    {subactivity.subactivity}
                                   </option>
                                 )
                               );
@@ -343,6 +561,49 @@ export const ControleHH = () => {
                         }
                       })}
                   </styled.ActivitySelect>
+                  <styled.ActivityCommentInput
+                    type="text"
+                    name="comment"
+                    placeholder="Escrever Comentário"
+                    onChange={(e) => handleInputComment(index, e.target.value)}
+                  />
+                  {hhRecords[index].area &&
+                    activities.activities.map((area) => {
+                      if (area.area === hhRecords[index].area) {
+                        return area.activities.map((activity) => {
+                          if (activity.activity === hhRecords[index].activity) {
+                            return activity.subactivities.map((subactivity) => {
+                              if (
+                                subactivity.subactivity ===
+                                  hhRecords[index].subactivity &&
+                                subactivity.haveIndicative
+                              ) {
+                                return (
+                                  <styled.ActivityIndicativeInput
+                                    style={{ borderRight: 0 }}
+                                    key={subactivity._id}
+                                    type="number"
+                                    name="indicative"
+                                    placeholder="Num"
+                                    onChange={(e) =>
+                                      handleInputIndicative(
+                                        index,
+                                        e.target.value
+                                      )
+                                    }
+                                    onKeyDown={(e) => {
+                                      if (["e", "E", "+", "-"].includes(e.key))
+                                        e.preventDefault();
+                                    }}
+                                  />
+                                );
+                              }
+                            });
+                          }
+                        });
+                      }
+                    })}
+
                   <styled.deleteButton
                     onClick={() => handleDeleteActivity(index)}
                   >
@@ -355,7 +616,59 @@ export const ControleHH = () => {
                   {hhRecords[index].roles.map((role, roleIndex) => (
                     <styled.visibleActivityDiv key={roleIndex}>
                       <SVGConnector cap={roleIndex === 0 ? 15 : 0} />
-                      <styled.activityInputDiv>
+                      <styled.activityInputDiv
+                        style={{ padding: "0 100px" }}
+                        $error={hhRecords[index].roles[roleIndex].error}
+                      >
+                        <styled.ActivitySelect
+                          value={role.role}
+                          name="'role"
+                          onChange={(e) =>
+                            handleSelectRole(index, roleIndex, e.target.value)
+                          }
+                        >
+                          <option value="">Selecionar Função</option>
+                          {fieldRoles &&
+                            fieldRoles.roles.map((role) => (
+                              <option key={role._id} value={role.role}>
+                                {role.role}
+                              </option>
+                            ))}
+                        </styled.ActivitySelect>
+                        <styled.ActivityIndicativeInput
+                          style={{ width: "200px", borderRight: 0 }}
+                          type="number"
+                          name="quantity"
+                          max="100"
+                          value={role.quantity}
+                          placeholder="Escrever quantidade"
+                          onChange={(e) =>
+                            handleInputQuantity(
+                              index,
+                              roleIndex,
+                              e.target.value
+                            )
+                          }
+                          onKeyDown={(e) => {
+                            if (["e", "E", "+", "-"].includes(e.key))
+                              e.preventDefault();
+                          }}
+                        />
+                        <styled.ActivityIndicativeInput
+                          style={{ width: "200px" }}
+                          type="number"
+                          name="hours"
+                          max="24"
+                          value={role.hours}
+                          placeholder="Escrever horas"
+                          onChange={(e) =>
+                            handleInputHours(index, roleIndex, e.target.value)
+                          }
+                          onKeyDown={(e) => {
+                            if (["e", "E", "+", "-"].includes(e.key))
+                              e.preventDefault();
+                          }}
+                        />
                         <styled.deleteButton
                           onClick={() => handleDeleteRole(index, roleIndex)}
                         >
