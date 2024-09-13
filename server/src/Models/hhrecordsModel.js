@@ -27,7 +27,7 @@ const hhrecordSchema = new mongoose.Schema(
             type: String,
             required: true,
           },
-          subActivity: {
+          subactivity: {
             type: String,
             required: true,
           },
@@ -68,5 +68,30 @@ const hhrecordSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
+
+hhrecordSchema.statics.isUnique = async function (projectId, date, hhRecords) {
+  try {
+    if (!projectId || !date || !hhRecords) throw new Error("Dados inválidos");
+
+    const { area, activity, subActivity } = hhRecords[0];
+
+    const duplicateRecord = await this.findOne({
+      projectId,
+      date,
+      hhRecords: {
+        $elemMatch: {
+          area,
+          activity,
+          subActivity,
+        },
+      },
+    });
+
+    return duplicateRecord !== null;
+  } catch (err) {
+    console.log("Erro ao verificar duplicidade", err.message);
+    return false;
+  }
+};
 
 export default mongoose.model("HHRecord", hhrecordSchema);

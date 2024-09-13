@@ -3,6 +3,7 @@
 // -imports Ract, Redux- >
 import { useEffect, useState, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { innovaApi } from "../../services/http.js";
 import { fetchUserWorks } from "../../store/slicers/worksSlicer";
 import { fetchActivities } from "../../store/slicers/activitySlicer.js";
 import { fetchFieldRoles } from "../../store/slicers/fieldRoleSlicer.js";
@@ -19,6 +20,7 @@ import SVGCalendar from "../../shared/icons/controleHH/calendar_icon.jsx";
 import SVGDelete from "../../shared/icons/controleHH/Delete_icon.jsx";
 import SVGConnector from "../../shared/icons/controleHH/conector_svg.jsx";
 import SVGReload from "../../shared/icons/controleHH/Reload_icon.jsx";
+import { Title } from "../error404/404Styles.js";
 
 // -Date Normalizer- >
 const formatKey = (day, month, year) => {
@@ -28,7 +30,7 @@ const formatKey = (day, month, year) => {
   )}${year}`;
 };
 
-export const ControleHH = () => {
+export const ControleHH = ({ toastMessage }) => {
   // -Declaracoes da página- >
   const works = useSelector((state) => state.works);
   const activities = useSelector((state) => state.activity);
@@ -38,6 +40,7 @@ export const ControleHH = () => {
 
   const [windowHeight, setWindowHeight] = useState(window.innerHeight);
   const [selectedWork, setSelectedWork] = useState("");
+  const [workError, setWorkError] = useState(false);
   const [selectedDay, setSelectedDay] = useState(
     formatKey(date.getDate(), date.getMonth(), date.getFullYear())
   );
@@ -179,7 +182,27 @@ export const ControleHH = () => {
 
   // -Onclick React Handlers- >
   const handleGetLastHHRecord = async () => {
-    alert("Getting last HH Record");
+    const isValid = validateWork();
+    if (isValid) {
+      try {
+        const { data } = await innovaApi.get(
+          `hhcontroll/get-last-record/${selectedWork}`
+        );
+
+        setHHRecords(data.hhRecord.hhRecords);
+        toastMessage({
+          danger: false,
+          title: "Sucesso",
+          message: "Ultimo registro de hh recuperado",
+        });
+      } catch (e) {
+        toastMessage({
+          danger: true,
+          title: "Error",
+          message: "Erro ao buscar ultimo registro",
+        });
+      }
+    }
   };
 
   const handleAddActivity = () => {
@@ -387,15 +410,59 @@ export const ControleHH = () => {
     setHHRecords(newHHRecords);
   };
 
-  const handleSendHHRecord = () => {
+  const handleSendHHRecord = async () => {
     const isValid = validateHHRecord();
 
     if (isValid) {
-      alert("Sending HH Record");
+      try {
+        const dataBody = {
+          projectId: selectedWork,
+          date: `${placeAndDate.year}-${placeAndDate.month}-${placeAndDate.day}`,
+          hhRecords: removeErrorAndOpen(hhRecords),
+        };
+        const response = await innovaApi.post("/hhcontroll/sendHH", dataBody);
+
+        toastMessage({
+          danger: false,
+          title: "Sucesso",
+          message: "Registro de horas feito com sucesso",
+        });
+      } catch (e) {
+        if (e.response.status === 409) {
+          toastMessage({
+            danger: true,
+            title: "Error",
+            message: "Atividade já registrada",
+          });
+        } else if (e.response.status === 500) {
+          toastMessage({
+            danger: true,
+            title: "Error",
+            message: "Ocorreu um erro interno no servidor.",
+          });
+        } else {
+          toastMessage({
+            danger: true,
+            title: "Error",
+            message: "Ocorreu um erro ao enviar o registro de horas.",
+          });
+        }
+        console.error(e);
+      }
     }
   };
 
   // -Funções de uso interno- >
+  function validateWork() {
+    let isValid = true;
+
+    if (selectedWork === "") {
+      isValid = false;
+      setWorkError(true);
+    }
+
+    return isValid;
+  }
   function validateHHRecord() {
     let isValid = true;
 
@@ -407,7 +474,8 @@ export const ControleHH = () => {
         activity.area.trim() === "" ||
         activity.activity.trim() === "" ||
         activity.subactivity.trim() === "" ||
-        activity.workDescription.trim() === ""
+        activity.workDescription.trim() === "" ||
+        activity.roles.length === 0
       ) {
         hasError = true;
         isValid = false;
@@ -436,8 +504,28 @@ export const ControleHH = () => {
       };
     });
 
+    if (selectedWork === "") {
+      isValid = false;
+      setWorkError(true);
+    }
+
     setHHRecords(newHHRecords);
     return isValid;
+  }
+
+  function removeErrorAndOpen(hhRecords) {
+    return hhRecords.map((activity) => {
+      const { error, open, ...cleanActivity } = activity;
+
+      const cleanRoles = cleanActivity.roles.map(
+        ({ error, ...cleanRole }) => cleanRole
+      );
+
+      return {
+        ...cleanActivity,
+        roles: cleanRoles,
+      };
+    });
   }
 
   // -Dinamic page Content Renders- >
@@ -445,13 +533,13 @@ export const ControleHH = () => {
     if (works.status === "loading") {
       return (
         <ul>
-          <styled.work>
+          <styled.work style={{ marginBottom: "30px" }}>
             <Loading />
           </styled.work>
-          <styled.work>
+          <styled.work style={{ marginBottom: "30px" }}>
             <Loading />
           </styled.work>
-          <styled.work>
+          <styled.work style={{ marginBottom: "30px" }}>
             <Loading />
           </styled.work>
         </ul>
@@ -463,7 +551,10 @@ export const ControleHH = () => {
             <styled.work
               key={work._id}
               $isSelected={selectedWork === work._id}
-              onClick={() => setSelectedWork(work._id)}
+              onClick={() => {
+                setSelectedWork(work._id);
+                setWorkError(false);
+              }}
             >
               {work.name}
             </styled.work>
@@ -699,7 +790,7 @@ export const ControleHH = () => {
   // -Estrutura principal- >
   return (
     <styled.controllContainer>
-      <styled.contentDiv>
+      <styled.contentDiv $error={workError}>
         <styled.titleDiv>Usinas</styled.titleDiv>
         {renderWorks()}
         {works.status === "failed" && <p>Erro ao carregar as usinas.</p>}

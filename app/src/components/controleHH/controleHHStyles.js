@@ -16,7 +16,9 @@ export const contentDiv = styled.div`
   position: relative;
   display: flex;
   flex-direction: column;
-  border: 3px solid ${(props) => props.theme.colors.grey};
+  border: 3px solid
+    ${(props) =>
+      props.$error ? props.theme.colors.danger : props.theme.colors.grey};
 `;
 
 export const titleDiv = styled.div`
