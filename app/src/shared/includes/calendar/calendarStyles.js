@@ -52,16 +52,20 @@ export const calendarDay = styled.div`
     props.$isDisabled || props.$isDayOfWeek ? "default" : "pointer"};
 
   background-color: ${(props) =>
-    props.$isSelected ? props.theme.colors.secundary_2 : "transparent"};
+    props.$isSelected
+      ? props.theme.colors.secundary_2
+      : props.$isBetween
+      ? props.theme.colors.secundary_1
+      : "transparent"};
 
   color: ${(props) =>
     props.$isDisabled
       ? props.theme.colors.grey
-      : props.$isSelected
+      : props.$isSelected || props.$isBetween
       ? props.theme.fonts.color
       : props.theme.colors.primary_dark};
 
-  opacity: ${(props) => (props.$isDisabled ? 0.5 : 1)};
+  opacity: ${(props) => (props.$isDisabled ? 0.5 : props.$isBetween ? 0.5 : 1)};
 
   &:hover {
     background-color: ${(props) =>

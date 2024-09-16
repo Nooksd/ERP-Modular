@@ -1,13 +1,13 @@
 // jsonwebtoken.js
 
 import jwt from "jsonwebtoken";
-import dotenv from "dotenv";	
+import dotenv from "dotenv";
 
 dotenv.config();
 
 class JWT {
   static validateAccessToken(req, res, next) {
-    const token = req.cookies.accessToken
+    const token = req.cookies.accessToken;
 
     if (!token) {
       return res.status(403).json({
@@ -40,6 +40,7 @@ class JWT {
   static async validateRefreshToken(token) {
     try {
       const decoded = jwt.verify(token, process.env.JWT_REFRESH_KEY);
+
       return decoded.user;
     } catch (err) {
       throw new Error("Token de refresh inválido");

@@ -1,6 +1,23 @@
 import HHrecords from "../Models/hhrecordsModel.js";
 import Work from "../Models/workModel.js";
 
+async function isManegerOnWork(projectId, userId) {
+  try {
+    const work = await Work.findById(projectId);
+
+    if (!work) return false;
+
+    const isManager = work.managerIds.some((managerId) =>
+      managerId.equals(userId)
+    );
+
+    if (!isManager) return false;
+    return true;
+  } catch (e) {
+    return false;
+  }
+}
+
 class HHControllController {
   static async sendHH(req, res) {
     try {
@@ -15,20 +32,9 @@ class HHControllController {
 
       const userId = req.user.user._id;
 
-      const work = await Work.findById(projectId);
+      const isManager = await isManegerOnWork(projectId, userId);
 
-      if (!work) {
-        return res.status(404).json({
-          message: "Obra não encontrada.",
-          status: false,
-        });
-      }
-
-      const isManager = work.managerIds.some((managerId) =>
-        managerId.equals(userId)
-      );
-
-      if (!isManager) {
+      if (isManager) {
         return res.status(403).json({
           message: "Usuário não tem permissão para enviar HH para esta obra.",
           status: false,
@@ -120,18 +126,7 @@ class HHControllController {
         });
       }
 
-      const work = await Work.findById(projectId);
-
-      if (!work) {
-        return res.status(404).json({
-          message: "Obra não encontrada.",
-          status: false,
-        });
-      }
-
-      const isManager = work.managerIds.some((managerId) =>
-        managerId.equals(userId)
-      );
+      const isManager = await isManegerOnWork(projectId, userId);
 
       if (!isManager) {
         return res.status(403).json({
@@ -164,6 +159,86 @@ class HHControllController {
       });
     }
   }
+
+  static async getHHRecordsByProject(req, res) {
+    try {
+      const { projectId } = req.params;
+      const userId = req.user.user._id;
+
+      if (!projectId) {
+        return res.status(400).json({
+          message: "Id da obra é obrigatório.",
+          status: false,
+        });
+      }
+
+      const isManager = await isManegerOnWork(projectId, userId);
+
+      if (!isManager) {
+        return res.status(403).json({
+          message: "Usuário não tem permissão para esta obra.",
+          status: false,
+        });
+      }
+
+      const {
+        page = 1,
+        limit = 10,
+        startDate,
+        endDate,
+        order = true,
+      } = req.query;
+
+      
+      const dateFilter = {};
+      if (startDate) {
+        dateFilter.$gte = new Date(startDate);
+      }
+      if (endDate) {
+        dateFilter.$lte = new Date(endDate);
+      }
+
+      
+      const hhSummary = await HHrecords.getHistoryByProjectId(
+        projectId,
+        order === "true",
+        dateFilter
+      );
+      
+      const startIndex = (page - 1) * limit;
+      const paginatedSummary = hhSummary.slice(
+        startIndex,
+        startIndex + parseInt(limit)
+      );
+
+      const totalRecords = hhSummary.length;
+
+      if (!paginatedSummary.length) {
+        return res.status(404).json({
+          message: "Sem Registro de HH",
+          status: false,
+        });
+      }
+
+      res.status(200).json({
+        message: "Registros de HH encontrados.",
+        hhRecords: paginatedSummary,
+        pagination: {
+          totalRecords,
+          totalPages: Math.ceil(totalRecords / limit),
+          currentPage: parseInt(page),
+        },
+        status: true,
+      });
+    } catch (e) {
+      res.status(500).json({
+        message: "Erro interno do servidor",
+        status: false,
+      });
+    }
+  }
+
+  static async getHHRecordsByDate(req, res) {}
 }
 
 export default HHControllController;

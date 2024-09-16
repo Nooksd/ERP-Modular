@@ -113,7 +113,7 @@ class UserController {
           status: false,
         });
       }
-
+      
       const user = await JWT.validateRefreshToken(token);
 
       if (!user) {

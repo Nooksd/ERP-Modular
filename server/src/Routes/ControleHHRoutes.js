@@ -14,5 +14,10 @@ HHControllerRoutes.get(
   JWT.validateAccessToken,
   HHControllController.getLastHHRecord
 );
+HHControllerRoutes.get(
+  "/get-history/:projectId",
+  JWT.validateAccessToken,
+  HHControllController.getHHRecordsByProject
+);
 
 export default HHControllerRoutes;

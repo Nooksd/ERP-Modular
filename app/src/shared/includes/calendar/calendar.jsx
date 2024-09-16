@@ -1,7 +1,7 @@
 import { useState } from "react";
 import * as styled from "./calendarStyles.js";
 
-const Calendar = ({ selectedDay, onDaySelect }) => {
+const Calendar = ({ selectedDay, onDaySelect, single = true }) => {
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const daysOfWeek = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sa"];
   const daysInMonth = (month, year) => new Date(year, month + 1, 0).getDate();
@@ -59,9 +59,70 @@ const Calendar = ({ selectedDay, onDaySelect }) => {
     )}${year}`;
   };
 
+  const formatDate = (date) => {
+    const dateString = new Date(
+      date.replace(/(\d{2})(\d{2})(\d{4})/, "$3-$2-$1")
+    );
+    return Date.parse(dateString);
+  };
+
+  const handleDaySelect = (dayKey) => {
+    if (single) {
+      onDaySelect(dayKey);
+    } else {
+      if (selectedDay.includes(dayKey)) {
+        const newSelectedDays = selectedDay.filter((day) => day !== dayKey);
+        onDaySelect(newSelectedDays);
+      } else {
+        if (selectedDay.length === 0) {
+          onDaySelect([dayKey]);
+        } else if (selectedDay.length <= 2) {
+          if (formatDate(selectedDay[0]) > formatDate(dayKey)) {
+            onDaySelect([dayKey, selectedDay[0]]);
+          } else {
+            onDaySelect([selectedDay[0], dayKey]);
+          }
+        }
+      }
+    }
+  };
+
   const isNextDisabled =
     currentMonth.getFullYear() === today.getFullYear() &&
     currentMonth.getMonth() === today.getMonth();
+
+  const isSelected = (dayKey) => {
+    if (single) {
+      return selectedDay === dayKey;
+    } else {
+      return selectedDay.includes(dayKey);
+    }
+  };
+
+  const isBetween = (dateKey) => {
+    if (single) {
+      return false;
+    } else {
+      if (dateKey === null) return false;
+      if (selectedDay.length < 2) return false;
+      const startKey = selectedDay[0];
+      const endKey = selectedDay[1];
+      const startDate = new Date(
+        `${startKey.slice(4, 8)}-${startKey.slice(2, 4)}-${startKey.slice(
+          0,
+          2
+        )}`
+      );
+      const endDate = new Date(
+        `${endKey.slice(4, 8)}-${endKey.slice(2, 4)}-${endKey.slice(0, 2)}`
+      );
+      const currentDate = new Date(
+        `${dateKey.slice(4, 8)}-${dateKey.slice(2, 4)}-${dateKey.slice(0, 2)}`
+      );
+
+      return currentDate > startDate && currentDate < endDate;
+    }
+  };
 
   return (
     <styled.calendarContainer>
@@ -73,7 +134,10 @@ const Calendar = ({ selectedDay, onDaySelect }) => {
           {currentMonth.toLocaleString("default", { month: "long" })}{" "}
           {currentMonth.getFullYear()}
         </div>
-        <styled.prevNextButton onClick={handleNextMonth} disabled={isNextDisabled}>
+        <styled.prevNextButton
+          onClick={handleNextMonth}
+          disabled={isNextDisabled}
+        >
           {">"}
         </styled.prevNextButton>
       </styled.calendarHeader>
@@ -105,8 +169,9 @@ const Calendar = ({ selectedDay, onDaySelect }) => {
             <styled.calendarDay
               key={index}
               $isDisabled={!day || isFutureDay}
-              $isSelected={selectedDay === dayKey}
-              onClick={() => !isFutureDay && day && onDaySelect(dayKey)}
+              $isBetween={isBetween(dayKey)}
+              $isSelected={isSelected(dayKey)}
+              onClick={() => !isFutureDay && day && handleDaySelect(dayKey)}
             >
               {day}
             </styled.calendarDay>

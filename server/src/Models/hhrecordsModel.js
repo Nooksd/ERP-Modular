@@ -94,4 +94,53 @@ hhrecordSchema.statics.isUnique = async function (projectId, date, hhRecords) {
   }
 };
 
+hhrecordSchema.statics.getHistoryByProjectId = async function (
+  projectId,
+  order = true,
+  dateFilter = {}
+) {
+  try {
+    if (!projectId) throw new Error("projectId é obrigatório.");
+
+    const matchQuery = {
+      projectId: new mongoose.Types.ObjectId(projectId),
+    };
+    if (Object.keys(dateFilter).length > 0) {
+      matchQuery.date = dateFilter;
+    }
+
+    const history = await this.aggregate([
+      { $match: matchQuery },
+      {
+        $unwind: "$hhRecords",
+      },
+      {
+        $group: {
+          _id: "$date",
+          activities: { $sum: 1 },
+          roles: { $sum: { $size: "$hhRecords.roles" } },
+          hours: { $sum: { $sum: "$hhRecords.roles.hours" } },
+        },
+      },
+      {
+        $project: {
+          _id: 0,
+          date: "$_id",
+          activities: 1,
+          roles: 1,
+          hours: 1,
+        },
+      },
+      {
+        $sort: { date: order ? -1 : 1 },
+      },
+    ]);
+
+    return history;
+  } catch (err) {
+    console.log("Erro ao buscar histórico de HH", err.message);
+    return [];
+  }
+};
+
 export default mongoose.model("HHRecord", hhrecordSchema);

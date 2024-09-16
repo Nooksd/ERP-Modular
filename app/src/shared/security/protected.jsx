@@ -58,7 +58,7 @@ const ProtectedRouter = () => {
     },
     {
       path: "historico",
-      name: "Histórico",
+      name: "Histórico HH",
       component: <Historico />,
       icon: <SVGHistory width="35" height="35" />,
     },
