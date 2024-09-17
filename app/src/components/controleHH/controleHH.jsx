@@ -81,6 +81,10 @@ export const ControleHH = ({ toastMessage }) => {
 
   // -Whachers de mudancas useEffect- >
   useEffect(() => {
+    console.log(hhRecords);
+  }, [hhRecords]);
+
+  useEffect(() => {
     if (!works || works.status !== "succeeded") {
       dispatch(fetchUserWorks());
     }
@@ -655,6 +659,7 @@ export const ControleHH = ({ toastMessage }) => {
                   <styled.ActivityCommentInput
                     type="text"
                     name="comment"
+                    value={hhRecords[index].workDescription}
                     placeholder="Escrever Comentário"
                     onChange={(e) => handleInputComment(index, e.target.value)}
                   />
@@ -674,6 +679,7 @@ export const ControleHH = ({ toastMessage }) => {
                                     style={{ borderRight: 0 }}
                                     key={subactivity._id}
                                     type="number"
+                                    value={hhRecords[index].indicative}
                                     name="indicative"
                                     placeholder="Num"
                                     onChange={(e) =>

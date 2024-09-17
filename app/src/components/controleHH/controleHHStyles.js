@@ -108,9 +108,10 @@ export const hhRecordDiv = styled.div`
   height: 100%;
   max-height: calc(${(props) => props.$windowHeight}px - 253px);
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: start;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-content: flex-start;
+  justify-content: center;
   gap: 15px;
   padding: 20px;
   margin: 10px 1px 0 0;
@@ -155,6 +156,13 @@ export const visibleActivityDiv = styled.div`
 export const ActivitySelect = styled.select`
   width: 400px;
   height: 100%;
+  color: ${(props) => props.theme.colors.primary_dark};
+
+  option {
+    font-size: 16px;
+    font-weight: 500;
+    color: ${(props) => props.theme.colors.primary_dark};
+  }
 `;
 
 export const ActivityCommentInput = styled.input`
@@ -162,6 +170,7 @@ export const ActivityCommentInput = styled.input`
   height: 100%;
   padding: 5px 10px;
   border-left: 3px solid ${(props) => props.theme.colors.grey};
+  color: ${(props) => props.theme.colors.primary_dark};
 
   &::-webkit-outer-spin-button,
   &::-webkit-inner-spin-button {
@@ -176,6 +185,7 @@ export const ActivityIndicativeInput = styled.input`
   text-align: center;
   border-left: 3px solid ${(props) => props.theme.colors.grey};
   border-right: 3px solid ${(props) => props.theme.colors.grey};
+  color: ${(props) => props.theme.colors.primary_dark};
 
   &::-webkit-outer-spin-button,
   &::-webkit-inner-spin-button {

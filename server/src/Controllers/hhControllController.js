@@ -34,7 +34,7 @@ class HHControllController {
 
       const isManager = await isManegerOnWork(projectId, userId);
 
-      if (isManager) {
+      if (!isManager) {
         return res.status(403).json({
           message: "Usuário não tem permissão para enviar HH para esta obra.",
           status: false,

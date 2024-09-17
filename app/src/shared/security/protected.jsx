@@ -59,19 +59,19 @@ const ProtectedRouter = () => {
     {
       path: "historico",
       name: "Histórico HH",
-      component: <Historico />,
+      component: <Historico toastMessage={setToastMessage} />,
       icon: <SVGHistory width="35" height="35" />,
     },
     {
       path: "gestaohh",
       name: "Gestão HH",
-      component: <GestaoHH />,
+      component: <GestaoHH toastMessage={setToastMessage} />,
       icon: <SVGControll width="35" height="35" />,
     },
     {
       path: "usuarios",
       name: "Usuários",
-      component: <Usuarios />,
+      component: <Usuarios toastMessage={setToastMessage} />,
       icon: <SVGUsers width="35" height="35" />,
       requiresManager: true,
     },

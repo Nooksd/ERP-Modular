@@ -105,21 +105,37 @@ hhrecordSchema.statics.getHistoryByProjectId = async function (
     const matchQuery = {
       projectId: new mongoose.Types.ObjectId(projectId),
     };
+
     if (Object.keys(dateFilter).length > 0) {
       matchQuery.date = dateFilter;
     }
 
     const history = await this.aggregate([
       { $match: matchQuery },
-      {
-        $unwind: "$hhRecords",
-      },
+      { $unwind: "$hhRecords" },
       {
         $group: {
           _id: "$date",
-          activities: { $sum: 1 },
-          roles: { $sum: { $size: "$hhRecords.roles" } },
-          hours: { $sum: { $sum: "$hhRecords.roles.hours" } },
+          activities: { $sum: 1 }, // Contar atividades
+          roles: {
+            $sum: {
+              $sum: "$hhRecords.roles.quantity" // Somar os valores de quantity
+            }
+          },
+          hours: {
+            $sum: {
+              $reduce: {
+                input: "$hhRecords.roles", // Percorrer o array de roles
+                initialValue: 0,
+                in: {
+                  $add: [
+                    "$$value",
+                    { $multiply: ["$$this.hours", "$$this.quantity"] },
+                  ],
+                },
+              },
+            },
+          },
         },
       },
       {
