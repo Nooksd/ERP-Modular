@@ -101,12 +101,12 @@ export const historyDiv = styled.div`
   }
 
   &::-webkit-scrollbar-thumb {
-    background: ${(props) => props.theme.colors.secundary_2};
+    background: ${(props) => props.theme.colors.secondary_2};
     border-radius: 10px;
   }
 
   &::-webkit-scrollbar-thumb:hover {
-    background: ${(props) => props.theme.colors.secundary_1};
+    background: ${(props) => props.theme.colors.secondary_1};
   }
 `;
 
@@ -116,8 +116,17 @@ export const empityHHRecordP = styled.p`
   color: ${(props) => props.theme.colors.primary_dark};
 `;
 
+export const recordWraperDiv = styled.div`
+  width: 80%;
+  height: auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+`;
+
 export const RecordDiv = styled.div`
-  width: 100%;
+  width: inherit;
   height: 50px;
   display: flex;
   align-items: center;
@@ -206,18 +215,67 @@ export const recordHoursDiv = styled.div`
   }
 `;
 
-export const editDeleteDiv = styled.div`
+export const EditButton = styled.button`
+  width: 35px;
+  height: 35px;
+  border-radius: 50%;
   display: flex;
-  gap: 40px;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: 3px solid ${(props) => props.theme.colors.primary_1};
+  cursor: pointer;
+  font-size: 26px;
 
   svg {
-    fill: ${(props) => props.theme.colors.danger};
+    path {
+      fill: ${(props) => props.theme.colors.primary_1};
+    }
+  }
+
+  &:hover {
+    background-color: ${(props) => props.theme.colors.primary_1};
+
+    svg {
+      path {
+        fill: ${(props) => props.theme.fonts.color};
+      }
+    }
+  }
+`;
+
+export const DeleteButton = styled.button`
+  width: 35px;
+  height: 35px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: 3px solid ${(props) => props.theme.colors.danger};
+  cursor: pointer;
+  font-size: 26px;
+
+  svg {
+    path {
+      fill: ${(props) => props.theme.colors.danger};
+    }
+  }
+
+  &:hover {
+    background-color: ${(props) => props.theme.colors.danger};
+
+    svg {
+      path {
+        fill: ${(props) => props.theme.fonts.color};
+      }
+    }
   }
 `;
 
 export const HistoryControllDiv = styled.div`
   width: 100%;
-  height: 100px;
+  height: 75px;
   display: flex;
   align-items: center;
   justify-content: center;

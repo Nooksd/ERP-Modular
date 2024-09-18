@@ -30,15 +30,17 @@ const formatKey = (day, month, year) => {
   )}${year}`;
 };
 
-export const ControleHH = ({ toastMessage }) => {
+export const ControleHH = ({ toastMessage, isNew = true }) => {
   // -Declaracoes da página- >
   const works = useSelector((state) => state.works);
   const activities = useSelector((state) => state.activity);
   const fieldRoles = useSelector((state) => state.fieldRoles);
+  const { recordData } = location.state || {};
   const dispatch = useDispatch();
   const date = new Date();
 
   const [windowHeight, setWindowHeight] = useState(window.innerHeight);
+  const [isNewRecord, setIsNewRecord] = useState(isNew);
   const [selectedWork, setSelectedWork] = useState("");
   const [workError, setWorkError] = useState(false);
   const [selectedDay, setSelectedDay] = useState(
@@ -81,8 +83,8 @@ export const ControleHH = ({ toastMessage }) => {
 
   // -Whachers de mudancas useEffect- >
   useEffect(() => {
-    console.log(hhRecords);
-  }, [hhRecords]);
+    console.log(recordData);
+  }, [recordData]);
 
   useEffect(() => {
     if (!works || works.status !== "succeeded") {
@@ -815,17 +817,21 @@ export const ControleHH = ({ toastMessage }) => {
                 />
               </styled.calendarContainer>
             )}
-
             <SVGCalendar onClick={() => setOpenCalendar((prev) => !prev)} />
           </styled.calendarContainerWrapper>
           <styled.placeAndDateDiv>
-            {`${placeAndDate.place}, ${placeAndDate.day}-${placeAndDate.month}-${placeAndDate.year}`}
+            <styled.createOrEditButton
+              $isNewRecord={isNewRecord}
+              onClick={() => setIsNewRecord((prev) => !prev)}
+            >
+              <span>Registrar</span>
+              <span>Editar</span>
+            </styled.createOrEditButton>
           </styled.placeAndDateDiv>
           <styled.getLastHHRecordButton onClick={() => handleGetLastHHRecord()}>
             <SVGReload />
           </styled.getLastHHRecordButton>
         </styled.titleDiv>
-
         <styled.hhRecordDiv $windowHeight={windowHeight}>
           {renderActivities()}
           <styled.addOneMoreButton
@@ -836,6 +842,9 @@ export const ControleHH = ({ toastMessage }) => {
           </styled.addOneMoreButton>
         </styled.hhRecordDiv>
         <styled.finalCheckDiv>
+          <styled.placeAndDateDiv style={{ left: 100 }}>
+            {`${placeAndDate.place}, ${placeAndDate.day}-${placeAndDate.month}-${placeAndDate.year}`}
+          </styled.placeAndDateDiv>
           <styled.placeAndDateDiv>
             {`${totalSummary.totalActivities} ${
               totalSummary.totalActivities === 1 ? "Atividade" : "Atividades"

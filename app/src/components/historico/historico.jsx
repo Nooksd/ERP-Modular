@@ -4,6 +4,7 @@
 import { useEffect, useState, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { innovaApi } from "../../services/http.js";
+import { useNavigate } from "react-router-dom";
 import { fetchUserWorks } from "../../store/slicers/worksSlicer";
 
 // -imports Componentes- >
@@ -20,21 +21,27 @@ import SVGSearch from "../../shared/icons/historyHH/Search_icon.jsx";
 import SVGDelete from "../../shared/icons/controleHH/Delete_icon.jsx";
 import SVGEdit from "../../shared/icons/historyHH/Edit_icon.jsx";
 
-export const Historico = ({ toastMessage }) => {
+export const Historico = ({ toastMessage, modalMessage, modalInfo }) => {
   // -Declaracoes da página- >
   const works = useSelector((state) => state.works);
+  const navigate = useNavigate();
   const dispatch = useDispatch();
 
   const [windowHeight, setWindowHeight] = useState(window.innerHeight);
+
   const [selectedDay, setSelectedDay] = useState([]);
   const [selectedWork, setSelectedWork] = useState("");
+
   const [openCalendar, setOpenCalendar] = useState(false);
+
   const [hhRecords, setHHRecords] = useState([]);
   const [pages, setPages] = useState(1);
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(15);
   const [error, setError] = useState(false);
   const [order, setOrder] = useState(true);
+
+  const [whatDelete, setWhatDelete] = useState("");
 
   // -Whachers de mudancas useEffect- >
   useEffect(() => {
@@ -65,6 +72,22 @@ export const Historico = ({ toastMessage }) => {
     }
   }, [limit]);
 
+  useEffect(() => {
+    if (modalInfo.response !== null) {
+      switch (modalInfo.event) {
+        case "delete":
+          if (modalInfo.response) deleteRecord();
+          break;
+      }
+      modalMessage({
+        title: "",
+        message: "",
+        response: null,
+        event: null,
+      });
+    }
+  }, [modalInfo.response]);
+
   // -Onclick React Handlers- >
   const handleSelectWork = (value) => {
     setError(false);
@@ -78,8 +101,6 @@ export const Historico = ({ toastMessage }) => {
         const response = await innovaApi.get(
           `/hhcontroll/get-history/${selectedWork}?page=${page}&limit=${limit}${createDateRange()}&order=${order}`
         );
-
-        console.log(response.data);
         setHHRecords(response.data.hhRecords);
         setPages(response.data.pagination.totalPages);
         toastMessage({
@@ -102,6 +123,45 @@ export const Historico = ({ toastMessage }) => {
       });
     }
   };
+
+  const handleEditClick = (record) => {
+    const recordData = {
+      recordId: record.recordId,
+      projectId: selectedWork,
+    };
+
+    navigate("/controlehh", { state: recordData });
+  };
+
+  const handleDeleteClick = (record) => {
+    const date = new Date(record.date);
+    const localDate = new Date(
+      date.getUTCFullYear(),
+      date.getUTCMonth(),
+      date.getUTCDate()
+    ).toLocaleDateString("pt-BR", {
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+    });
+
+    const workName = works.works.userWorks.find(
+      (obj) => obj._id === selectedWork
+    ).name;
+
+    setWhatDelete({
+      projectId: selectedWork,
+      recordId: record.recordId,
+    });
+
+    modalMessage({
+      response: null,
+      event: "delete",
+      title: "Confirmação",
+      message: `Deseja excluir o registro das horas do dia ${localDate} de ${workName}?`,
+    });
+  };
+
   // -Funções de uso interno- >
   function validateWork() {
     let isValid = true;
@@ -137,6 +197,27 @@ export const Historico = ({ toastMessage }) => {
     return dateRange;
   }
 
+  async function deleteRecord() {
+    try {
+      await innovaApi.delete(
+        `/hhcontroll/delete-record/${whatDelete.recordId}`
+      );
+      toastMessage({
+        danger: false,
+        title: "Sucesso",
+        message: "Registro de hh excluído com sucesso",
+      });
+      setWhatDelete("");
+      handleSearchHHRecords();
+    } catch (e) {
+      toastMessage({
+        danger: true,
+        title: "Error",
+        message: "Não foi possível excluir o registro de hh",
+      });
+    }
+  }
+
   // -Dinamic page Content Renders- >
   const renderHHRecords = () => {
     if (hhRecords.length === 0) {
@@ -162,26 +243,28 @@ export const Historico = ({ toastMessage }) => {
         });
 
         return (
-          <styled.RecordDiv key={index}>
-            <styled.Division />
-            <styled.recordIndexH4>{`#${index + 1}`}</styled.recordIndexH4>
-            <styled.Division />
-            <styled.recordDateH4>{localDate}</styled.recordDateH4>
-            <styled.Division />
-            <styled.recordActivitiesDiv>
-              {record.activities}
-            </styled.recordActivitiesDiv>
-            <styled.Division />
-            <styled.recordRolesDiv>{record.roles}</styled.recordRolesDiv>
-            <styled.Division />
-            <styled.recordHoursDiv>{record.hours}</styled.recordHoursDiv>
-            <styled.Division />
-            <styled.editDeleteDiv>
-              <SVGDelete width="24" height="24" style={{ cursor: "pointer" }} />
-              <SVGEdit width="24" height="24" style={{ cursor: "pointer" }} />
-            </styled.editDeleteDiv>
-            <styled.Division />
-          </styled.RecordDiv>
+          <styled.recordWraperDiv key={index}>
+            <styled.RecordDiv>
+              <styled.recordIndexH4>{`#${index + 1}`}</styled.recordIndexH4>
+              <styled.Division />
+              <styled.recordDateH4>{localDate}</styled.recordDateH4>
+              <styled.Division />
+              <styled.recordActivitiesDiv>
+                {record.activities}
+              </styled.recordActivitiesDiv>
+              <styled.Division />
+              <styled.recordRolesDiv>{record.roles}</styled.recordRolesDiv>
+              <styled.Division />
+              <styled.recordHoursDiv>{record.hours}</styled.recordHoursDiv>
+              <styled.Division />
+            </styled.RecordDiv>
+            <styled.EditButton onClick={() => handleEditClick(record)}>
+              <SVGEdit width="20" height="20" />
+            </styled.EditButton>
+            <styled.DeleteButton onClick={() => handleDeleteClick(record)}>
+              <SVGDelete width="16" height="16" />
+            </styled.DeleteButton>
+          </styled.recordWraperDiv>
         );
       })
     );

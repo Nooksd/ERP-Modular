@@ -189,7 +189,6 @@ class HHControllController {
         order = true,
       } = req.query;
 
-      
       const dateFilter = {};
       if (startDate) {
         dateFilter.$gte = new Date(startDate);
@@ -198,13 +197,12 @@ class HHControllController {
         dateFilter.$lte = new Date(endDate);
       }
 
-      
       const hhSummary = await HHrecords.getHistoryByProjectId(
         projectId,
         order === "true",
         dateFilter
       );
-      
+
       const startIndex = (page - 1) * limit;
       const paginatedSummary = hhSummary.slice(
         startIndex,
@@ -228,6 +226,52 @@ class HHControllController {
           totalPages: Math.ceil(totalRecords / limit),
           currentPage: parseInt(page),
         },
+        status: true,
+      });
+    } catch (e) {
+      res.status(500).json({
+        message: "Erro interno do servidor",
+        status: false,
+      });
+    }
+  }
+
+  static async deleteRecord(req, res) {
+    try {
+      const { recordId } = req.params;
+      const userId = req.user.user._id;
+
+      if (!recordId) {
+        return res.status(400).json({
+          message: "Id do registro é obrigatório.",
+          status: false,
+        });
+      }
+
+      const projectId = await HHrecords.findById(recordId)
+        .select(" projectId ")
+        .exec();
+
+      const isManager = await isManegerOnWork(projectId.projectId, userId);
+
+      if (!isManager) {
+        return res.status(403).json({
+          message: "Usuário não tem permissão para esta obra.",
+          status: false,
+        });
+      }
+
+      const deletedRecord = await HHrecords.findByIdAndDelete(recordId);
+
+      if (!deletedRecord) {
+        return res.status(404).json({
+          message: "Registro de HH não encontrado.",
+          status: false,
+        });
+      }
+
+      res.status(200).json({
+        message: "Registro de HH excluído com sucesso.",
         status: true,
       });
     } catch (e) {

@@ -75,7 +75,7 @@ export const MenuIten = styled.div`
   justify-content: center;
   cursor: pointer;
 
-  border-right: ${(props) => (props.$isActive ? "4px solid" + props.theme.colors.secundary_1 : "none")}; 
+  border-right: ${(props) => (props.$isActive ? "4px solid" + props.theme.colors.secondary_1 : "none")}; 
   transition: border-right 0.3s ease, background-color 0.3s ease; 
 `;
 

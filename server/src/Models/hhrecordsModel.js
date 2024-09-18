@@ -115,17 +115,20 @@ hhrecordSchema.statics.getHistoryByProjectId = async function (
       { $unwind: "$hhRecords" },
       {
         $group: {
-          _id: "$date",
-          activities: { $sum: 1 }, // Contar atividades
+          _id: {
+            date: "$date",
+            recordId: "$_id",
+          },
+          activities: { $sum: 1 },
           roles: {
             $sum: {
-              $sum: "$hhRecords.roles.quantity" // Somar os valores de quantity
-            }
+              $sum: "$hhRecords.roles.quantity",
+            },
           },
           hours: {
             $sum: {
               $reduce: {
-                input: "$hhRecords.roles", // Percorrer o array de roles
+                input: "$hhRecords.roles",
                 initialValue: 0,
                 in: {
                   $add: [
@@ -141,7 +144,8 @@ hhrecordSchema.statics.getHistoryByProjectId = async function (
       {
         $project: {
           _id: 0,
-          date: "$_id",
+          date: "$_id.date",
+          recordId: "$_id.recordId",
           activities: 1,
           roles: 1,
           hours: 1,

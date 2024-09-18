@@ -24,11 +24,18 @@ import SVGHHControll from "../icons/hamburguer/HHControll_icon";
 import SVGHistory from "../icons/hamburguer/History_icon";
 import SVGControll from "../icons/hamburguer/Controll_icon";
 import SVGUsers from "../icons/hamburguer/Users_icon";
+import Modal from "../includes/modal/modal";
 
 const ProtectedRouter = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [toastMessage, setToastMessage] = useState({
     danger: false,
+    message: "",
+    title: "",
+  });
+  const [modalMessage, setModalMessage] = useState({
+    response: null,
+    event: null,
     message: "",
     title: "",
   });
@@ -47,33 +54,55 @@ const ProtectedRouter = () => {
     {
       path: "home",
       name: "Home",
+      isRestricted: false,
       component: <Home />,
       icon: <SVGHome width="40" height="40" />,
     },
     {
       path: "controlehh",
       name: "Controle HH",
+      isRestricted: true,
       component: <ControleHH toastMessage={setToastMessage} />,
       icon: <SVGHHControll width="35" height="35" />,
     },
     {
       path: "historico",
       name: "Histórico HH",
-      component: <Historico toastMessage={setToastMessage} />,
+      isRestricted: true,
+      component: (
+        <Historico
+          toastMessage={setToastMessage}
+          modalMessage={setModalMessage}
+          modalInfo={modalMessage}
+        />
+      ),
       icon: <SVGHistory width="35" height="35" />,
     },
     {
       path: "gestaohh",
       name: "Gestão HH",
-      component: <GestaoHH toastMessage={setToastMessage} />,
+      isRestricted: true,
+      component: (
+        <GestaoHH
+          toastMessage={setToastMessage}
+          modalMessage={setModalMessage}
+          modalInfo={modalMessage}
+        />
+      ),
       icon: <SVGControll width="35" height="35" />,
     },
     {
       path: "usuarios",
       name: "Usuários",
-      component: <Usuarios toastMessage={setToastMessage} />,
-      icon: <SVGUsers width="35" height="35" />,
       requiresManager: true,
+      component: (
+        <Usuarios
+          toastMessage={setToastMessage}
+          modalMessage={setModalMessage}
+          modalInfo={modalMessage}
+        />
+      ),
+      icon: <SVGUsers width="35" height="35" />,
     },
   ];
 
@@ -101,12 +130,12 @@ const ProtectedRouter = () => {
 
     if (!page) return <Error404 />;
 
+    if (!page.isRestricted || (page.requiresManager && user.isManager))
+      return page.component;
+
     const allowedPages = user.pages.map((page) =>
       normalizeString(page.toLowerCase())
     );
-
-    if ((page.requiresManager && user.isManager) || currentPage === "home")
-      return page.component;
 
     if (!allowedPages.includes(currentPage)) {
       return <Error404 />;
@@ -136,12 +165,13 @@ const ProtectedRouter = () => {
     <NavbarMenuContentContainer>
       <Hamburger user={user} />
       <NavbarContentContainer>
+        <Toast toastContent={toastMessage} setToastContent={setToastMessage} />
+        <Modal modalMessage={modalMessage} setModalMessage={setModalMessage} />
         <Header
           page={pageData && pageData.name}
           icon={pageData && pageData.icon}
           logged={true}
         />
-        <Toast toastContent={toastMessage} setToastContent={setToastMessage} />
         <NavbarContentContainer>{renderPageContent()}</NavbarContentContainer>
       </NavbarContentContainer>
     </NavbarMenuContentContainer>

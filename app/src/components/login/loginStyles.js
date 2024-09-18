@@ -27,8 +27,8 @@ export const GreenLoginBlock = styled.div`
   position: relative;
   background-image: linear-gradient(
     to bottom right,
-    ${(props) => props.theme.colors.secundary_2},
-    ${(props) => props.theme.colors.secundary_1}
+    ${(props) => props.theme.colors.secondary_2},
+    ${(props) => props.theme.colors.secondary_1}
   );
 `;
 
@@ -228,7 +228,7 @@ export const KeepLoggedLabel = styled.label`
 export const LoginButton = styled.button`
   width: 100%;
   height: 60px;
-  background-color: ${(props) => props.theme.colors.secundary_2};
+  background-color: ${(props) => props.theme.colors.secondary_2};
   border-radius: 10px;
   color: ${(props) => props.theme.fonts.color};
   font-size: 16px;

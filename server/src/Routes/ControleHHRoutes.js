@@ -19,5 +19,10 @@ HHControllerRoutes.get(
   JWT.validateAccessToken,
   HHControllController.getHHRecordsByProject
 );
+HHControllerRoutes.delete(
+  "/delete-record/:recordId",
+  JWT.validateAccessToken,
+  HHControllController.deleteRecord
+);
 
 export default HHControllerRoutes;

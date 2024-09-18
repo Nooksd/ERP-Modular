@@ -5,9 +5,9 @@ const generalColors = {
   primary_light: "#8ea1d7",
   primary_1: "#2E4483",
   primary_2: "#2257A8",
-  secundary_1: "#95C11F",
-  secundary_2: "#B0D159",
-  secundary_3: "#F3F9E6",
+  secondary_1: "#95C11F",
+  secondary_2: "#B0D159",
+  secondary_3: "#F3F9E6",
   grey: "#E6E6E6",
 
   danger: "#cc3333",

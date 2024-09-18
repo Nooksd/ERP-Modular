@@ -53,9 +53,9 @@ export const calendarDay = styled.div`
 
   background-color: ${(props) =>
     props.$isSelected
-      ? props.theme.colors.secundary_2
+      ? props.theme.colors.secondary_2
       : props.$isBetween
-      ? props.theme.colors.secundary_1
+      ? props.theme.colors.secondary_1
       : "transparent"};
 
   color: ${(props) =>
@@ -71,7 +71,7 @@ export const calendarDay = styled.div`
     background-color: ${(props) =>
       !props.$isDisabled &&
       !props.$isDayOfWeek &&
-      props.theme.colors.secundary_2};
+      props.theme.colors.secondary_2};
     color: ${(props) =>
       props.$isDisabled
         ? props.theme.colors.grey

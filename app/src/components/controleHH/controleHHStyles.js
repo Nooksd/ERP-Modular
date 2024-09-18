@@ -54,10 +54,10 @@ export const work = styled.li`
       : props.theme.colors.primary_dark};
 
   background-color: ${(props) =>
-    props.$isSelected ? props.theme.colors.secundary_2 : "transparent"};
+    props.$isSelected ? props.theme.colors.secondary_2 : "transparent"};
 
   &:hover {
-    background-color: ${(props) => props.theme.colors.secundary_1};
+    background-color: ${(props) => props.theme.colors.secondary_1};
     color: ${(props) => props.theme.fonts.color};
     transition: background-color 0.1s ease;
   }
@@ -83,6 +83,41 @@ export const placeAndDateDiv = styled.div`
   font-weight: 400;
 `;
 
+export const createOrEditButton = styled.button`
+  width: 200px;
+  height: 30px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  justify-content: space-around;
+  background: linear-gradient(
+    90deg,
+    ${(props) =>
+        props.$isNewRecord ? props.theme.colors.primary_2 : "rgba(0,0,0,0)"}
+      50%,
+    ${(props) =>
+        !props.$isNewRecord ? props.theme.colors.secondary_1 : "rgba(0,0,0,0)"}
+      50%
+  );
+
+  span {
+    font-size: 14px;
+  }
+  span:first-child {
+    color: ${(props) =>
+      !props.$isNewRecord
+        ? props.theme.colors.primary_dark
+        : props.theme.fonts.color};
+  }
+  span:last-child {
+    color: ${(props) =>
+      props.$isNewRecord
+        ? props.theme.colors.primary_dark
+        : props.theme.fonts.color};
+  }
+`;
+
 export const getLastHHRecordButton = styled.div`
   position: absolute;
   top: 50%;
@@ -90,7 +125,7 @@ export const getLastHHRecordButton = styled.div`
   transform: translateY(-50%);
   width: 30px;
   height: 30px;
-  background-color: ${(props) => props.theme.colors.secundary_2};
+  background-color: ${(props) => props.theme.colors.secondary_2};
   border-radius: 50%;
   cursor: pointer;
   display: flex;
@@ -98,7 +133,7 @@ export const getLastHHRecordButton = styled.div`
   justify-content: center;
 
   &:hover {
-    background-color: ${(props) => props.theme.colors.secundary_1};
+    background-color: ${(props) => props.theme.colors.secondary_1};
     transition: background-color 0.1s ease;
   }
 `;
@@ -128,12 +163,12 @@ export const hhRecordDiv = styled.div`
   }
 
   &::-webkit-scrollbar-thumb {
-    background: ${(props) => props.theme.colors.secundary_2};
+    background: ${(props) => props.theme.colors.secondary_2};
     border-radius: 10px;
   }
 
   &::-webkit-scrollbar-thumb:hover {
-    background: ${(props) => props.theme.colors.secundary_1};
+    background: ${(props) => props.theme.colors.secondary_1};
   }
 `;
 
@@ -212,14 +247,14 @@ export const openActivityButton = styled.button`
   align-items: center;
   justify-content: center;
   background: none;
-  border: 3px solid ${(props) => props.theme.colors.secundary_2};
-  color: ${(props) => props.theme.colors.secundary_2};
+  border: 3px solid ${(props) => props.theme.colors.secondary_2};
+  color: ${(props) => props.theme.colors.secondary_2};
   cursor: pointer;
   font-size: 26px;
 
   &:hover {
-    border-color: ${(props) => props.theme.colors.secundary_1};
-    color: ${(props) => props.theme.colors.secundary_1};
+    border-color: ${(props) => props.theme.colors.secondary_1};
+    color: ${(props) => props.theme.colors.secondary_1};
     transition: background-color 0.1s ease;
   }
 `;
@@ -273,14 +308,14 @@ export const deleteButton = styled.button`
 export const addOneMoreButton = styled.button`
   width: 175px;
   height: 40px;
-  background-color: ${(props) => props.theme.colors.secundary_2};
+  background-color: ${(props) => props.theme.colors.secondary_2};
   border-radius: 10px;
   color: ${(props) => props.theme.fonts.color};
   font-size: 32px;
   cursor: pointer;
 
   &:hover {
-    background-color: ${(props) => props.theme.colors.secundary_1};
+    background-color: ${(props) => props.theme.colors.secondary_1};
     transition: background-color 0.1s ease;
   }
 `;
