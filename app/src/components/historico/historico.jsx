@@ -125,9 +125,15 @@ export const Historico = ({ toastMessage, modalMessage, modalInfo }) => {
   };
 
   const handleEditClick = (record) => {
+    const date = new Date(record.date);
+    const localDate = `${String(date.getUTCDate()).padStart(2, "0")}${String(
+      date.getUTCMonth() + 1
+    ).padStart(2, "0")}${date.getUTCFullYear()}`;
+
     const recordData = {
       recordId: record.recordId,
       projectId: selectedWork,
+      date: localDate,
     };
 
     navigate("/controlehh", { state: recordData });

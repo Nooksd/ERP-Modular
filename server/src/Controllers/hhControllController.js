@@ -42,7 +42,6 @@ class HHControllController {
       }
 
       for (const record of hhRecords) {
-        // Validações de campos principais
         if (
           !record.area ||
           typeof record.area !== "string" ||
@@ -282,7 +281,157 @@ class HHControllController {
     }
   }
 
-  static async getHHRecordsByDate(req, res) {}
+  static async getHHRecord(req, res) {
+    try {
+      const { recordId } = req.params;
+      const userId = req.user.user._id;
+
+      if (!recordId) {
+        return res.status(400).json({
+          message: "Id do registro é obrigatório.",
+          status: false,
+        });
+      }
+
+      const projectId = await HHrecords.findById(recordId)
+        .select(" projectId ")
+        .exec();
+
+      const isManager = await isManegerOnWork(projectId.projectId, userId);
+
+      if (!isManager) {
+        return res.status(403).json({
+          message: "Usuário não tem permissão para esta obra.",
+          status: false,
+        });
+      }
+
+      const hhRecord = await HHrecords.findById(recordId).select(
+        "-createdAt -updatedAt -projectId -userId"
+      );
+
+      if (!hhRecord) {
+        return res.status(404).json({
+          message: "Registro de HH não encontrado.",
+          status: false,
+        });
+      }
+
+      res.status(200).json({
+        message: "Registro de HH encontrado.",
+        hhRecord,
+        status: true,
+      });
+    } catch (e) {
+      res.status(500).json({
+        message: "Erro interno do servidor",
+        status: false,
+      });
+    }
+  }
+
+  static async updateRecord(req, res) {
+    try {
+      const { recordId } = req.params;
+      const userId = req.user.user._id;
+      const { hhRecords } = req.body;
+
+      if (!recordId) {
+        return res.status(400).json({
+          message: "Id do registro é obrigatório.",
+          status: false,
+        });
+      }
+
+      if (!hhRecords) {
+        return res.status(400).json({
+          message: "Os dados do registro são obrigatórios.",
+          status: false,
+        });
+      }
+
+      const projectId = await HHrecords.findById(recordId)
+        .select(" projectId ")
+        .exec();
+
+      const isManager = await isManegerOnWork(projectId.projectId, userId);
+
+      if (!isManager) {
+        return res.status(403).json({
+          message: "Usuário não tem permissão para esta obra.",
+          status: false,
+        });
+      }
+
+      for (const record of hhRecords) {
+        if (
+          !record.area ||
+          typeof record.area !== "string" ||
+          !record.activity ||
+          typeof record.activity !== "string" ||
+          !record.subactivity ||
+          typeof record.subactivity !== "string" ||
+          !record.workDescription ||
+          typeof record.workDescription !== "string"
+        ) {
+          return res.status(400).json({
+            message:
+              "Campos obrigatórios em hhRecords estão ausentes ou inválidos.",
+            status: false,
+          });
+        }
+
+        if (!Array.isArray(record.roles) || record.roles.length === 0) {
+          return res.status(400).json({
+            message:
+              "Pelo menos um role deve ser definido em cada registro de HH.",
+            status: false,
+          });
+        }
+
+        for (const role of record.roles) {
+          if (
+            !role.role ||
+            typeof role.role !== "string" ||
+            typeof role.quantity !== "number" ||
+            role.quantity <= 0 ||
+            typeof role.hours !== "number" ||
+            role.hours <= 0
+          ) {
+            return res.status(400).json({
+              message:
+                "Campos obrigatórios em roles estão ausentes ou inválidos.",
+              status: false,
+            });
+          }
+        }
+      }
+
+      const updatedRecord = await HHrecords.findByIdAndUpdate(
+        recordId,
+        { $set: { hhRecords } },
+        { new: true }
+      );
+
+      if (!updatedRecord) {
+        return res.status(404).json({
+          message: "Registro de HH não encontrado.",
+          status: false,
+        });
+      }
+
+      res.status(200).json({
+        message: "Registro de HH atualizado com sucesso.",
+        hhRecord: updatedRecord,
+        status: true,
+      });
+    } catch (e) {
+      res.status(500).json({
+        message: "Erro interno do servidor",
+        status: false,
+      });
+    }
+  }
 }
 
 export default HHControllController;

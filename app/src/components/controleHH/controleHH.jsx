@@ -3,6 +3,7 @@
 // -imports Ract, Redux- >
 import { useEffect, useState, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { useLocation } from "react-router-dom";
 import { innovaApi } from "../../services/http.js";
 import { fetchUserWorks } from "../../store/slicers/worksSlicer";
 import { fetchActivities } from "../../store/slicers/activitySlicer.js";
@@ -20,7 +21,6 @@ import SVGCalendar from "../../shared/icons/controleHH/calendar_icon.jsx";
 import SVGDelete from "../../shared/icons/controleHH/Delete_icon.jsx";
 import SVGConnector from "../../shared/icons/controleHH/conector_svg.jsx";
 import SVGReload from "../../shared/icons/controleHH/Reload_icon.jsx";
-import { Title } from "../error404/404Styles.js";
 
 // -Date Normalizer- >
 const formatKey = (day, month, year) => {
@@ -30,17 +30,18 @@ const formatKey = (day, month, year) => {
   )}${year}`;
 };
 
-export const ControleHH = ({ toastMessage, isNew = true }) => {
+export const ControleHH = ({ toastMessage }) => {
   // -Declaracoes da página- >
   const works = useSelector((state) => state.works);
   const activities = useSelector((state) => state.activity);
   const fieldRoles = useSelector((state) => state.fieldRoles);
-  const { recordData } = location.state || {};
   const dispatch = useDispatch();
+  const location = useLocation();
   const date = new Date();
 
+  const recordData = location.state || {};
   const [windowHeight, setWindowHeight] = useState(window.innerHeight);
-  const [isNewRecord, setIsNewRecord] = useState(isNew);
+  const [isNewRecord, setIsNewRecord] = useState(true);
   const [selectedWork, setSelectedWork] = useState("");
   const [workError, setWorkError] = useState(false);
   const [selectedDay, setSelectedDay] = useState(
@@ -83,7 +84,12 @@ export const ControleHH = ({ toastMessage, isNew = true }) => {
 
   // -Whachers de mudancas useEffect- >
   useEffect(() => {
-    console.log(recordData);
+    if (recordData.projectId && recordData.recordId && recordData.date) {
+      setIsNewRecord(false);
+      setSelectedWork(recordData.projectId);
+      setSelectedDay(recordData.date);
+      handleGetHHRecord(recordData.recordId);
+    }
   }, [recordData]);
 
   useEffect(() => {
@@ -187,25 +193,36 @@ export const ControleHH = ({ toastMessage, isNew = true }) => {
   }, [hhRecords]);
 
   // -Onclick React Handlers- >
-  const handleGetLastHHRecord = async () => {
+  const handleGetHHRecord = async (recordId) => {
     const isValid = validateWork();
-    if (isValid) {
+    if (isValid || recordId) {
       try {
-        const { data } = await innovaApi.get(
-          `hhcontroll/get-last-record/${selectedWork}`
-        );
+        let response;
+        if (!recordId) {
+          response = await innovaApi.get(
+            `hhcontroll/get-last-record/${selectedWork}`
+          );
+        } else {
+          setWorkError(false);
+          response = await innovaApi.get(`hhcontroll/get-record/${recordId}`);
+        }
+
+        const { data } = response;
+
+        console.log(data);
 
         setHHRecords(data.hhRecord.hhRecords);
         toastMessage({
           danger: false,
           title: "Sucesso",
-          message: "Ultimo registro de hh recuperado",
+          message: data.message,
         });
       } catch (e) {
+        console.log(e);
         toastMessage({
           danger: true,
           title: "Error",
-          message: "Erro ao buscar ultimo registro",
+          message: "Erro ao buscar registro",
         });
       }
     }
@@ -419,20 +436,34 @@ export const ControleHH = ({ toastMessage, isNew = true }) => {
   const handleSendHHRecord = async () => {
     const isValid = validateHHRecord();
 
-    if (isValid) {
+    if (isValid || recordData.recordId) {
       try {
         const dataBody = {
           projectId: selectedWork,
           date: `${placeAndDate.year}-${placeAndDate.month}-${placeAndDate.day}`,
           hhRecords: removeErrorAndOpen(hhRecords),
         };
-        const response = await innovaApi.post("/hhcontroll/sendHH", dataBody);
+        if (recordData.recordId) {
+          await innovaApi.put(
+            `/hhcontroll/update-record/${recordData.recordId}`,
+            {
+              hhRecords: removeErrorAndOpen(hhRecords),
+            }
+          );
+          toastMessage({
+            danger: false,
+            title: "Sucesso",
+            message: "Registro de horas atualizado com sucesso",
+          });
+        } else {
+          await innovaApi.post("/hhcontroll/sendHH", dataBody);
+          toastMessage({
+            danger: false,
+            title: "Sucesso",
+            message: "Registro de horas feito com sucesso",
+          });
+        }
 
-        toastMessage({
-          danger: false,
-          title: "Sucesso",
-          message: "Registro de horas feito com sucesso",
-        });
       } catch (e) {
         if (e.response.status === 409) {
           toastMessage({
@@ -453,7 +484,6 @@ export const ControleHH = ({ toastMessage, isNew = true }) => {
             message: "Ocorreu um erro ao enviar o registro de horas.",
           });
         }
-        console.error(e);
       }
     }
   };
@@ -828,7 +858,7 @@ export const ControleHH = ({ toastMessage, isNew = true }) => {
               <span>Editar</span>
             </styled.createOrEditButton>
           </styled.placeAndDateDiv>
-          <styled.getLastHHRecordButton onClick={() => handleGetLastHHRecord()}>
+          <styled.getLastHHRecordButton onClick={() => handleGetHHRecord()}>
             <SVGReload />
           </styled.getLastHHRecordButton>
         </styled.titleDiv>

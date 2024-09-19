@@ -10,6 +10,11 @@ HHControllerRoutes.post(
   HHControllController.sendHH
 );
 HHControllerRoutes.get(
+  "/get-record/:recordId",
+  JWT.validateAccessToken,
+  HHControllController.getHHRecord
+);
+HHControllerRoutes.get(
   "/get-last-record/:projectId",
   JWT.validateAccessToken,
   HHControllController.getLastHHRecord
@@ -18,6 +23,11 @@ HHControllerRoutes.get(
   "/get-history/:projectId",
   JWT.validateAccessToken,
   HHControllController.getHHRecordsByProject
+);
+ HHControllerRoutes.put(
+  "/update-record/:recordId",
+  JWT.validateAccessToken,
+  HHControllController.updateRecord
 );
 HHControllerRoutes.delete(
   "/delete-record/:recordId",
