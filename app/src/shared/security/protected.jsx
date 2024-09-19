@@ -57,6 +57,7 @@ const ProtectedRouter = () => {
       isRestricted: false,
       component: <Home />,
       icon: <SVGHome width="40" height="40" />,
+      small: <SVGHome />,
     },
     {
       path: "controlehh",
@@ -64,9 +65,10 @@ const ProtectedRouter = () => {
       isRestricted: true,
       component: <ControleHH toastMessage={setToastMessage} />,
       icon: <SVGHHControll width="35" height="35" />,
+      small: <SVGHHControll />,
     },
     {
-      path: "historico",
+      path: "historicohh",
       name: "Histórico HH",
       isRestricted: true,
       component: (
@@ -77,6 +79,7 @@ const ProtectedRouter = () => {
         />
       ),
       icon: <SVGHistory width="35" height="35" />,
+      small: <SVGHistory />,
     },
     {
       path: "gestaohh",
@@ -103,6 +106,7 @@ const ProtectedRouter = () => {
         />
       ),
       icon: <SVGUsers width="35" height="35" />,
+      small: <SVGUsers />,
     },
   ];
 
@@ -163,7 +167,7 @@ const ProtectedRouter = () => {
 
   return (
     <NavbarMenuContentContainer>
-      <Hamburger user={user} />
+      <Hamburger user={user} pageIcons={pages}/>
       <NavbarContentContainer>
         <Toast toastContent={toastMessage} setToastContent={setToastMessage} />
         <Modal modalMessage={modalMessage} setModalMessage={setModalMessage} />

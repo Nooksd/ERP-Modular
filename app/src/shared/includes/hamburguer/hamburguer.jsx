@@ -1,24 +1,20 @@
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-
 import * as styled from "./hamburguerStyles.js";
 
 import SVGHamburger from "../../icons/hamburguer/Menu_icon.jsx";
-import SVGHistory from "../../icons/hamburguer/History_icon.jsx";
-import SVGHHControll from "../../icons/hamburguer/HHControll_icon.jsx";
-import SVGControll from "../../icons/hamburguer/Controll_icon.jsx";
 import SVGUsers from "../../icons/hamburguer/Users_icon.jsx";
 
-const pageIcons = {
-  historico: <SVGHistory />,
-  controlehh: <SVGHHControll />,
-  gestaohh: <SVGControll />,
-  usuarios: <SVGUsers />,
+const normalizeString = (str) => {
+  return str
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/\s+/g, "");
 };
 
-const Hamburguer = ({ user }) => {
+const Hamburguer = ({ user, pageIcons }) => {
   const [openMenu, setOpenMenu] = useState(false);
-  
   const location = useLocation();
 
   const renderMenuItems = () => {
@@ -27,28 +23,27 @@ const Hamburguer = ({ user }) => {
     return (
       <>
         {user.pages.map((page) => {
-          const formattedPage = page
-            .trim()
-            .toLowerCase()
-            .normalize("NFD")
-            .replace(/[\u0300-\u036f]/g, "")
-            .replace(/\s+/g, "");
-          const IconComponent = pageIcons[formattedPage];
-          const isActive = location.pathname === `/${formattedPage}`;
+          const formattedPage = normalizeString(page);
 
-          if (!IconComponent) return null;
+          const pageData = pageIcons.find(
+            (p) => normalizeString(p.path) === formattedPage
+          );
+
+          if (!pageData) return null;
+
+          const isActive = location.pathname === `/${formattedPage}`;
 
           return (
             <Link to={`/${formattedPage}`} key={formattedPage}>
-              <styled.MenuIten key={formattedPage} $isActive={isActive}>
-                <styled.IconWrapper>{IconComponent}</styled.IconWrapper>
+              <styled.MenuIten $isActive={isActive}>
+                <styled.IconWrapper>{pageData.small}</styled.IconWrapper>
                 <styled.ItenText $active={openMenu}>{page}</styled.ItenText>
               </styled.MenuIten>
             </Link>
           );
         })}
         {user.isManager && (
-          <Link to="/usuarios" style={{ "width": "100%"}}>
+          <Link to="/usuarios" style={{ width: "100%" }}>
             <styled.MenuIten $isActive={location.pathname === "/usuarios"}>
               <styled.IconWrapper>
                 <SVGUsers />
