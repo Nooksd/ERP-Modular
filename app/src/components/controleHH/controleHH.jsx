@@ -463,7 +463,6 @@ export const ControleHH = ({ toastMessage }) => {
             message: "Registro de horas feito com sucesso",
           });
         }
-
       } catch (e) {
         if (e.response.status === 409) {
           toastMessage({
@@ -588,8 +587,10 @@ export const ControleHH = ({ toastMessage }) => {
               key={work._id}
               $isSelected={selectedWork === work._id}
               onClick={() => {
-                setSelectedWork(work._id);
-                setWorkError(false);
+                if (!recordData.projectId) {
+                  setSelectedWork(work._id);
+                  setWorkError(false);
+                }
               }}
             >
               {work.name}
@@ -827,7 +828,7 @@ export const ControleHH = ({ toastMessage }) => {
 
   // -Estrutura principal- >
   return (
-    <styled.controllContainer>
+    <styled.controllContainer $windowHeight={windowHeight}>
       <styled.contentDiv $error={workError}>
         <styled.titleDiv>Usinas</styled.titleDiv>
         {renderWorks()}
@@ -847,18 +848,26 @@ export const ControleHH = ({ toastMessage }) => {
                 />
               </styled.calendarContainer>
             )}
-            <SVGCalendar onClick={() => setOpenCalendar((prev) => !prev)} />
+            <SVGCalendar
+              onClick={() =>
+                !recordData.projectId ? setOpenCalendar((prev) => !prev) : null
+              }
+            />
           </styled.calendarContainerWrapper>
           <styled.placeAndDateDiv>
             <styled.createOrEditButton
               $isNewRecord={isNewRecord}
-              onClick={() => setIsNewRecord((prev) => !prev)}
+              onClick={() =>
+                !recordData.projectId ? setIsNewRecord((prev) => !prev) : null
+              }
             >
               <span>Registrar</span>
               <span>Editar</span>
             </styled.createOrEditButton>
           </styled.placeAndDateDiv>
-          <styled.getLastHHRecordButton onClick={() => handleGetHHRecord()}>
+          <styled.getLastHHRecordButton
+            onClick={() => (!recordData.projectId ? handleGetHHRecord() : null)}
+          >
             <SVGReload />
           </styled.getLastHHRecordButton>
         </styled.titleDiv>

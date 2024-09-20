@@ -25,11 +25,20 @@ export const Loading = styled.div`
 
 export const NavbarMenuContentContainer = styled.div`
   width: 100%;
-  height: 100%;
+  background-color: #f6f8fd;
+  height: 100vh;
   display: flex;
+
+  select {
+    background-color: #f6f8fd;
+  }
+  input {
+    background-color: #f6f8fd;
+  }
 `;
 
 export const NavbarContentContainer = styled.div`
   width: 100%;
+  padding-left: 40px;
   height: 100%;
 `;

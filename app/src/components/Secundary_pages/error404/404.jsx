@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import * as styled from "./404Styles.js";
 
-import SVGInnova404 from "../../shared/icons/error404/Innova404_icon.jsx";
+import SVGInnova404 from "../../../shared/icons/error404/Innova404_icon.jsx";
 
 export const Error404 = () => {
   const [countdown, setCountdown] = useState(10);

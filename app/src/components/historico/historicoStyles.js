@@ -17,6 +17,7 @@ export const content = styled.div`
     ${(props) =>
       props.$error ? props.theme.colors.danger : props.theme.colors.grey};
 `;
+
 export const titleDiv = styled.div`
   width: 100%;
   height: 45px;
@@ -288,7 +289,7 @@ export const controllButton = styled.button`
   width: 35px;
   height: 35px;
   border-radius: 50%;
-  background-color: ${(props) => props.theme.colors.primary_1};
+  background-color: ${(props) => props.theme.colors.secondary_1};
   color: ${(props) => props.theme.fonts.color};
   font-size: 16px;
   font-weight: 600;

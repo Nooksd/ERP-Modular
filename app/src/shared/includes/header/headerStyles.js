@@ -17,7 +17,7 @@ export const NavBar = styled.nav`
   align-items: center;
   z-index: 9999;
   justify-content: space-between;
-  padding: 10px 27px;
+  padding: 10px 50px;
   background-image: linear-gradient(
     45deg,
     ${(props) => props.theme.colors.primary_1},

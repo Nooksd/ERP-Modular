@@ -14,17 +14,17 @@ import Toast from "../includes/toast/toast";
 
 import { Home } from "../../components/home/home";
 import { ControleHH } from "../../components/controleHH/controleHH";
-import { Usuarios } from "../../components/Usuários/usuarios";
 import { Historico } from "../../components/historico/historico";
 import { GestaoHH } from "../../components/gestaoHH/gestaoHH";
-import { Error404 } from "../../components/error404/404";
+import { Adm } from "../../components/administrativo/adm";
+import { Error404 } from "../../components/Secundary_pages/error404/404";
 
 import SVGHome from "../icons/home/Home_icon";
 import SVGHHControll from "../icons/hamburguer/HHControll_icon";
 import SVGHistory from "../icons/hamburguer/History_icon";
 import SVGControll from "../icons/hamburguer/Controll_icon";
-import SVGUsers from "../icons/hamburguer/Users_icon";
 import Modal from "../includes/modal/modal";
+import SVGPersonConfig from "../icons/hamburguer/PersonConfig_icon";
 
 const ProtectedRouter = () => {
   const [isLoading, setIsLoading] = useState(true);
@@ -93,20 +93,21 @@ const ProtectedRouter = () => {
         />
       ),
       icon: <SVGControll width="35" height="35" />,
+      small: <SVGControll />,
     },
     {
-      path: "usuarios",
-      name: "Usuários",
-      requiresManager: true,
+      path: "administrativo",
+      name: "Administrativo",
+      isRestricted: true,
       component: (
-        <Usuarios
+        <Adm
           toastMessage={setToastMessage}
           modalMessage={setModalMessage}
           modalInfo={modalMessage}
         />
       ),
-      icon: <SVGUsers width="35" height="35" />,
-      small: <SVGUsers />,
+      icon: <SVGPersonConfig width="30" height="30" />,
+      small: <SVGPersonConfig />,
     },
   ];
 
@@ -134,8 +135,7 @@ const ProtectedRouter = () => {
 
     if (!page) return <Error404 />;
 
-    if (!page.isRestricted || (page.requiresManager && user.isManager))
-      return page.component;
+    if (!page.isRestricted) return page.component;
 
     const allowedPages = user.pages.map((page) =>
       normalizeString(page.toLowerCase())
@@ -167,7 +167,7 @@ const ProtectedRouter = () => {
 
   return (
     <NavbarMenuContentContainer>
-      <Hamburger user={user} pageIcons={pages}/>
+      <Hamburger user={user} pageIcons={pages} />
       <NavbarContentContainer>
         <Toast toastContent={toastMessage} setToastContent={setToastMessage} />
         <Modal modalMessage={modalMessage} setModalMessage={setModalMessage} />

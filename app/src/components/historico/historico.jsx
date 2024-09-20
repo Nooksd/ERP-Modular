@@ -1,7 +1,7 @@
-// Página de envio e edicao de HH
+// Página de Histórico
 
 // -imports Ract, Redux- >
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { innovaApi } from "../../services/http.js";
 import { useNavigate } from "react-router-dom";
@@ -9,7 +9,6 @@ import { fetchUserWorks } from "../../store/slicers/worksSlicer";
 
 // -imports Componentes- >
 import Calendar from "../../shared/includes/calendar/calendar.jsx";
-import { Loading } from "../../styles/global.js";
 
 // -imports Styles- >
 import * as styled from "./historicoStyles.js";
@@ -68,7 +67,11 @@ export const Historico = ({ toastMessage, modalMessage, modalInfo }) => {
 
   useEffect(() => {
     if (selectedWork !== "") {
-      setPage(1);
+      if (page === 1) {
+        handleSearchHHRecords();
+      } else {
+        setPage(1);
+      }
     }
   }, [limit]);
 

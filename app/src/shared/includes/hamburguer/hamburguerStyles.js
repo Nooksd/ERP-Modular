@@ -23,8 +23,8 @@ const slideOut = keyframes`
 `;
 
 export const Hamburger = styled.div`
-  position: relative;
-  width: ${(props) => (props.$active ? "200px" : "75px")};
+  position: absolute;
+  width: ${(props) => (props.$active ? `250px` : "75px")};
   transition: 0.5s all;
   display: flex;
   flex-direction: column;

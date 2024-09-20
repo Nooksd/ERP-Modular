@@ -3,7 +3,6 @@ import { Link, useLocation } from "react-router-dom";
 import * as styled from "./hamburguerStyles.js";
 
 import SVGHamburger from "../../icons/hamburguer/Menu_icon.jsx";
-import SVGUsers from "../../icons/hamburguer/Users_icon.jsx";
 
 const normalizeString = (str) => {
   return str
@@ -42,16 +41,6 @@ const Hamburguer = ({ user, pageIcons }) => {
             </Link>
           );
         })}
-        {user.isManager && (
-          <Link to="/usuarios" style={{ width: "100%" }}>
-            <styled.MenuIten $isActive={location.pathname === "/usuarios"}>
-              <styled.IconWrapper>
-                <SVGUsers />
-              </styled.IconWrapper>
-              <styled.ItenText $active={openMenu}>Usuários</styled.ItenText>
-            </styled.MenuIten>
-          </Link>
-        )}
       </>
     );
   };
