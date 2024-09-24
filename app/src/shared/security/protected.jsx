@@ -28,6 +28,8 @@ import SVGPersonConfig from "../icons/hamburguer/PersonConfig_icon";
 
 const ProtectedRouter = () => {
   const [isLoading, setIsLoading] = useState(true);
+  const [windowHeight, setWindowHeight] = useState(window.innerHeight);
+
   const [toastMessage, setToastMessage] = useState({
     danger: false,
     message: "",
@@ -39,9 +41,11 @@ const ProtectedRouter = () => {
     message: "",
     title: "",
   });
+
   const dispatch = useDispatch();
-  const { user, loading, isAuthenticated } = useSelector((state) => state.user);
   const location = useLocation();
+
+  const { user, loading, isAuthenticated } = useSelector((state) => state.user);
 
   const normalizeString = (str) => {
     return str
@@ -63,7 +67,12 @@ const ProtectedRouter = () => {
       path: "controlehh",
       name: "Controle HH",
       isRestricted: true,
-      component: <ControleHH toastMessage={setToastMessage} />,
+      component: (
+        <ControleHH
+          toastMessage={setToastMessage}
+          windowHeight={windowHeight}
+        />
+      ),
       icon: <SVGHHControll width="35" height="35" />,
       small: <SVGHHControll />,
     },
@@ -73,6 +82,7 @@ const ProtectedRouter = () => {
       isRestricted: true,
       component: (
         <Historico
+          windowHeight={windowHeight}
           toastMessage={setToastMessage}
           modalMessage={setModalMessage}
           modalInfo={modalMessage}
@@ -87,6 +97,7 @@ const ProtectedRouter = () => {
       isRestricted: true,
       component: (
         <GestaoHH
+          windowHeight={windowHeight}
           toastMessage={setToastMessage}
           modalMessage={setModalMessage}
           modalInfo={modalMessage}
@@ -101,6 +112,7 @@ const ProtectedRouter = () => {
       isRestricted: true,
       component: (
         <Adm
+          windowHeight={windowHeight}
           toastMessage={setToastMessage}
           modalMessage={setModalMessage}
           modalInfo={modalMessage}
@@ -110,6 +122,19 @@ const ProtectedRouter = () => {
       small: <SVGPersonConfig />,
     },
   ];
+
+  // -Whachers de mudancas useEffect- >
+  useEffect(() => {
+    const handleResize = () => {
+      setWindowHeight(window.innerHeight);
+    };
+
+    window.addEventListener("resize", handleResize);
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
 
   useEffect(() => {
     const checkAuthStatus = async () => {

@@ -89,7 +89,7 @@ export const historyDiv = styled.div`
   gap: 15px;
   padding: 20px;
   margin: 10px 1px 0 0;
-  overflow-y: scroll;
+  overflow-y: auto;
   border-bottom: 3px solid ${(props) => props.theme.colors.grey};
 
   &::-webkit-scrollbar {

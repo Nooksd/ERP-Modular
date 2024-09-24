@@ -39,6 +39,6 @@ export const NavbarMenuContentContainer = styled.div`
 
 export const NavbarContentContainer = styled.div`
   width: 100%;
-  padding-left: 40px;
+  padding-left: 37.5px;
   height: 100%;
 `;

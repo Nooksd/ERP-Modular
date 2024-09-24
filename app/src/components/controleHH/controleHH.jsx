@@ -30,7 +30,7 @@ const formatKey = (day, month, year) => {
   )}${year}`;
 };
 
-export const ControleHH = ({ toastMessage }) => {
+export const ControleHH = ({ toastMessage, windowHeight }) => {
   // -Declaracoes da página- >
   const works = useSelector((state) => state.works);
   const activities = useSelector((state) => state.activity);
@@ -40,7 +40,6 @@ export const ControleHH = ({ toastMessage }) => {
   const date = new Date();
 
   const recordData = location.state || {};
-  const [windowHeight, setWindowHeight] = useState(window.innerHeight);
   const [isNewRecord, setIsNewRecord] = useState(true);
   const [selectedWork, setSelectedWork] = useState("");
   const [workError, setWorkError] = useState(false);
@@ -109,18 +108,6 @@ export const ControleHH = ({ toastMessage }) => {
       dispatch(fetchFieldRoles());
     }
   }, [dispatch, works.status]);
-
-  useEffect(() => {
-    const handleResize = () => {
-      setWindowHeight(window.innerHeight);
-    };
-
-    window.addEventListener("resize", handleResize);
-
-    return () => {
-      window.removeEventListener("resize", handleResize);
-    };
-  }, []);
 
   useEffect(() => {
     if (works.works.userWorks) {
@@ -829,7 +816,7 @@ export const ControleHH = ({ toastMessage }) => {
   // -Estrutura principal- >
   return (
     <styled.controllContainer $windowHeight={windowHeight}>
-      <styled.contentDiv $error={workError}>
+      <styled.contentDiv $error={workError} style={{ maxWidth: "300px" }}>
         <styled.titleDiv>Usinas</styled.titleDiv>
         {renderWorks()}
         {works.status === "failed" && <p>Erro ao carregar as usinas.</p>}

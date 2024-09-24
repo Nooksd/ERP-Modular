@@ -20,13 +20,16 @@ import SVGSearch from "../../shared/icons/historyHH/Search_icon.jsx";
 import SVGDelete from "../../shared/icons/controleHH/Delete_icon.jsx";
 import SVGEdit from "../../shared/icons/historyHH/Edit_icon.jsx";
 
-export const Historico = ({ toastMessage, modalMessage, modalInfo }) => {
+export const Historico = ({
+  toastMessage,
+  modalMessage,
+  modalInfo,
+  windowHeight,
+}) => {
   // -Declaracoes da página- >
   const works = useSelector((state) => state.works);
   const navigate = useNavigate();
   const dispatch = useDispatch();
-
-  const [windowHeight, setWindowHeight] = useState(window.innerHeight);
 
   const [selectedDay, setSelectedDay] = useState([]);
   const [selectedWork, setSelectedWork] = useState("");
@@ -48,18 +51,6 @@ export const Historico = ({ toastMessage, modalMessage, modalInfo }) => {
       dispatch(fetchUserWorks());
     }
   }, [dispatch]);
-
-  useEffect(() => {
-    const handleResize = () => {
-      setWindowHeight(window.innerHeight);
-    };
-
-    window.addEventListener("resize", handleResize);
-
-    return () => {
-      window.removeEventListener("resize", handleResize);
-    };
-  }, []);
 
   useEffect(() => {
     if (selectedWork !== "") handleSearchHHRecords();
