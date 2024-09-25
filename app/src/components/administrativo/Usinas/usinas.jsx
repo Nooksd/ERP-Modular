@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
+import { innovaApi } from "../../../services/http.js";
 import * as styled from "./usinasStyles.js";
+
 import SVGCheck from "../../../shared/icons/adm/usinas/Check_icon.jsx";
 import SVGClose from "../../../shared/icons/adm/usinas/Close_icon.jsx";
 import SVGUpDown from "../../../shared/icons/historyHH/UpDownArrow_icon.jsx";
@@ -7,70 +9,156 @@ import SVGSearch from "../../../shared/icons/historyHH/Search_icon.jsx";
 import SVGEdit from "../../../shared/icons/historyHH/Edit_icon.jsx";
 import SVGDelete from "../../../shared/icons/controleHH/Delete_icon.jsx";
 
-const Usinas = () => {
+const Usinas = ({ toastMessage, modalMessage, modalInfo, openPage }) => {
   const [activeMode, setActiveMode] = useState(true);
-  const [usinas, setUsinas] = useState([
-    {
-      name: "Jaicos",
-      location: "Jaicos, MG",
-      startDate: "23/02/2023",
-      endDate: "10/07/2024",
-      isActive: true,
-    },
-    {
-      name: "Rio Quente I",
-      location: "Rio Quente, MG",
-      startDate: "23/02/2023",
-      endDate: "10/07/2024",
-      isActive: true,
-    },
-    {
-      name: "Rio Quente II",
-      location: "Rio Quente, MG",
-      startDate: "23/02/2023",
-      endDate: "10/07/2024",
-      isActive: true,
-    },
-    {
-      name: "Rio Quente III",
-      location: "Rio Quente, MG",
-      startDate: "23/02/2023",
-      endDate: "10/07/2024",
-      isActive: true,
-    },
-  ]);
+  const [usinas, setUsinas] = useState([]);
   const [order, setOrder] = useState(true);
   const [search, setSearch] = useState("");
   const [limit, setLimit] = useState(10);
   const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+
+  const [whatDelete, setWhatDelete] = useState("");
+  const [editInfo, setEditInfo] = useState([]);
+
+  useEffect(() => {
+    if (usinas.length > 0) handleSearchButtonClick();
+  }, [page]);
+
+  useEffect(() => {
+    if (modalInfo.response !== null) {
+      switch (modalInfo.event) {
+        case "delete":
+          if (modalInfo.response) deleteRecord();
+          break;
+      }
+      modalMessage({
+        title: "",
+        message: "",
+        response: null,
+        event: null,
+      });
+    }
+  }, [modalInfo.response]);
+
+  const handleAddNewUsinaButtonClick = () => {
+    openPage("Adicionar Usina", 2);
+  };
+
+  const handleSearchButtonClick = async () => {
+    try {
+      const response = await innovaApi.get(
+        `/work/get-all-works?page=${page}&limit=${limit}&order=${order}&name=${search}&active=${activeMode}`
+      );
+
+      setUsinas(response.data.works);
+      setTotalPages(response.data.pagination.totalPages);
+      toastMessage({
+        danger: false,
+        title: "Sucesso",
+        message: "Usinas encontradas com sucesso",
+      });
+    } catch (e) {
+      toastMessage({
+        danger: true,
+        title: "Error",
+        message: "Erro ao buscar Usinas",
+      });
+    }
+  };
+
+  const handleDeleteButtonClick = async (usinaId, usinaNome) => {
+    setWhatDelete(usinaId);
+
+    modalMessage({
+      response: null,
+      event: "delete",
+      title: "Confirmação",
+      message: `Deseja excluir a usina ${usinaNome} (Ação Permanente)?`,
+    });
+  };
+
+  const handleEditButtonClick = (usinaId) => {
+    openPage("Editar Usina", 2, usinaId);
+  };
+
+  async function deleteRecord() {
+    try {
+      await innovaApi.delete(`/work/delete/${whatDelete}`);
+      toastMessage({
+        danger: false,
+        title: "Sucesso",
+        message: "Usina excluída com sucesso",
+      });
+      setWhatDelete("");
+      handleSearchButtonClick();
+    } catch (e) {
+      toastMessage({
+        danger: true,
+        title: "Error",
+        message: "Não foi possível excluir a usina",
+      });
+    }
+  }
 
   const RenderResultsOnPege = () => {
-    return usinas.map((usina, index) => (
-      <styled.usinaDiv $isEven={(index + 1) % 2 == 0} key={index}>
-        <styled.usinaIndexSpan>
-          {`#${index + 1 + (page - 1) * limit}`}
-        </styled.usinaIndexSpan>
-        <styled.usinaDataSpan>{usina.name}</styled.usinaDataSpan>
-        <styled.usinaDataSpan>{usina.location}</styled.usinaDataSpan>
-        <styled.usinaDataSpan>{usina.startDate}</styled.usinaDataSpan>
-        <styled.usinaDataSpan>{usina.endDate}</styled.usinaDataSpan>
-        <styled.controllButtonsDiv>
-          <styled.EditButton>
-            <SVGEdit width="20" height="20" />
-          </styled.EditButton>
-          <styled.DeleteButton>
-            <SVGDelete width="16" height="16" />
-          </styled.DeleteButton>
-        </styled.controllButtonsDiv>
-      </styled.usinaDiv>
-    ));
+    return usinas.map((usina, index) => {
+      const dateStart = new Date(usina.startDate);
+      const dateEnd = new Date(usina.endDate);
+
+      const startDate = new Date(
+        dateStart.getUTCFullYear(),
+        dateStart.getUTCMonth(),
+        dateStart.getUTCDate()
+      ).toLocaleDateString("pt-BR", {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+      });
+      const endDate =
+        dateEnd == "Invalid Date"
+          ? "Sem Data Final"
+          : new Date(
+              dateEnd.getUTCFullYear(),
+              dateEnd.getUTCMonth(),
+              dateEnd.getUTCDate()
+            ).toLocaleDateString("pt-BR", {
+              year: "numeric",
+              month: "2-digit",
+              day: "2-digit",
+            });
+
+      return (
+        <styled.usinaDiv $isEven={(index + 1) % 2 == 0} key={index}>
+          <styled.usinaIndexSpan>
+            {`#${index + 1 + (page - 1) * limit}`}
+          </styled.usinaIndexSpan>
+          <styled.usinaDataSpan>{usina.name}</styled.usinaDataSpan>
+          <styled.usinaDataSpan>{usina.location}</styled.usinaDataSpan>
+          <styled.usinaDataSpan>{startDate}</styled.usinaDataSpan>
+          <styled.usinaDataSpan>{endDate}</styled.usinaDataSpan>
+          <styled.controllButtonsDiv>
+            <styled.EditButton onClick={() => handleEditButtonClick(usina._id)}>
+              <SVGEdit width="20" height="20" />
+            </styled.EditButton>
+            <styled.DeleteButton
+              onClick={() => handleDeleteButtonClick(usina._id, usina.name)}
+            >
+              <SVGDelete width="16" height="16" />
+            </styled.DeleteButton>
+          </styled.controllButtonsDiv>
+        </styled.usinaDiv>
+      );
+    });
   };
   return (
     <>
       <styled.headerUsinasDiv>Controle de Usinas/Obras</styled.headerUsinasDiv>
       <styled.filterOptionsDiv>
         <styled.addNewOneDiv>
-          <styled.addNewOneButton>
+          <styled.addNewOneButton
+            onClick={() => handleAddNewUsinaButtonClick()}
+          >
             <span>+</span> Nova Usina
           </styled.addNewOneButton>
         </styled.addNewOneDiv>
@@ -93,7 +181,9 @@ const Usinas = () => {
           </styled.switchModeDiv>
           <styled.filterPartDiv>
             <div>
-              <styled.totalNumberSelect>
+              <styled.totalNumberSelect
+                onChange={(e) => setLimit(e.target.value)}
+              >
                 <option>10</option>
                 <option>30</option>
                 <option>50</option>
@@ -105,6 +195,7 @@ const Usinas = () => {
               <styled.searchInput
                 name="search"
                 placeholder="Pesquisar por Nome"
+                onChange={(e) => setSearch(e.target.value)}
               />
               <button
                 style={{ background: "none" }}
@@ -112,7 +203,7 @@ const Usinas = () => {
               >
                 <SVGUpDown width="25" height="25" decrescent={order} />
               </button>
-              <styled.searchButton>
+              <styled.searchButton onClick={() => handleSearchButtonClick()}>
                 <SVGSearch width="15" height="15" />
                 Buscar
               </styled.searchButton>
@@ -128,7 +219,26 @@ const Usinas = () => {
           </styled.infoPartDiv>
         </styled.filterAndInfoDiv>
       </styled.filterOptionsDiv>
-      {usinas.length > 0 && RenderResultsOnPege()}
+      <styled.resultsDiv>
+        {usinas.length > 0 && RenderResultsOnPege()}
+        {usinas.length > 0 && (
+          <styled.paginationDiv>
+            <button
+              disabled={page === 1}
+              onClick={() => setPage((prev) => prev - 1)}
+            >
+              {"<"}
+            </button>
+            <span>{`Página ${page} de ${totalPages}`}</span>
+            <button
+              disabled={page === totalPages}
+              onClick={() => setPage((prev) => prev + 1)}
+            >
+              {">"}
+            </button>
+          </styled.paginationDiv>
+        )}
+      </styled.resultsDiv>
     </>
   );
 };

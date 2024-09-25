@@ -23,41 +23,68 @@ import Usinas from "./Usinas/usinas.jsx";
 import Employees from "./Employees/Employees.jsx";
 import Users from "./Users/Users.jsx";
 import Atividades from "./Atividades/Atv.jsx";
+import AddUsina from "./Usinas/addUsina/addusina.jsx";
 
-export const Adm = ({ windowHeight }) => {
-  const [selectedPage, setSelectedPage] = useState(
-    localStorage.getItem("Page")
+export const Adm = ({
+  windowHeight,
+  toastMessage,
+  modalMessage,
+  modalInfo,
+}) => {
+  const [pageTrail, setPageTrail] = useState(
+    JSON.parse(localStorage.getItem("PageTrail"))
   );
-  const [pageTrail, setPageTrail] = useState(["Administrativo"]);
+  const [editData, setEditData] = useState("");
 
-  useEffect(() => {
-    setPageTrail(["Administrativo", selectedPage]);
-  }, [selectedPage]);
+  const handleSelectPage = (page, index = null, editId = "") => {
+    let newPageTrail = [];
 
-  const handleSelectPage = (page) => {
-    setSelectedPage(page);
-    localStorage.setItem("Page", page);
+    if (editId) {
+      setEditData(editId);
+    } else {
+      setEditData("");
+    }
+
+    if (index !== null && index < pageTrail.length) {
+      newPageTrail = pageTrail.slice(0, index);
+      newPageTrail[index] = page;
+    } else {
+      newPageTrail = [...pageTrail, page];
+    }
+
+    setPageTrail(newPageTrail);
+    localStorage.setItem("PageTrail", JSON.stringify(newPageTrail));
   };
 
   const pageSelector = () => {
-    switch (selectedPage) {
+    switch (pageTrail[pageTrail.length - 1]) {
       case "Colaboradores":
-        return <Employees setPage={setSelectedPage} />;
+        return <Employees />;
       case "Usinas/Obras":
-        return <Usinas setPage={setSelectedPage} />;
+        return (
+          <Usinas
+            toastMessage={toastMessage}
+            modalMessage={modalMessage}
+            openPage={handleSelectPage}
+            modalInfo={modalInfo}
+          />
+        );
+      case "Adicionar Usina":
+      case "Editar Usina":
+        return <AddUsina toastMessage={toastMessage} editData={editData} />;
       case "Atividades de Campo":
-        return <Atividades setPage={setSelectedPage} />;
+        return <Atividades />;
       case "Usuários":
-        return <Users setPage={setSelectedPage} />;
+        return <Users />;
       default:
         alert("Página em construção");
-        setSelectedPage("Administrativo");
+        setPageTrail(["Administrativo"]);
     }
   };
 
   return (
     <styled.contentDiv $windowHeight={windowHeight}>
-      {selectedPage === "Administrativo" ? (
+      {pageTrail[pageTrail.length - 1] === "Administrativo" ? (
         <>
           <styled.infoBlocksDiv>
             <styled.infoBlock $first={true}>
@@ -85,7 +112,7 @@ export const Adm = ({ windowHeight }) => {
                 Controle de Empresa
               </styled.optionsTitleDiv>
               <styled.optionButton
-                onClick={() => handleSelectPage("Colaboradores")}
+                onClick={() => handleSelectPage("Colaboradores", 1)}
               >
                 <div>
                   <SVGEmployees width="30" height="35" />
@@ -93,7 +120,7 @@ export const Adm = ({ windowHeight }) => {
                 <span>Colaboradores</span>
               </styled.optionButton>
               <styled.optionButton
-                onClick={() => handleSelectPage("Centros de Custos")}
+                onClick={() => handleSelectPage("Centros de Custos", 1)}
               >
                 <div>
                   <SVGCentroCusto width="20" height="20" />
@@ -101,20 +128,24 @@ export const Adm = ({ windowHeight }) => {
                 <span>Centros de Custos</span>
               </styled.optionButton>
               <styled.optionButton
-                onClick={() => handleSelectPage("Departamentos")}
+                onClick={() => handleSelectPage("Departamentos", 1)}
               >
                 <div>
                   <SVGDepartments width="20" height="20" />
                 </div>
                 <span>Departamentos</span>
               </styled.optionButton>
-              <styled.optionButton onClick={() => handleSelectPage("Aditivos")}>
+              <styled.optionButton
+                onClick={() => handleSelectPage("Aditivos", 1)}
+              >
                 <div>
                   <SVGAdictives width="20" height="20" />
                 </div>
                 <span>Aditivos</span>
               </styled.optionButton>
-              <styled.optionButton onClick={() => handleSelectPage("Equipes")}>
+              <styled.optionButton
+                onClick={() => handleSelectPage("Equipes", 1)}
+              >
                 <div>
                   <SVGTeam width="20" height="20" />
                 </div>
@@ -122,7 +153,7 @@ export const Adm = ({ windowHeight }) => {
               </styled.optionButton>
               <styled.optionsTitleDiv>Controle de Obra</styled.optionsTitleDiv>
               <styled.optionButton
-                onClick={() => handleSelectPage("Usinas/Obras")}
+                onClick={() => handleSelectPage("Usinas/Obras", 1)}
               >
                 <div>
                   <SVGUsinas width="20" height="20" />
@@ -130,7 +161,7 @@ export const Adm = ({ windowHeight }) => {
                 <span>Usinas/Obras</span>
               </styled.optionButton>
               <styled.optionButton
-                onClick={() => handleSelectPage("Atividades de Campo")}
+                onClick={() => handleSelectPage("Atividades de Campo", 1)}
               >
                 <div>
                   <SVGTools width="20" height="20" />
@@ -142,26 +173,32 @@ export const Adm = ({ windowHeight }) => {
               <styled.optionsTitleDiv>
                 Controle da aplicação
               </styled.optionsTitleDiv>
-              <styled.optionButton onClick={() => handleSelectPage("Usuários")}>
+              <styled.optionButton
+                onClick={() => handleSelectPage("Usuários", 1)}
+              >
                 <div>
                   <SVGAppUsers width="20" height="20" />
                 </div>
                 <span>Usuários</span>
               </styled.optionButton>
-              <styled.optionButton onClick={() => handleSelectPage("Páginas")}>
+              <styled.optionButton
+                onClick={() => handleSelectPage("Páginas", 1)}
+              >
                 <div>
                   <SVGPages width="17" height="20" />
                 </div>
                 <span>Páginas</span>
               </styled.optionButton>
-              <styled.optionButton onClick={() => handleSelectPage("Status")}>
+              <styled.optionButton
+                onClick={() => handleSelectPage("Status", 1)}
+              >
                 <div>
                   <SVGStatus width="20" height="20" />
                 </div>
                 <span>Status</span>
               </styled.optionButton>
               <styled.optionButton
-                onClick={() => handleSelectPage("Histórico")}
+                onClick={() => handleSelectPage("Histórico", 1)}
               >
                 <div>
                   <SVGLogs width="20" height="20" />
@@ -177,7 +214,9 @@ export const Adm = ({ windowHeight }) => {
             {pageTrail.map((page, index) => (
               <span key={index}>
                 <SVGArrowRight width="20" height="20" />
-                <span onClick={() => handleSelectPage(page)}>{page}</span>
+                <span onClick={() => handleSelectPage(page, index)}>
+                  {page}
+                </span>
               </span>
             ))}
           </styled.pageTrailDiv>

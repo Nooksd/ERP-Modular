@@ -44,7 +44,7 @@ class WorkController {
       }
       const userId = req.user.user._id;
 
-      const userWorks = await Work.find({ managerIds: userId });
+      const userWorks = await Work.find({ managerIds: userId, isActive: true });
 
       if (!userWorks.length) {
         return res.status(404).json({
@@ -112,8 +112,24 @@ class WorkController {
           status: false,
         });
       }
-      const { page = 1, limit = 10 } = req.query;
-      const works = await Work.find()
+      const {
+        page = 1,
+        limit = 10,
+        name,
+        order = true,
+        active = true,
+      } = req.query;
+
+      let filter = name ? { name: { $regex: name, $options: "i" } } : {};
+
+      filter = { ...filter, isActive: active === "true" };
+
+      const sortOrder = order ? 1 : -1;
+
+      const totalWorks = await Work.countDocuments(filter);
+
+      const works = await Work.find(filter)
+        .sort({ ["name"]: sortOrder })
         .limit(limit * 1)
         .skip((page - 1) * limit)
         .exec();
@@ -121,6 +137,11 @@ class WorkController {
       res.status(200).json({
         message: "Obras listadas com sucesso",
         works,
+        pagination: {
+          totalWorks,
+          totalPages: Math.ceil(totalWorks / limit),
+          currentPage: parseInt(page),
+        },
         status: true,
       });
     } catch (e) {

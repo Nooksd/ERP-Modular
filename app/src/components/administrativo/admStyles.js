@@ -209,24 +209,5 @@ export const pageContent = styled.div`
   height: 100%;
   display: flex;
   flex-direction: column;
-  overflow-y: auto;
   border: 3px solid ${(props) => props.theme.colors.grey};
-
-  &::-webkit-scrollbar {
-    width: 8px;
-  }
-
-  &::-webkit-scrollbar-track {
-    background: ${(props) => props.theme.colors.primary_2};
-    border-radius: 10px;
-  }
-
-  &::-webkit-scrollbar-thumb {
-    background: ${(props) => props.theme.colors.secondary_2};
-    border-radius: 10px;
-  }
-
-  &::-webkit-scrollbar-thumb:hover {
-    background: ${(props) => props.theme.colors.secondary_1};
-  }
 `;

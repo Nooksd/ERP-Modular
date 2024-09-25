@@ -2,7 +2,7 @@ import styled from "styled-components";
 
 export const headerUsinasDiv = styled.div`
   width: 100%;
-  height: 45px;
+  min-height: 45px;
   display: flex;
   gap: 20px;
   align-items: center;
@@ -24,7 +24,7 @@ export const Division = styled.nav`
 
 export const filterOptionsDiv = styled.div`
   width: 100%;
-  height: 200px;
+  min-height: 200px;
 `;
 
 export const addNewOneDiv = styled.div`
@@ -64,7 +64,7 @@ export const filterAndInfoDiv = styled.div`
   background-color: ${(props) => props.theme.fonts.color};
   color: ${(props) => props.theme.colors.primary_dark};
   padding: 0 30px;
-  border-top: 1px solid ${(props) => props.theme.colors.primary_dark};
+  border-top: 3px solid ${(props) => props.theme.colors.primary_dark};
   border-bottom: 1px solid ${(props) => props.theme.colors.primary_dark};
   display: flex;
   flex-direction: column;
@@ -76,7 +76,7 @@ export const switchModeDiv = styled.div`
   display: flex;
   height: 40px;
   left: 40px;
-  top: -41px;
+  top: -43px;
 `;
 
 export const switchModeButton = styled.button`
@@ -260,4 +260,37 @@ export const DeleteButton = styled.button`
       }
     }
   }
+`;
+
+export const resultsDiv = styled.div`
+  width: 100%;
+  height: 100%;
+  overflow-y: auto;
+
+  &::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: ${(props) => props.theme.colors.primary_2};
+    border-radius: 10px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: ${(props) => props.theme.colors.secondary_2};
+    border-radius: 10px;
+  }
+
+  &::-webkit-scrollbar-thumb:hover {
+    background: ${(props) => props.theme.colors.secondary_1};
+  }
+`;
+
+export const paginationDiv = styled.div`
+  width: 100%;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
 `;
