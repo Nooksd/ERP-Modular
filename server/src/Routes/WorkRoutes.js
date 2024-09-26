@@ -25,7 +25,7 @@ WorkRoutes.get(
   WorkController.getAllWorks
 );
 WorkRoutes.put(
-  "/:workId",
+  "/update-work/:workId",
   JWT.validateAccessToken,
   WorkController.updateWork
 );

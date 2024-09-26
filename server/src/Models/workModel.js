@@ -10,6 +10,11 @@ const workSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    cno: {
+      type: Number,
+      required: true,
+      unique: true,
+    },
     startDate: {
       type: Date,
       required: true,
@@ -28,5 +33,19 @@ const workSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
+
+workSchema.statics.isUnique = async function (cno) {
+  try {
+    if (!cno) throw new Error("Dados inválidos");
+
+    const cnoInDatabase = await this.findOne({ cno });
+
+    if (cnoInDatabase) return false;
+    return true;
+  } catch (err) {
+    console.log("Erro ao verificar dados", err.message);
+    return false;
+  }
+};
 
 export default mongoose.model("Work", workSchema);

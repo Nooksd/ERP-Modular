@@ -12,8 +12,10 @@ class WorkController {
 
       const { workId } = req.params;
 
+      
       const work = await Work.findById(workId).exec();
 
+      
       if (!work) {
         return res.status(404).json({
           message: "Obra não encontrada",
@@ -23,7 +25,7 @@ class WorkController {
 
       res.status(200).json({
         message: "Obra encontrada com sucesso",
-        employee,
+        work,
         status: true,
       });
     } catch (e) {
@@ -74,24 +76,42 @@ class WorkController {
         });
       }
 
-      const { name, location, startDate, endDate, isActive, managerIds } =
-        req.body;
+      const { name, location, cno, startDate, endDate, managerIds } = req.body;
 
-      if (!name || !location || !startDate) {
+      if (!name || !location || !cno || !startDate) {
         return res.status(400).json({
           message: "Todos os campos são obrigatórios",
           status: false,
         });
       }
 
-      Work.create({
-        name,
-        location,
-        startDate,
-        endDate,
-        isActive,
-        managerIds,
-      });
+      const isUnique = await Work.isUnique(cno);
+
+      if (!isUnique) {
+        return res.status(409).json({
+          message: "Obra já cadastrada",
+          status: false,
+        });
+      }
+
+      if (endDate) {
+        Work.create({
+          name,
+          location,
+          cno,
+          startDate: new Date(startDate),
+          endDate: new Date(endDate),
+          managerIds,
+        });
+      } else {
+        Work.create({
+          name,
+          location,
+          cno,
+          startDate: new Date(startDate),
+          managerIds,
+        });
+      }
 
       res.status(201).json({
         message: "Obra criada com sucesso",
@@ -99,11 +119,12 @@ class WorkController {
       });
     } catch (e) {
       res.status(500).json({
-        message: "Erro interno do servidor " + e.message,
+        message: "Erro interno do servidor",
         status: false,
       });
     }
   }
+
   static async getAllWorks(req, res) {
     try {
       if (!req.user.user.isManager) {
@@ -160,12 +181,13 @@ class WorkController {
         });
       }
       const workId = req.params.workId;
-      const { name, location, startDate, endDate, isActive, managerIds } =
+      const { name, location, cno, startDate, endDate, isActive, managerIds } =
         req.body;
 
       if (
         !name &&
         !location &&
+        !cno &&
         !startDate &&
         !endDate &&
         !managerIds &&
@@ -181,6 +203,7 @@ class WorkController {
       const updateData = {};
       if (name) updateData.name = name;
       if (location) updateData.location = location;
+      if (cno) updateData.cno = cno;
       if (startDate) updateData.startDate = startDate;
       if (endDate) updateData.endDate = endDate;
       if (isActive === true || isActive === false)
@@ -210,7 +233,7 @@ class WorkController {
       });
     } catch (e) {
       res.status(500).json({
-        message: "Erro interno do servidor " + e.message,
+        message: "Erro interno do servidor",
         status: false,
       });
     }
@@ -239,7 +262,7 @@ class WorkController {
       });
     } catch (e) {
       res.status(500).json({
-        message: "Erro interno do servidor " + e.message,
+        message: "Erro interno do servidor",
         status: false,
       });
     }

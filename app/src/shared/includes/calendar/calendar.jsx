@@ -1,13 +1,28 @@
 import { useState } from "react";
 import * as styled from "./calendarStyles.js";
 
-const Calendar = ({ selectedDay, onDaySelect, single = true }) => {
+const Calendar = ({
+  selectedDay,
+  onDaySelect,
+  single = true,
+  allowFuture = false,
+  minDate = null,
+}) => {
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const daysOfWeek = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sa"];
   const daysInMonth = (month, year) => new Date(year, month + 1, 0).getDate();
   const firstDayOfMonth = (month, year) => new Date(year, month, 1).getDay();
 
   const today = new Date();
+
+  const parseMinDate = (minDateString) => {
+    const day = minDateString.slice(0, 2);
+    const month = minDateString.slice(2, 4);
+    const year = minDateString.slice(4, 8);
+    return new Date(`${year}-${month}-${day}`);
+  };
+
+  const minDateParsed = minDate ? parseMinDate(minDate) : null;
 
   const handlePrevMonth = () => {
     const newDate = new Date(currentMonth);
@@ -88,6 +103,7 @@ const Calendar = ({ selectedDay, onDaySelect, single = true }) => {
   };
 
   const isNextDisabled =
+    !allowFuture &&
     currentMonth.getFullYear() === today.getFullYear() &&
     currentMonth.getMonth() === today.getMonth();
 
@@ -124,6 +140,15 @@ const Calendar = ({ selectedDay, onDaySelect, single = true }) => {
     }
   };
 
+  const isBeforeMinDate = (day, month, year) => {
+    if (!minDateParsed) return false;
+
+    const min = new Date(minDateParsed);
+    const currentDate = new Date(year, month, day);
+
+    return currentDate < min;
+  };
+
   return (
     <styled.calendarContainer>
       <styled.calendarHeader>
@@ -158,6 +183,7 @@ const Calendar = ({ selectedDay, onDaySelect, single = true }) => {
 
           const isFutureDay =
             day &&
+            !allowFuture &&
             (currentMonth.getFullYear() > today.getFullYear() ||
               (currentMonth.getFullYear() === today.getFullYear() &&
                 currentMonth.getMonth() > today.getMonth()) ||
@@ -165,13 +191,22 @@ const Calendar = ({ selectedDay, onDaySelect, single = true }) => {
                 currentMonth.getMonth() === today.getMonth() &&
                 day > today.getDate()));
 
+          const isDayDisabled =
+            !day ||
+            (isFutureDay && !allowFuture) ||
+            isBeforeMinDate(
+              day,
+              currentMonth.getMonth(),
+              currentMonth.getFullYear()
+            );
+
           return (
             <styled.calendarDay
               key={index}
-              $isDisabled={!day || isFutureDay}
+              $isDisabled={isDayDisabled}
               $isBetween={isBetween(dayKey)}
               $isSelected={isSelected(dayKey)}
-              onClick={() => !isFutureDay && day && handleDaySelect(dayKey)}
+              onClick={() => !isDayDisabled && day && handleDaySelect(dayKey)}
             >
               {day}
             </styled.calendarDay>

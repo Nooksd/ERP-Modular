@@ -2,7 +2,7 @@ import styled from "styled-components";
 
 export const contentDiv = styled.div`
   width: 100%;
-  height: ${(props) => `calc( ${props.$windowHeight}px - 115px)`};
+  height: calc(${(props) => props.$windowHeight}px - 115px);
   padding: 15px 20px;
   position: relative;
   display: inline-block;

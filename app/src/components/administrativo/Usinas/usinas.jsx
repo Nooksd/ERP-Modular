@@ -19,11 +19,10 @@ const Usinas = ({ toastMessage, modalMessage, modalInfo, openPage }) => {
   const [totalPages, setTotalPages] = useState(1);
 
   const [whatDelete, setWhatDelete] = useState("");
-  const [editInfo, setEditInfo] = useState([]);
 
   useEffect(() => {
-    if (usinas.length > 0) handleSearchButtonClick();
-  }, [page]);
+    handleSearchButtonClick();
+  }, [page, activeMode]);
 
   useEffect(() => {
     if (modalInfo.response !== null) {
