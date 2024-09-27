@@ -10,8 +10,9 @@ import SVGEdit from "../../../shared/icons/historyHH/Edit_icon.jsx";
 import SVGDelete from "../../../shared/icons/controleHH/Delete_icon.jsx";
 
 const Usinas = ({ toastMessage, modalMessage, modalInfo, openPage }) => {
-  const [activeMode, setActiveMode] = useState(true);
   const [usinas, setUsinas] = useState([]);
+  
+  const [activeMode, setActiveMode] = useState(true);
   const [order, setOrder] = useState(true);
   const [search, setSearch] = useState("");
   const [limit, setLimit] = useState(10);
@@ -19,6 +20,7 @@ const Usinas = ({ toastMessage, modalMessage, modalInfo, openPage }) => {
   const [totalPages, setTotalPages] = useState(1);
 
   const [whatDelete, setWhatDelete] = useState("");
+  const [whatDisable, setWhatDisable] = useState("");
 
   useEffect(() => {
     handleSearchButtonClick();
@@ -28,7 +30,10 @@ const Usinas = ({ toastMessage, modalMessage, modalInfo, openPage }) => {
     if (modalInfo.response !== null) {
       switch (modalInfo.event) {
         case "delete":
-          if (modalInfo.response) deleteRecord();
+          if (modalInfo.response) deleteUsina();
+          break;
+        case "disable":
+          if (modalInfo.response) disableUsina();
           break;
       }
       modalMessage({
@@ -44,7 +49,7 @@ const Usinas = ({ toastMessage, modalMessage, modalInfo, openPage }) => {
     openPage("Adicionar Usina", 2);
   };
 
-  const handleSearchButtonClick = async () => {
+  const handleSearchButtonClick = async (click = false) => {
     try {
       const response = await innovaApi.get(
         `/work/get-all-works?page=${page}&limit=${limit}&order=${order}&name=${search}&active=${activeMode}`
@@ -52,11 +57,13 @@ const Usinas = ({ toastMessage, modalMessage, modalInfo, openPage }) => {
 
       setUsinas(response.data.works);
       setTotalPages(response.data.pagination.totalPages);
-      toastMessage({
-        danger: false,
-        title: "Sucesso",
-        message: "Usinas encontradas com sucesso",
-      });
+      if (click) {
+        toastMessage({
+          danger: false,
+          title: "Sucesso",
+          message: "Usinas encontradas com sucesso",
+        });
+      }
     } catch (e) {
       toastMessage({
         danger: true,
@@ -81,7 +88,19 @@ const Usinas = ({ toastMessage, modalMessage, modalInfo, openPage }) => {
     openPage("Editar Usina", 2, usinaId);
   };
 
-  async function deleteRecord() {
+  const handleDisableUsina = (usinaId, usinaNome) => {
+    setWhatDisable(usinaId);
+    const action = activeMode ? "desativar" : "ativar";
+
+    modalMessage({
+      response: null,
+      event: "disable",
+      title: "Confirmação",
+      message: `Deseja ${action} a usina ${usinaNome}?`,
+    });
+  };
+
+  async function deleteUsina() {
     try {
       await innovaApi.delete(`/work/delete/${whatDelete}`);
       toastMessage({
@@ -96,6 +115,30 @@ const Usinas = ({ toastMessage, modalMessage, modalInfo, openPage }) => {
         danger: true,
         title: "Error",
         message: "Não foi possível excluir a usina",
+      });
+    }
+  }
+
+  async function disableUsina() {
+    try {
+      await innovaApi.put(`/work/update-work/${whatDisable}`, {
+        isActive: !activeMode,
+      });
+
+      const action = activeMode ? "desabilitada" : "habilitada";
+
+      toastMessage({
+        danger: false,
+        title: "Sucesso",
+        message: `Usina ${action} com sucesso`,
+      });
+      setWhatDisable("");
+      setActiveMode((prev) => !prev);
+    } catch (e) {
+      toastMessage({
+        danger: true,
+        title: "Error",
+        message: "Não foi possível desabilitar a usina",
       });
     }
   }
@@ -145,6 +188,9 @@ const Usinas = ({ toastMessage, modalMessage, modalInfo, openPage }) => {
             >
               <SVGDelete width="16" height="16" />
             </styled.DeleteButton>
+            <styled.disableButton
+              onClick={() => handleDisableUsina(usina._id, usina.name)}
+            />
           </styled.controllButtonsDiv>
         </styled.usinaDiv>
       );
@@ -202,7 +248,9 @@ const Usinas = ({ toastMessage, modalMessage, modalInfo, openPage }) => {
               >
                 <SVGUpDown width="25" height="25" decrescent={order} />
               </button>
-              <styled.searchButton onClick={() => handleSearchButtonClick()}>
+              <styled.searchButton
+                onClick={() => handleSearchButtonClick(true)}
+              >
                 <SVGSearch width="15" height="15" />
                 Buscar
               </styled.searchButton>

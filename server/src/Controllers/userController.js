@@ -113,7 +113,7 @@ class UserController {
           status: false,
         });
       }
-      
+
       const user = await JWT.validateRefreshToken(token);
 
       if (!user) {
@@ -307,10 +307,24 @@ class UserController {
         });
       }
 
-      const { page = 1, limit = 10 } = req.query;
+      const {
+        page = 1,
+        limit = 10,
+        name,
+        order = true,
+        active = true,
+      } = req.query;
 
-      const users = await User.find()
-        .select("name avatar")
+      let filter = name ? { name: { $regex: name, $options: "i" } } : {};
+
+      filter = { ...filter, isActive: active === "true" };
+
+      const sortOrder = order === "true" ? 1 : -1;
+
+      const totalUsers = await User.countDocuments(filter);
+
+      const users = await User.find(filter)
+        .sort({ ["name"]: sortOrder })
         .limit(limit * 1)
         .skip((page - 1) * limit)
         .exec();
@@ -318,6 +332,11 @@ class UserController {
       res.status(200).json({
         message: "Usuários listados com sucesso",
         users,
+        pagination: {
+          totalUsers,
+          totalPages: Math.ceil(totalUsers / limit),
+          currentPage: parseInt(page),
+        },
         status: true,
       });
     } catch (e) {

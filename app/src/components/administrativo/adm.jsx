@@ -59,7 +59,14 @@ export const Adm = ({
   const pageSelector = () => {
     switch (pageTrail[pageTrail.length - 1]) {
       case "Colaboradores":
-        return <Employees />;
+        return (
+          <Employees
+            toastMessage={toastMessage}
+            modalMessage={modalMessage}
+            openPage={handleSelectPage}
+            modalInfo={modalInfo}
+          />
+        );
       case "Usinas/Obras":
         return (
           <Usinas
@@ -73,9 +80,23 @@ export const Adm = ({
       case "Editar Usina":
         return <AddUsina toastMessage={toastMessage} editData={editData} />;
       case "Atividades de Campo":
-        return <Atividades />;
+        return (
+          <Atividades
+            toastMessage={toastMessage}
+            modalMessage={modalMessage}
+            openPage={handleSelectPage}
+            modalInfo={modalInfo}
+          />
+        );
       case "Usuários":
-        return <Users />;
+        return (
+          <Users
+            toastMessage={toastMessage}
+            modalMessage={modalMessage}
+            openPage={handleSelectPage}
+            modalInfo={modalInfo}
+          />
+        );
       default:
         alert("Página em construção");
         setPageTrail(["Administrativo"]);

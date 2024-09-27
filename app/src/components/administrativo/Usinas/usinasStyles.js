@@ -262,6 +262,39 @@ export const DeleteButton = styled.button`
   }
 `;
 
+export const disableButton = styled.button`
+  width: 35px;
+  height: 35px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 3px solid ${(props) => props.theme.colors.primary_dark};
+  cursor: pointer;
+  position: relative;
+
+  &:hover {
+    background-color: ${(props) => props.theme.colors.primary_dark};
+
+    &:after {
+      background-color: ${(props) => props.theme.fonts.color};
+    }
+  }
+
+  &:after {
+    content: "";
+    position: absolute;
+    width: 50%;
+    height: 50%;
+    border-radius: 50%;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    border: 1.5px solid ${(props) => props.theme.colors.primary_dark};
+    z-index: 2;
+  }
+`;
+
 export const resultsDiv = styled.div`
   width: 100%;
   height: 100%;
