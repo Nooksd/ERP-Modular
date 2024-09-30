@@ -151,9 +151,10 @@ class UserController {
         });
       }
 
-      const { name, email, password } = req.body;
+      const { name, email, password, employeeId, avatar, isManager, pages } =
+        req.body;
 
-      if (!name || !email || !password) {
+      if (!name || !email || !password || !employeeId) {
         return res.status(400).json({
           message: "Todos os campos são obrigatórios",
           status: false,
@@ -174,6 +175,10 @@ class UserController {
       User.create({
         name,
         email,
+        employeeId,
+        avatar,
+        isManager,
+        pages,
         password: hashedPassword,
       });
 
@@ -323,10 +328,11 @@ class UserController {
 
       const totalUsers = await User.countDocuments(filter);
 
-      const users = await User.find(filter)
+      const users = await User.find()
         .sort({ ["name"]: sortOrder })
         .limit(limit * 1)
         .skip((page - 1) * limit)
+        .select("-password")
         .exec();
 
       res.status(200).json({

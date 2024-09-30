@@ -42,9 +42,9 @@ class EmployeeController {
         });
       }
 
-      const { name, cpf, position, email, startDate } = req.body;
+      const { name, cpf, role, email, startDate, managerId } = req.body;
 
-      if (!name || !cpf || !position) {
+      if (!name || !cpf || !role) {
         return res.status(400).json({
           message: "Todos os campos são obrigatórios",
           status: false,
@@ -63,9 +63,10 @@ class EmployeeController {
       Employee.create({
         name,
         cpf,
-        position,
+        role,
         email,
         startDate,
+        managerId,
       });
 
       res.status(201).json({
@@ -117,15 +118,8 @@ class EmployeeController {
       }
 
       const { employeeId } = req.params;
-      const {
-        name,
-        cpf,
-        email,
-        position,
-        startDate,
-        isActive,
-        managerId,
-      } = req.body;
+      const { name, cpf, email, position, startDate, isActive, managerId } =
+        req.body;
 
       if (
         !name &&

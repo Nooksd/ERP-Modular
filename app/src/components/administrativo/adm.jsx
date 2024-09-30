@@ -24,6 +24,7 @@ import Employees from "./Employees/Employees.jsx";
 import Users from "./Users/Users.jsx";
 import Atividades from "./Atividades/Atv.jsx";
 import AddUsina from "./Usinas/addUsina/addusina.jsx";
+import AddUser from "./Users/addUser/addUser.jsx";
 
 export const Adm = ({
   windowHeight,
@@ -97,6 +98,9 @@ export const Adm = ({
             modalInfo={modalInfo}
           />
         );
+      case "Adicionar Usuário":
+      case "Editar Usuário":
+        return <AddUser toastMessage={toastMessage} editData={editData} />;
       default:
         alert("Página em construção");
         setPageTrail(["Administrativo"]);

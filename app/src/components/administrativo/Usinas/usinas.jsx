@@ -23,7 +23,7 @@ const Usinas = ({ toastMessage, modalMessage, modalInfo, openPage }) => {
   const [whatDisable, setWhatDisable] = useState("");
 
   useEffect(() => {
-    handleSearchButtonClick();
+    handleSearch();
   }, [page, activeMode]);
 
   useEffect(() => {
@@ -49,7 +49,7 @@ const Usinas = ({ toastMessage, modalMessage, modalInfo, openPage }) => {
     openPage("Adicionar Usina", 2);
   };
 
-  const handleSearchButtonClick = async (click = false) => {
+  const handleSearch = async (click = false) => {
     try {
       const response = await innovaApi.get(
         `/work/get-all-works?page=${page}&limit=${limit}&order=${order}&name=${search}&active=${activeMode}`
@@ -109,7 +109,7 @@ const Usinas = ({ toastMessage, modalMessage, modalInfo, openPage }) => {
         message: "Usina excluída com sucesso",
       });
       setWhatDelete("");
-      handleSearchButtonClick();
+      handleSearch();
     } catch (e) {
       toastMessage({
         danger: true,
@@ -249,7 +249,7 @@ const Usinas = ({ toastMessage, modalMessage, modalInfo, openPage }) => {
                 <SVGUpDown width="25" height="25" decrescent={order} />
               </button>
               <styled.searchButton
-                onClick={() => handleSearchButtonClick(true)}
+                onClick={() => handleSearch(true)}
               >
                 <SVGSearch width="15" height="15" />
                 Buscar

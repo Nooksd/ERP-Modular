@@ -15,6 +15,7 @@ import WorkRoutes from "./src/Routes/WorkRoutes.js";
 import EmployeeRoutes from "./src/Routes/EmployeeRoutes.js";
 import ActivityRoutes from "./src/Routes/activityRoutes.js";
 import RoleRoutes from "./src/Routes/RoleRoutes.js";
+import PageRoutes from "./src/Routes/PagesRoutes.js";
 
 app.use(
   cors({
@@ -41,6 +42,7 @@ app.use("/api/work", WorkRoutes);
 app.use("/api/employee", EmployeeRoutes);
 app.use("/api/activity", ActivityRoutes);
 app.use("/api/role", RoleRoutes);
+app.use("/api/page", PageRoutes);
 
 app.use("/*", (req, res) => {
   res.status(404).json({
