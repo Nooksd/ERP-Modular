@@ -15,9 +15,11 @@ export const formContainer = styled.div`
   width: 1000px;
   height: 80%;
   display: flex;
-  flex-direction: column;
+  flex-wrap: wrap;
+  flex-direction: row;
+  padding: 20px 0;
   gap: 50px;
-  align-items: center;
+  align-content: flex-start;
   justify-content: center;
   margin: 0 auto;
   border-top: 3px solid ${(props) => props.theme.colors.primary_dark};

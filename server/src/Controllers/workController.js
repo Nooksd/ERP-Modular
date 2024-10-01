@@ -38,12 +38,6 @@ class WorkController {
 
   static async getUserWorks(req, res) {
     try {
-      if (!req.user.user.isManager) {
-        return res.status(403).json({
-          message: "Sem permissão",
-          status: false,
-        });
-      }
       const userId = req.user.user._id;
 
       const userWorks = await Work.find({ managerIds: userId, isActive: true });

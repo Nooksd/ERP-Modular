@@ -115,14 +115,14 @@ const Users = ({ toastMessage, modalMessage, modalInfo, openPage }) => {
       toastMessage({
         danger: true,
         title: "Error",
-        message: "Não foi possível excluir a usuário",
+        message: "Não foi possível excluir o usuário",
       });
     }
   }
 
   async function disableUser() {
     try {
-      await innovaApi.put(`/work/update-work/${whatDisable}`, {
+      await innovaApi.put(`/user/update-user/${whatDisable}`, {
         isActive: !activeMode,
       });
 

@@ -33,7 +33,8 @@ export const Adm = ({
   modalInfo,
 }) => {
   const [pageTrail, setPageTrail] = useState(
-    JSON.parse(localStorage.getItem("PageTrail"))
+    JSON.parse(localStorage.getItem("PageTrail")) ||
+      ["Administrativo"]
   );
   const [editData, setEditData] = useState("");
 

@@ -127,7 +127,7 @@ const AddUser = ({ toastMessage, editData }) => {
     } else {
       setEmailError(false);
     }
-    if (!userInfo.password || userInfo.password.length < 5) {
+    if ((!userInfo.password || userInfo.password.length < 5) && !editData) {
       setPasswordError(true);
       isValid = false;
     } else {
@@ -243,20 +243,37 @@ const AddUser = ({ toastMessage, editData }) => {
           />
         </styled.formDiv>
         <styled.formManagerAndSubmitButtonDiv>
-          <styled.formManagerSelect
-            $error={employeeIdError}
-            value={userInfo.employeeId}
-            name="employeeId"
-            onChange={(e) => handleInputChange(e)}
-          >
-            <option value="">Selecionar funcionário</option>
-            {employees.employees.map((employee) => (
-              <option key={employee.name} value={employee._id}>
-                {employee.name}
-              </option>
-            ))}
-          </styled.formManagerSelect>
-          <div>teste</div>
+          <styled.formDiv>
+            <styled.formLabel>funcionário da conta</styled.formLabel>
+            <styled.formManagerSelect
+              $error={employeeIdError}
+              value={userInfo.employeeId}
+              name="employeeId"
+              onChange={(e) => handleInputChange(e)}
+            >
+              <option value="">Selecionar funcionário</option>
+              {employees.employees.map((employee) => (
+                <option key={employee.name} value={employee._id}>
+                  {employee.name}
+                </option>
+              ))}
+            </styled.formManagerSelect>
+          </styled.formDiv>
+          <styled.formDiv style={{ width: 100 }}>
+            <styled.formLabel style={{ padding: 0 }}>
+              funcionário Gestor
+            </styled.formLabel>
+            <styled.formManagerSwitch
+              onClick={() => {
+                setUserInfo((prevInfo) => ({
+                  ...prevInfo,
+                  isManager: !prevInfo.isManager,
+                }));
+              }}
+            >
+              <styled.formManagerSwitchButton $active={userInfo.isManager} />
+            </styled.formManagerSwitch>
+          </styled.formDiv>
         </styled.formManagerAndSubmitButtonDiv>
         <styled.formManagerAndSubmitButtonDiv>
           <styled.formManagerDiv>

@@ -17,7 +17,7 @@ export const formContainer = styled.div`
   display: flex;
   flex-wrap: wrap;
   flex-direction: row;
-  padding-top: 20px;
+  padding: 20px 0;
   gap: 50px;
   align-content: flex-start;
   justify-content: center;
@@ -92,6 +92,7 @@ export const formLabel = styled.label`
   padding: 10px;
   color: ${(props) => props.theme.colors.primary_dark};
   font-size: 18px;
+  white-space: nowrap;
 `;
 
 export const formInputDiv = styled.div`
@@ -102,64 +103,61 @@ export const formInputDiv = styled.div`
   gap: 10%;
 `;
 
-export const formDateDiv = styled.div`
-  width: 100%;
-  min-height: 40px;
-  display: flex;
-  align-items: center;
-  justify-content: space-around;
-  padding: 10px;
-  border: 1px solid
-    ${(props) =>
-      props.$error
-        ? props.theme.colors.danger
-        : props.theme.colors.primary_dark};
-  background-color: #f6f8fd;
-  position: relative;
-  border-radius: 5px;
-  color: ${(props) => props.theme.colors.primary_dark};
-  font-size: 18px;
-
-  span {
-    width: 100px;
-  }
-`;
-
-export const calendarDeleteIconDiv = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-  gap: 10px;
-
-  svg:last-child {
-    cursor: pointer;
-    path {
-      fill: ${(props) => props.theme.colors.danger};
-    }
-  }
-`;
-
-export const calendarContainerStart = styled.div`
-  position: absolute;
-  z-index: 1000;
-  top: -320px;
-  left: 20px;
-`;
-
-export const calendarContainerEnd = styled.div`
-  position: absolute;
-  z-index: 1000;
-  top: -320px;
-  right: 90%;
-`;
-
 export const formManagerAndSubmitButtonDiv = styled.div`
   width: 80%;
   display: flex;
+  align-items: center;
   align-items: start;
   justify-content: start;
   gap: 100px;
+`;
+
+export const formManagerSwitch = styled.div`
+  width: 40px;
+  height: 30px;
+  margin-left: 40px;
+  border: none;
+  position: relative;
+  background-color: ${(props) => props.theme.colors.grey};
+  cursor: pointer;
+
+  &:before {
+    content: "";
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background-color: ${(props) => props.theme.colors.grey};
+    position: absolute;
+    top: 0;
+    left: -18px;
+  }
+
+  &:after {
+    content: "";
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background-color: ${(props) => props.theme.colors.grey};
+    position: absolute;
+    top: 0;
+    right: -18px;
+  }
+`;
+
+export const formManagerSwitchButton = styled.div`
+  width: 25px;
+  height: 25px;
+  border-radius: 50%;
+  position: absolute;
+  top: 50%;
+  left: ${(props) => (props.$active ? "28px" : "-12px")};
+  transition: left 0.3s ease;
+  transform: translateY(-50%);
+  background-color: ${(props) =>
+    props.$active
+      ? props.theme.colors.secondary_2
+      : props.theme.colors.primary_dark};
+  z-index: 2;
 `;
 
 export const formManagerDiv = styled.div`

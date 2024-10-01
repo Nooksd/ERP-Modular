@@ -172,15 +172,16 @@ class UserController {
 
       const hashedPassword = bcrypt.hashSync(password, 10);
 
-      User.create({
-        name,
-        email,
-        employeeId,
-        avatar,
-        isManager,
-        pages,
-        password: hashedPassword,
-      });
+      const createData = {};
+      createData.name = name;
+      createData.email = email;
+      createData.employeeId = employeeId;
+      createData.password = hashedPassword;
+      if (avatar) createData.avatar = avatar;
+      if (isManager) createData.isManager = isManager;
+      if (pages && Array.isArray(pages)) createData.pages = pages;
+
+      User.create(createData);
 
       res.status(201).json({
         message: "Usuário criado com sucesso",
@@ -211,7 +212,7 @@ class UserController {
         avatar,
         pages,
         isManager,
-        allowedProjects,
+        isActive,
       } = req.body;
 
       if (
@@ -222,7 +223,8 @@ class UserController {
         !pages &&
         isManager !== true &&
         isManager !== false &&
-        !allowedProjects
+        isActive !== true &&
+        isActive !== false
       ) {
         return res.status(400).json({
           message: "Nenhum dado para atualizar",
@@ -240,6 +242,8 @@ class UserController {
       if (avatar) updateData.avatar = avatar;
       if (isManager === true || isManager === false)
         updateData.isManager = isManager;
+      if (isActive === true || isActive === false)
+        updateData.isActive = isActive;
       if (pages && Array.isArray(pages)) updateData.pages = pages;
 
       const user = await User.findByIdAndUpdate(
@@ -328,7 +332,7 @@ class UserController {
 
       const totalUsers = await User.countDocuments(filter);
 
-      const users = await User.find()
+      const users = await User.find(filter)
         .sort({ ["name"]: sortOrder })
         .limit(limit * 1)
         .skip((page - 1) * limit)
