@@ -10,17 +10,17 @@ EmployeeRoutes.get(
   EmployeeController.getEmployee
 );
 EmployeeRoutes.post(
-  "/add-employee",
+  "/create",
   JWT.validateAccessToken,
   EmployeeController.createEmployee
 );
 EmployeeRoutes.get(
-  "/get-all-employees",
+  "/get-all",
   JWT.validateAccessToken,
   EmployeeController.getAllEmployees
 );
 EmployeeRoutes.put(
-  "/:employeeId",
+  "/update/:employeeId",
   JWT.validateAccessToken,
   EmployeeController.updateEmployee
 );

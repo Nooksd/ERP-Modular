@@ -168,7 +168,7 @@ export const infoPartDiv = styled.div`
   width: 100%;
   height: 50%;
   display: grid;
-  grid-template-columns: 0.3fr 0.2fr 1fr 1fr 1fr 0.5fr;
+  grid-template-columns: 0.3fr 1fr 0.7fr 1.3fr 1fr 0.5fr;
   color: ${(props) => props.theme.colors.primary_dark};
   align-items: end;
   padding: 10px 0;
@@ -179,7 +179,7 @@ export const UserDiv = styled.div`
   height: 50px;
   padding: 0 30px;
   display: grid;
-  grid-template-columns: 0.3fr 0.2fr 1fr 1fr 1fr 0.5fr;
+  grid-template-columns: 0.3fr 1fr 0.7fr 1.3fr 1fr 0.5fr;
   align-items: center;
   background-color: ${(props) =>
     props.$isEven ? props.theme.fonts.color : props.theme.colors.grey};

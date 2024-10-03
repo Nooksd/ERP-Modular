@@ -22,6 +22,7 @@ UserRoutes.get(
   JWT.validateAccessToken,
   UserController.getAllUsers
 );
+UserRoutes.get("/get-managers", JWT.validateAccessToken, UserController.getManagers)
 UserRoutes.get("/get-one/:userId", JWT.validateAccessToken, UserController.getUserById);
 UserRoutes.put("/update-user/:userId", JWT.validateAccessToken, UserController.updateUser);
 UserRoutes.delete("/delete/:userId", JWT.validateAccessToken, UserController.deleteUser);

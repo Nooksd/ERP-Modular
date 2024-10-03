@@ -3,10 +3,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { innovaApi } from "../../../../services/http.js";
 import * as styled from "./addUserStyles.js";
 
-import Calendar from "../../../../shared/includes/calendar/calendar.jsx";
-
-import SVGCalendar from "../../../../shared/icons/controleHH/calendar_icon.jsx";
-import SVGDelete from "../../../../shared/icons/controleHH/Delete_icon.jsx";
 import { fetchEmployees } from "../../../../store/slicers/employeeSlicer.js";
 
 const AddUser = ({ toastMessage, editData }) => {
@@ -208,7 +204,7 @@ const AddUser = ({ toastMessage, editData }) => {
       </styled.formTitle>
       <styled.formContainer>
         <styled.formDiv $required={true}>
-          <styled.formLabel>Nome da usuário</styled.formLabel>
+          <styled.formLabel>Nome do usuário</styled.formLabel>
           <styled.formInput
             name="name"
             $error={nameError}

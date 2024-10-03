@@ -357,6 +357,32 @@ class UserController {
     }
   }
 
+  static async getManagers(req, res) {
+    try {
+      if (!req.user.user.isManager) {
+        return res.status(403).json({
+          message: "Sem permissão",
+          status: false,
+        });
+      }
+
+      const managers = await User.find({ isManager: true })
+        .select("-password")
+        .exec();
+
+      res.status(200).json({
+        message: "Lista de managers",
+        status: true,
+        managerIds: managers,
+      });
+    } catch (e) {
+      res.status(500).json({
+        message: "Erro interno do servidor",
+        status: false,
+      });
+    }
+  }
+
   static async deleteUser(req, res) {
     try {
       if (!req.user.user.isManager) {

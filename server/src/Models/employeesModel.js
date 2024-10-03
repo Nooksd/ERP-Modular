@@ -18,8 +18,7 @@ const employeeSchema = new mongoose.Schema(
       default: "",
     },
     role: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Role",
+      type: String,
       required: true,
     },
     startDate: {
@@ -29,7 +28,7 @@ const employeeSchema = new mongoose.Schema(
       type: Boolean,
       default: true,
     },
-    managerId: {
+    managerIds: {
       type: [mongoose.Schema.Types.ObjectId],
       ref: "User",
     },

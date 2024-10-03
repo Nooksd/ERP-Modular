@@ -89,9 +89,24 @@ class EmployeeController {
         });
       }
 
-      const { page = 1, limit = 10 } = req.query;
+      const {
+        page = 1,
+        limit = 10,
+        name,
+        order = true,
+        active = true,
+      } = req.query;
 
-      const employees = await Employee.find()
+      let filter = name ? { name: { $regex: name, $options: "i" } } : {};
+
+      filter = { ...filter, isActive: active === "true" };
+
+      const sortOrder = order ? 1 : -1;
+
+      const totalEmployees = await Employee.countDocuments(filter);
+
+      const employees = await Employee.find(filter)
+        .sort({ ["name"]: sortOrder })
         .limit(limit * 1)
         .skip((page - 1) * limit)
         .exec();
@@ -99,6 +114,11 @@ class EmployeeController {
       res.status(200).json({
         message: "Funcionários listados com sucesso",
         employees,
+        pagination: {
+          totalEmployees,
+          totalPages: Math.ceil(totalEmployees / limit),
+          currentPage: parseInt(page),
+        },
         status: true,
       });
     } catch (e) {

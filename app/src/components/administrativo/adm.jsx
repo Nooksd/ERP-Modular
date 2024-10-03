@@ -25,6 +25,7 @@ import Users from "./Users/Users.jsx";
 import Atividades from "./Atividades/Atv.jsx";
 import AddUsina from "./Usinas/addUsina/addusina.jsx";
 import AddUser from "./Users/addUser/addUser.jsx";
+import AddEmployee from "./Employees/addEmployee/addEmployee.jsx";
 
 export const Adm = ({
   windowHeight,
@@ -33,18 +34,21 @@ export const Adm = ({
   modalInfo,
 }) => {
   const [pageTrail, setPageTrail] = useState(
-    JSON.parse(localStorage.getItem("PageTrail")) ||
-      ["Administrativo"]
+    JSON.parse(localStorage.getItem("PageTrail")) || ["Administrativo"]
   );
-  const [editData, setEditData] = useState("");
+  const [editData, setEditData] = useState(
+    localStorage.getItem("editData") || ""
+  );
 
   const handleSelectPage = (page, index = null, editId = "") => {
     let newPageTrail = [];
 
     if (editId) {
       setEditData(editId);
+      localStorage.setItem("editData", editId);
     } else {
       setEditData("");
+      localStorage.removeItem("editData");
     }
 
     if (index !== null && index < pageTrail.length) {
@@ -69,6 +73,9 @@ export const Adm = ({
             modalInfo={modalInfo}
           />
         );
+      case "Adicionar Funcionário":
+      case "Editar Funcionário":
+        return <AddEmployee toastMessage={toastMessage} editData={editData} />;
       case "Usinas/Obras":
         return (
           <Usinas

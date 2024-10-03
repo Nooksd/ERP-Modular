@@ -24,7 +24,7 @@ const Employees = ({ toastMessage, modalMessage, modalInfo, openPage }) => {
   const [whatDisable, setWhatDisable] = useState("");
 
   useEffect(() => {
-    // handleSearch();
+    handleSearch();
   }, [page, activeMode]);
 
   useEffect(() => {
@@ -53,11 +53,11 @@ const Employees = ({ toastMessage, modalMessage, modalInfo, openPage }) => {
   const handleSearch = async (click = false) => {
     try {
       const response = await innovaApi.get(
-        `/employee/get-all-employees?page=${page}&limit=${limit}&order=${order}&name=${search}&active=${activeMode}`
+        `/employee/get-all?page=${page}&limit=${limit}&order=${order}&name=${search}&active=${activeMode}`
       );
       console.log(response);
 
-      setUsers(response.data.employees);
+      setEmployees(response.data.employees);
       setTotalPages(response.data.pagination.totalPages);
       if (click) {
         toastMessage({
@@ -123,7 +123,7 @@ const Employees = ({ toastMessage, modalMessage, modalInfo, openPage }) => {
 
   async function disableEmployee() {
     try {
-      await innovaApi.put(`/employee/update-employee/${whatDisable}`, {
+      await innovaApi.put(`/employee/update/${whatDisable}`, {
         isActive: !activeMode,
       });
 
@@ -147,20 +147,28 @@ const Employees = ({ toastMessage, modalMessage, modalInfo, openPage }) => {
 
   const RenderResultsOnPege = () => {
     return employees.map((employee, index) => {
+      const formatCPF = (cpf) => {
+        return cpf.replace(/^(\d{3})(\d{3})(\d{3})(\d{2})$/, "$1.$2.$3-$4");
+      };
       return (
         <styled.UserDiv $isEven={(index + 1) % 2 == 0} key={index}>
           <styled.userIndexSpan>
             {`#${index + 1 + (page - 1) * limit}`}
           </styled.userIndexSpan>
           <styled.userDataSpan>{employee.name}</styled.userDataSpan>
-          <styled.userDataSpan>{employee.cpf}</styled.userDataSpan>
+          <styled.userDataSpan>{formatCPF(employee.cpf)}</styled.userDataSpan>
           <styled.userDataSpan>{employee.email}</styled.userDataSpan>
+          <styled.userDataSpan>{employee.role}</styled.userDataSpan>
           <styled.controllButtonsDiv>
-            <styled.EditButton onClick={() => handleEditButtonClick(employee._id)}>
+            <styled.EditButton
+              onClick={() => handleEditButtonClick(employee._id)}
+            >
               <SVGEdit width="20" height="20" />
             </styled.EditButton>
             <styled.DeleteButton
-              onClick={() => handleDeleteButtonClick(employee._id, employee.name)}
+              onClick={() =>
+                handleDeleteButtonClick(employee._id, employee.name)
+              }
             >
               <SVGDelete width="16" height="16" />
             </styled.DeleteButton>
@@ -231,10 +239,10 @@ const Employees = ({ toastMessage, modalMessage, modalInfo, openPage }) => {
           </styled.filterPartDiv>
           <styled.infoPartDiv>
             <span>Index</span>
-            <span>Foto</span>
             <span>Nome</span>
+            <span>Cpf</span>
             <span>Email</span>
-            <span>Páginas</span>
+            <span>Função</span>
             <span>Controles</span>
           </styled.infoPartDiv>
         </styled.filterAndInfoDiv>

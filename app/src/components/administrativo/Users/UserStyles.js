@@ -193,6 +193,7 @@ export const userIndexSpan = styled.span`
 
 export const userAvatarImg = styled.img`
   height: 45px;
+  aspect-ratio: 1;
   border-radius: 5px;
 `;
 

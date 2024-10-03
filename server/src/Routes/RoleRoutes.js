@@ -14,5 +14,6 @@ RoleRoutes.get(
   JWT.validateAccessToken,
   RoleController.getAllFieldRoles
 );
+RoleRoutes.get("/get-all", JWT.validateAccessToken, RoleController.getAllRoles)
 
 export default RoleRoutes;

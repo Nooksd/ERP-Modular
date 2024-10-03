@@ -3,7 +3,7 @@ import Role from "../Models/RoleModel.js";
 class RoleController {
   static async createRole(req, res) {
     try {
-      if (!req.user.user.isManager) {
+      if (!req.user.user.pages.includes("Administrativo")) {
         return res.status(403).json({
           message: "Sem permissão",
           status: false,
@@ -43,7 +43,40 @@ class RoleController {
       });
     } catch (e) {
       res.status(500).json({
-        message: "Erro interno do servidor " + e.message,
+        message: "Erro interno do servidor",
+        status: false,
+      });
+    }
+  }
+
+  static async getAllRoles(req, res) {
+    try {
+      if (!req.user.user.pages.includes("Administrativo")) {
+        return res.status(403).json({
+          message: "Sem permissão",
+          status: false,
+        });
+      }
+
+      const roles = await Role.find()
+        .select("-baseSalary -isField -additives")
+        .exec();
+
+      if (!roles) {
+        return res.status(404).json({
+          message: "Sem funções",
+          status: false,
+        });
+      }
+
+      res.status(200).json({
+        message: "Funções",
+        roles,
+        status: true,
+      });
+    } catch (e) {
+      res.status(500).json({
+        message: "Erro interno do servidor",
         status: false,
       });
     }
@@ -51,7 +84,9 @@ class RoleController {
 
   static async getAllFieldRoles(req, res) {
     try {
-      const roles = await Role.find({ isField: true }).select("-baseSalary -isField -additives").exec();
+      const roles = await Role.find({ isField: true })
+        .select("-baseSalary -isField -additives")
+        .exec();
 
       if (!roles) {
         return res.status(404).json({
@@ -67,7 +102,7 @@ class RoleController {
       });
     } catch (e) {
       res.status(500).json({
-        message: "Erro interno do servidor " + e.message,
+        message: "Erro interno do servidor",
         status: false,
       });
     }
