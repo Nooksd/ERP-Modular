@@ -37,6 +37,10 @@ const AddUsina = ({ toastMessage, editData }) => {
   const addManagerRef = useRef(null);
 
   useEffect(() => {
+    console.log(appUsers.get);
+  }, [appUsers]);
+
+  useEffect(() => {
     if (!appUsers || appUsers.status !== "succeeded") {
       dispatch(fetchAppUsers());
     }
@@ -140,7 +144,7 @@ const AddUsina = ({ toastMessage, editData }) => {
         let response;
         if (editData) {
           response = await innovaApi.put(
-            `/work/update-work/${editData}`,
+            `/work/update/${editData}`,
             newUsinaInfo
           );
         } else {

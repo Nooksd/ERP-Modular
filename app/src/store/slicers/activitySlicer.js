@@ -4,7 +4,7 @@ import { innovaApi } from "../../services/http";
 export const fetchActivities = createAsyncThunk(
   "activity/fetchActivities",
   async () => {
-    const { data } = await innovaApi.get("/activity/get-all-activities");
+    const { data } = await innovaApi.get("/activity/get-all");
     return data;
   }
 );

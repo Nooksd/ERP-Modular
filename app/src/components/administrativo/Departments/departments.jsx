@@ -1,19 +1,16 @@
 import { useEffect, useState } from "react";
 import { innovaApi } from "../../../services/http.js";
 
-import * as styled from "./UserStyles.js";
+import * as styled from "./departmentsStyle.js";
 
-import SVGCheck from "../../../shared/icons/adm/usinas/Check_icon.jsx";
-import SVGClose from "../../../shared/icons/adm/usinas/Close_icon.jsx";
 import SVGUpDown from "../../../shared/icons/historyHH/UpDownArrow_icon.jsx";
 import SVGSearch from "../../../shared/icons/historyHH/Search_icon.jsx";
 import SVGEdit from "../../../shared/icons/historyHH/Edit_icon.jsx";
 import SVGDelete from "../../../shared/icons/controleHH/Delete_icon.jsx";
 
-const Users = ({ toastMessage, modalMessage, modalInfo, openPage }) => {
-  const [users, setUsers] = useState([]);
+const Departments = ({ toastMessage, modalMessage, modalInfo, openPage }) => {
+  const [roles, setRoles] = useState([]);
 
-  const [activeMode, setActiveMode] = useState(true);
   const [order, setOrder] = useState(true);
   const [search, setSearch] = useState("");
   const [limit, setLimit] = useState(10);
@@ -21,20 +18,16 @@ const Users = ({ toastMessage, modalMessage, modalInfo, openPage }) => {
   const [totalPages, setTotalPages] = useState(1);
 
   const [whatDelete, setWhatDelete] = useState("");
-  const [whatDisable, setWhatDisable] = useState("");
 
   useEffect(() => {
     handleSearch();
-  }, [page, activeMode]);
+  }, [page]);
 
   useEffect(() => {
     if (modalInfo.response !== null) {
       switch (modalInfo.event) {
         case "delete":
-          if (modalInfo.response) deleteUser();
-          break;
-        case "disable":
-          if (modalInfo.response) disableUser();
+          if (modalInfo.response) deleteEmployee();
           break;
       }
       modalMessage({
@@ -47,67 +40,55 @@ const Users = ({ toastMessage, modalMessage, modalInfo, openPage }) => {
   }, [modalInfo.response]);
 
   const handleAddOne = () => {
-    openPage("Adicionar Usuário", 2);
+    openPage("Adicionar Função", 2);
   };
 
   const handleSearch = async (click = false) => {
     try {
       const response = await innovaApi.get(
-        `/user/get-all?page=${page}&limit=${limit}&order=${order}&name=${search}&active=${activeMode}`
+        `/role/get-all?page=${page}&limit=${limit}&order=${order}&name=${search}`
       );
 
-      setUsers(response.data.users);
+      setRoles(response.data.roles);
       setTotalPages(response.data.pagination.totalPages);
       if (click) {
         toastMessage({
           danger: false,
           title: "Sucesso",
-          message: "Usuários encontrados com sucesso",
+          message: "Funcões encontradas com sucesso",
         });
       }
     } catch (e) {
       toastMessage({
         danger: true,
         title: "Error",
-        message: "Erro ao buscar Usuários",
+        message: "Erro ao buscar as funções",
       });
     }
   };
 
-  const handleDeleteButtonClick = async (userId, userNome) => {
-    setWhatDelete(userId);
+  const handleDeleteButtonClick = async (roleId, roleName) => {
+    setWhatDelete(roleId);
 
     modalMessage({
       response: null,
       event: "delete",
       title: "Confirmação",
-      message: `Deseja excluir o usuário ${userNome} (Ação Permanente)?`,
+      message: `Deseja excluir a função ${roleName} (Ação Permanente)?`,
     });
   };
 
-  const handleEditButtonClick = (userId) => {
-    openPage("Editar Usuário", 2, userId);
+  const handleEditButtonClick = (roleId) => {
+    openPage("Editar Função", 2, roleId);
   };
 
-  const handleDisableToggle = (userId, userNome) => {
-    setWhatDisable(userId);
-    const action = activeMode ? "desativar" : "ativar";
-
-    modalMessage({
-      response: null,
-      event: "disable",
-      title: "Confirmação",
-      message: `Deseja ${action} o usuário ${userNome}?`,
-    });
-  };
-
-  async function deleteUser() {
+  async function deleteEmployee() {
     try {
-      await innovaApi.delete(`/user/delete/${whatDelete}`);
+      await innovaApi.delete(`/role/delete/${whatDelete}`);
       toastMessage({
         danger: false,
         title: "Sucesso",
-        message: "Usuário excluído com sucesso",
+        message: "Função excluída com sucesso",
       });
       setWhatDelete("");
       handleSearch();
@@ -115,58 +96,36 @@ const Users = ({ toastMessage, modalMessage, modalInfo, openPage }) => {
       toastMessage({
         danger: true,
         title: "Error",
-        message: "Não foi possível excluir o usuário",
-      });
-    }
-  }
-
-  async function disableUser() {
-    try {
-      await innovaApi.put(`/user/update-user/${whatDisable}`, {
-        isActive: !activeMode,
-      });
-
-      const action = activeMode ? "desabilitada" : "habilitada";
-
-      toastMessage({
-        danger: false,
-        title: "Sucesso",
-        message: `Usuário ${action} com sucesso`,
-      });
-      setWhatDisable("");
-      setActiveMode((prev) => !prev);
-    } catch (e) {
-      toastMessage({
-        danger: true,
-        title: "Error",
-        message: "Não foi possível desabilitar a usuário",
+        message: "Não foi possível excluir a função",
       });
     }
   }
 
   const RenderResultsOnPege = () => {
-    return users.map((user, index) => {
+    return roles.map((role, index) => {
       return (
         <styled.UserDiv $isEven={(index + 1) % 2 == 0} key={index}>
           <styled.userIndexSpan>
             {`#${index + 1 + (page - 1) * limit}`}
           </styled.userIndexSpan>
-          <styled.userAvatarImg src={user.avatar} />
-          <styled.userDataSpan>{user.name}</styled.userDataSpan>
-          <styled.userDataSpan>{user.email}</styled.userDataSpan>
-          <styled.userDataSpan>{user.pages.length}</styled.userDataSpan>
+          <styled.userDataSpan>{role.sector}</styled.userDataSpan>
+          <styled.userDataSpan>{role.role}</styled.userDataSpan>
+          <styled.userDataSpan>{`R$ ${role.baseSalary
+            .toFixed(2)
+            .replace(".", ",")
+            .replace(/\B(?=(\d{3})+(?!\d))/g, ".")}`}</styled.userDataSpan>
+          <styled.userDataSpan>
+            {role.isField ? "Campo" : "Escritório"}
+          </styled.userDataSpan>
           <styled.controllButtonsDiv>
-            <styled.EditButton onClick={() => handleEditButtonClick(user._id)}>
+            <styled.EditButton onClick={() => handleEditButtonClick(role._id)}>
               <SVGEdit width="20" height="20" />
             </styled.EditButton>
             <styled.DeleteButton
-              onClick={() => handleDeleteButtonClick(user._id, user.name)}
+              onClick={() => handleDeleteButtonClick(role._id, role.role)}
             >
               <SVGDelete width="16" height="16" />
             </styled.DeleteButton>
-            <styled.disableButton
-              onClick={() => handleDisableToggle(user._id, user.name)}
-            />
           </styled.controllButtonsDiv>
         </styled.UserDiv>
       );
@@ -175,30 +134,14 @@ const Users = ({ toastMessage, modalMessage, modalInfo, openPage }) => {
 
   return (
     <>
-      <styled.headerUsersDiv>Controle de Usuários</styled.headerUsersDiv>
+      <styled.headerUsersDiv>Controle de funções</styled.headerUsersDiv>
       <styled.filterOptionsDiv>
         <styled.addNewOneDiv>
           <styled.addNewOneButton onClick={() => handleAddOne()}>
-            <span>+</span> Novo usuário
+            <span>+</span> Nova função
           </styled.addNewOneButton>
         </styled.addNewOneDiv>
         <styled.filterAndInfoDiv>
-          <styled.switchModeDiv>
-            <styled.switchModeButton
-              $active={!activeMode}
-              onClick={() => setActiveMode(true)}
-            >
-              <SVGCheck width="15" height="15" />
-              Ativos
-            </styled.switchModeButton>
-            <styled.switchModeButton
-              $active={activeMode}
-              onClick={() => setActiveMode(false)}
-            >
-              <SVGClose width="15" height="15" />
-              Inativos
-            </styled.switchModeButton>
-          </styled.switchModeDiv>
           <styled.filterPartDiv>
             <div>
               <styled.totalNumberSelect
@@ -231,17 +174,17 @@ const Users = ({ toastMessage, modalMessage, modalInfo, openPage }) => {
           </styled.filterPartDiv>
           <styled.infoPartDiv>
             <span>Index</span>
-            <span>Foto</span>
-            <span>Nome</span>
-            <span>Email</span>
-            <span>Páginas</span>
+            <span>Setor</span>
+            <span>Função</span>
+            <span>Salário Base</span>
+            <span>Tipo de cargo</span>
             <span>Controles</span>
           </styled.infoPartDiv>
         </styled.filterAndInfoDiv>
       </styled.filterOptionsDiv>
       <styled.resultsDiv>
-        {users.length > 0 && RenderResultsOnPege()}
-        {users.length > 0 && (
+        {roles.length > 0 && RenderResultsOnPege()}
+        {roles.length > 0 && (
           <styled.paginationDiv>
             <button
               disabled={page === 1}
@@ -263,4 +206,4 @@ const Users = ({ toastMessage, modalMessage, modalInfo, openPage }) => {
   );
 };
 
-export default Users;
+export default Departments;

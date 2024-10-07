@@ -52,7 +52,7 @@ const Usinas = ({ toastMessage, modalMessage, modalInfo, openPage }) => {
   const handleSearch = async (click = false) => {
     try {
       const response = await innovaApi.get(
-        `/work/get-all-works?page=${page}&limit=${limit}&order=${order}&name=${search}&active=${activeMode}`
+        `/work/get-all?page=${page}&limit=${limit}&order=${order}&name=${search}&active=${activeMode}`
       );
 
       setUsinas(response.data.works);

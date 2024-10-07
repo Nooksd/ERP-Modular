@@ -4,7 +4,7 @@ import { innovaApi } from "../../services/http";
 export const fetchAppUsers = createAsyncThunk(
   "users/fetchAppUsers",
   async () => {
-    const { data } = await innovaApi.get("/user/get-all-users");
+    const { data } = await innovaApi.get("/user/get-all");
     return data;
   }
 );
@@ -20,6 +20,7 @@ const appUsersSlicer = createSlice({
       })
       .addCase(fetchAppUsers.fulfilled, (state, action) => {
         state.status = "succeeded";
+        console.log(action.payload)
         state.appUsers = action.payload.users;
       })
       .addCase(fetchAppUsers.rejected, (state, action) => {

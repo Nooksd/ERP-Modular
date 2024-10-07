@@ -26,6 +26,8 @@ import Atividades from "./Atividades/Atv.jsx";
 import AddUsina from "./Usinas/addUsina/addusina.jsx";
 import AddUser from "./Users/addUser/addUser.jsx";
 import AddEmployee from "./Employees/addEmployee/addEmployee.jsx";
+import Departments from "./Departments/departments.jsx";
+import AddFunction from "./Departments/addDepartments/addDepartments.jsx";
 
 export const Adm = ({
   windowHeight,
@@ -76,6 +78,18 @@ export const Adm = ({
       case "Adicionar Funcionário":
       case "Editar Funcionário":
         return <AddEmployee toastMessage={toastMessage} editData={editData} />;
+      case "Departamentos":
+        return (
+          <Departments
+            toastMessage={toastMessage}
+            modalMessage={modalMessage}
+            openPage={handleSelectPage}
+            modalInfo={modalInfo}
+          />
+        );
+      case "Adicionar Função":
+      case "Editar Função":
+        return <AddFunction toastMessage={toastMessage} editData={editData} />;
       case "Usinas/Obras":
         return (
           <Usinas

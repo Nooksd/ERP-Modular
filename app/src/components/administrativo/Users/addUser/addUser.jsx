@@ -80,11 +80,11 @@ const AddUser = ({ toastMessage, editData }) => {
         let response;
         if (editData) {
           response = await innovaApi.put(
-            `/user/update-user/${editData}`,
+            `/user/update/${editData}`,
             userInfo
           );
         } else {
-          response = await innovaApi.post("/user/create-user", userInfo);
+          response = await innovaApi.post("/user/create", userInfo);
         }
 
         toastMessage({

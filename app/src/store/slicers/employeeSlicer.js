@@ -4,7 +4,7 @@ import { innovaApi } from "../../services/http";
 export const fetchEmployees = createAsyncThunk(
   "employee/fetch-employees",
   async () => {
-    const { data } = await innovaApi.get("/employee/get-all-employees");
+    const { data } = await innovaApi.get("/employee/get-all");
     return data;
   }
 );

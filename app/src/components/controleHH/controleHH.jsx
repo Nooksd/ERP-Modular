@@ -432,7 +432,7 @@ export const ControleHH = ({ toastMessage, windowHeight }) => {
         };
         if (recordData.recordId) {
           await innovaApi.put(
-            `/hhcontroll/update-record/${recordData.recordId}`,
+            `/hhcontroll/update/${recordData.recordId}`,
             {
               hhRecords: removeErrorAndOpen(hhRecords),
             }

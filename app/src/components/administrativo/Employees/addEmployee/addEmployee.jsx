@@ -108,13 +108,24 @@ const AddEmployee = ({ toastMessage, editData }) => {
     if (fieldValidator()) {
       try {
         let response;
+
+        const formatDate = (dateStr) => {
+          const [day, month, year] = dateStr.split("/");
+          return `${year}-${month}-${parseInt(day)}`;
+        };
+
+        let newEmployeeInfo = {
+          ...employeeInfo,
+          startDate: formatDate(employeeInfo.startDate),
+        };
+
         if (editData) {
           response = await innovaApi.put(
             `/employee/update/${editData}`,
-            employeeInfo
+            newEmployeeInfo
           );
         } else {
-          response = await innovaApi.post("/employee/create", employeeInfo);
+          response = await innovaApi.post("/employee/create", newEmployeeInfo);
         }
 
         toastMessage({
@@ -211,8 +222,10 @@ const AddEmployee = ({ toastMessage, editData }) => {
         startDate: formatDate1(result.startDate),
         managerIds: result.managerIds,
       };
-      
+
       setSelectedDay(formatDate2(result.startDate));
+
+      console.log(formatDate2(result.startDate));
 
       setEmployeeInfo(newEmployeeInfo);
 
