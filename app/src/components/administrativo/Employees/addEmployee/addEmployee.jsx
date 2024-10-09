@@ -18,7 +18,6 @@ const AddEmployee = ({ toastMessage, editData }) => {
 
   const [nameError, setNameError] = useState(false);
   const [cpfError, setCpfError] = useState(false);
-  const [emailError, setEmailError] = useState(false);
 
   const [roleError, setRoleError] = useState(false);
   const [managerIdsError, setManagerIdsError] = useState([]);
@@ -158,12 +157,6 @@ const AddEmployee = ({ toastMessage, editData }) => {
     } else {
       setNameError(false);
     }
-    if (!employeeInfo.email) {
-      setEmailError(true);
-      isValid = false;
-    } else {
-      setEmailError(false);
-    }
     if (!employeeInfo.cpf || employeeInfo.cpf.length !== 14) {
       setCpfError(true);
       isValid = false;
@@ -295,7 +288,6 @@ const AddEmployee = ({ toastMessage, editData }) => {
           <styled.formLabel>Email do funcionário</styled.formLabel>
           <styled.formInput
             name="email"
-            $error={emailError}
             value={employeeInfo.email}
             onChange={(e) => handleInputChange(e)}
           />

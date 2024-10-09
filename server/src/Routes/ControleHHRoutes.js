@@ -25,7 +25,7 @@ HHControllerRoutes.get(
   HHControllController.getHHRecordsByProject
 );
  HHControllerRoutes.put(
-  "/update-record/:recordId",
+  "/update/:recordId",
   JWT.validateAccessToken,
   HHControllController.updateRecord
 );

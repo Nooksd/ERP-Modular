@@ -15,23 +15,7 @@ const roleSchema = new mongoose.Schema({
     required: true,
     min: 0,
   },
-  additives: {
-    type: [
-      {
-        additive: {
-          type: String,
-          required: true,
-        },
-        percentage: {
-          type: Number,
-          min: 0,
-          max: 100,
-          default: 30,
-          required: true,
-        },
-      },
-    ],
-  },
+  additives: [String],
   isField: {
     type: Boolean,
     default: false,

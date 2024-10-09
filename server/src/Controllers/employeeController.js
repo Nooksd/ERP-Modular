@@ -94,7 +94,7 @@ class EmployeeController {
         limit = 10,
         name,
         order = true,
-        active = true,
+        active = "true",
       } = req.query;
 
       let filter = name ? { name: { $regex: name, $options: "i" } } : {};
@@ -138,14 +138,14 @@ class EmployeeController {
       }
 
       const { employeeId } = req.params;
-      const { name, cpf, email, position, startDate, isActive, managerId } =
+      const { name, cpf, email, role, startDate, isActive, managerId } =
         req.body;
 
       if (
         !name &&
         !email &&
         !cpf &&
-        !position &&
+        !role &&
         !startDate &&
         isActive !== true &&
         isActive !== false &&
@@ -161,8 +161,8 @@ class EmployeeController {
       if (name) updateData.name = name;
       if (email) updateData.email = email;
       if (cpf) updateData.cpf = cpf;
-      if (position) updateData.position = position;
-      if (startDate) updateData.startDate = startDate;
+      if (role) updateData.role = role;
+      if (startDate) updateData.startDate = new Date(startDate);
       if (isActive === true || isActive === false)
         updateData.isActive = isActive;
       if (managerId && Array.isArray(managerId))

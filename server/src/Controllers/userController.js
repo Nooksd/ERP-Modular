@@ -318,10 +318,10 @@ class UserController {
 
       const {
         page = 1,
-        limit = 10,
+        limit = 999,
         name,
         order = true,
-        active = true,
+        active = "true",
       } = req.query;
 
       let filter = name ? { name: { $regex: name, $options: "i" } } : {};

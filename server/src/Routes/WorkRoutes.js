@@ -20,12 +20,12 @@ WorkRoutes.post(
   WorkController.createWork
 );
 WorkRoutes.get(
-  "/get-all-works",
+  "/get-all",
   JWT.validateAccessToken,
   WorkController.getAllWorks
 );
 WorkRoutes.put(
-  "/update-work/:workId",
+  "/update/:workId",
   JWT.validateAccessToken,
   WorkController.updateWork
 );
