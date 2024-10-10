@@ -9,8 +9,14 @@ ActivityRoutes.get(
   JWT.validateAccessToken,
   ActivityController.getAllActivities
 );
+
+ActivityRoutes.get(
+  "/get-one/:activityId",
+  JWT.validateAccessToken,
+  ActivityController.getActivity
+);
 ActivityRoutes.post(
-  "/create-activity",
+  "/create",
   JWT.validateAccessToken,
   ActivityController.createActivity
 );

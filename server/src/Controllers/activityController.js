@@ -111,6 +111,39 @@ class ActivityController {
     }
   }
 
+  static async getActivity(req, res) {
+    try {
+      if (!req.user.user.pages.includes("Administrativo")) {
+        return res.status(403).json({
+          message: "Sem permissão",
+          status: false,
+        });
+      }
+
+      const { activityId } = req.params;
+
+      const activity = await Activity.findById(activityId).exec();
+
+      if (!activity) {
+        return res.status(404).json({
+          message: "Atividade não encontrada",
+          status: false,
+        });
+      }
+
+      res.status(200).json({
+        message: "atividade encontrada com sucesso",
+        activity,
+        status: true,
+      });
+    } catch (e) {
+      res.status(500).json({
+        message: "Erro interno do servidor",
+        status: false,
+      });
+    }
+  }
+
   static async updateActivity(req, res) {
     try {
       if (!req.user.user.pages.includes("Administrativo")) {

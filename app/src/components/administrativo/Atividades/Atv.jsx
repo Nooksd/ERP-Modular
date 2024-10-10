@@ -21,10 +21,6 @@ const Atividades = ({ toastMessage, modalMessage, modalInfo, openPage }) => {
   const [whatDeleteActivity, setWhatDeleteActivity] = useState("");
   const [whatDeleteSubactivity, setWhatDeleteSubactivity] = useState("");
 
-  // useEffect(() => {
-  //   console.log(activities)
-  // }, [activities])
-
   useEffect(() => {
     handleSearch();
   }, [page]);
@@ -68,8 +64,6 @@ const Atividades = ({ toastMessage, modalMessage, modalInfo, openPage }) => {
       const response = await innovaApi.get(
         `/activity/get-all?page=${page}&limit=${limit}&order=${order}&name=${search}`
       );
-
-      console.log(response.data);
 
       setActivities(response.data.activities);
       setTotalPages(response.data.pagination.totalPages);
@@ -135,9 +129,6 @@ const Atividades = ({ toastMessage, modalMessage, modalInfo, openPage }) => {
     if (type === "area") {
       openPage("Editar Área", 2, activityId);
     }
-    if (type === "atividade") {
-      openPage("Editar Atividade", 2, activityId);
-    }
     if (type === "subatividade") {
       openPage("Editar Subatividade", 2, activityId);
     }
@@ -145,7 +136,7 @@ const Atividades = ({ toastMessage, modalMessage, modalInfo, openPage }) => {
 
   async function deleteArea() {
     try {
-      // await innovaApi.delete(`/activity/delete/${whatDeleteArea}`);
+      await innovaApi.delete(`/activity/delete/${whatDeleteArea}`);
 
       toastMessage({
         danger: false,
@@ -187,8 +178,6 @@ const Atividades = ({ toastMessage, modalMessage, modalInfo, openPage }) => {
           ),
         };
 
-        console.log(newArea);
-
         await innovaApi.put(`/activity/update/${whatDeleteArea}`, newArea);
 
         toastMessage({
@@ -198,20 +187,7 @@ const Atividades = ({ toastMessage, modalMessage, modalInfo, openPage }) => {
         });
         setWhatDeleteArea("");
         setActivities((prev) =>
-          prev.map((area) => {
-            const updatedActivities = area.activities.filter(
-              (activity) => activity._id !== whatDeleteArea
-            );
-            return {
-              ...area,
-              activities: updatedActivities,
-              totalActivities: updatedActivities.length,
-              totalSubactivities: updatedActivities.reduce(
-                (count, act) => count + act.totalSubActivities,
-                0
-              ),
-            };
-          })
+          prev.map((area) => (area._id === whatDeleteArea ? newArea : area))
         );
       }
     } catch (e) {
@@ -258,8 +234,6 @@ const Atividades = ({ toastMessage, modalMessage, modalInfo, openPage }) => {
               0
             ),
           };
-
-          console.log(newArea);
 
           await innovaApi.put(`/activity/update/${whatDeleteArea}`, newArea);
 
@@ -352,7 +326,7 @@ const Atividades = ({ toastMessage, modalMessage, modalInfo, openPage }) => {
                   <styled.controllButtonsDiv>
                     <styled.EditButton
                       onClick={() =>
-                        handleEditButtonClick(activity._id, "atividade")
+                        handleEditButtonClick(area._id, "area")
                       }
                     >
                       <SVGEdit width="20" height="20" />
@@ -424,13 +398,10 @@ const Atividades = ({ toastMessage, modalMessage, modalInfo, openPage }) => {
       </styled.headerUsersDiv>
       <styled.filterOptionsDiv>
         <styled.addNewOneDiv>
-          <styled.addNewOneButton onClick={() => handleAddOne()}>
+          <styled.addNewOneButton onClick={() => handleAddOne("area")}>
             <span>+</span> Nova área
           </styled.addNewOneButton>
-          <styled.addNewOneButton onClick={() => handleAddOne()}>
-            <span>+</span> Nova atividade
-          </styled.addNewOneButton>
-          <styled.addNewOneButton onClick={() => handleAddOne()}>
+          <styled.addNewOneButton onClick={() => handleAddOne("subatividade")}>
             <span>+</span> Nova sub atividade
           </styled.addNewOneButton>
         </styled.addNewOneDiv>

@@ -26,8 +26,7 @@ const activitySchema = new mongoose.Schema({
           required: true,
         },
         subactivities: {
-          type: [subActivitySchema], 
-          required: true,
+          type: [subActivitySchema],
           default: [],
         },
       },

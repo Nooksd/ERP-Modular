@@ -20,14 +20,16 @@ import SVGLogs from "../../shared/icons/adm/Logs_icon.jsx";
 import SVGArrowRight from "../../shared/icons/adm/ArrowRight_icon.jsx";
 
 import Usinas from "./Usinas/usinas.jsx";
-import Employees from "./Employees/Employees.jsx";
-import Users from "./Users/Users.jsx";
-import Atividades from "./Atividades/Atv.jsx";
 import AddUsina from "./Usinas/addUsina/addusina.jsx";
-import AddUser from "./Users/addUser/addUser.jsx";
+import Employees from "./Employees/Employees.jsx";
 import AddEmployee from "./Employees/addEmployee/addEmployee.jsx";
+import Users from "./Users/Users.jsx";
+import AddUser from "./Users/addUser/addUser.jsx";
 import Departments from "./Departments/departments.jsx";
 import AddFunction from "./Departments/addDepartments/addDepartments.jsx";
+import Atividades from "./Atividades/Atv.jsx";
+import AddArea from "./Atividades/addArea/addArea.jsx";
+import AddSubactivity from "./Atividades/addSubactivity/addSubactivity.jsx";
 
 export const Adm = ({
   windowHeight,
@@ -110,6 +112,14 @@ export const Adm = ({
             openPage={handleSelectPage}
             modalInfo={modalInfo}
           />
+        );
+      case "Adicionar Área":
+      case "Editar Área":
+        return <AddArea toastMessage={toastMessage} editData={editData} />;
+      case "Adicionar Subatividade":
+      case "Editar Subatividade":
+        return (
+          <AddSubactivity toastMessage={toastMessage} editData={editData} />
         );
       case "Usuários":
         return (
