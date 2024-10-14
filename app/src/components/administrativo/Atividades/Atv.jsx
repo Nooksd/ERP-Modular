@@ -47,16 +47,8 @@ const Atividades = ({ toastMessage, modalMessage, modalInfo, openPage }) => {
     }
   }, [modalInfo.response]);
 
-  const handleAddOne = (type) => {
-    if (type === "area") {
-      openPage("Adicionar Área", 2);
-    }
-    if (type === "atividade") {
-      openPage("Adicionar Atividade", 2);
-    }
-    if (type === "subatividade") {
-      openPage("Adicionar Subatividade", 2);
-    }
+  const handleAddOne = () => {
+    openPage("Adicionar Atividade", 2);
   };
 
   const handleSearch = async (click = false) => {
@@ -125,13 +117,8 @@ const Atividades = ({ toastMessage, modalMessage, modalInfo, openPage }) => {
     }
   };
 
-  const handleEditButtonClick = (activityId, type) => {
-    if (type === "area") {
-      openPage("Editar Área", 2, activityId);
-    }
-    if (type === "subatividade") {
-      openPage("Editar Subatividade", 2, activityId);
-    }
+  const handleEditButtonClick = (activityId) => {
+    openPage("Editar Atividade", 2, activityId);
   };
 
   async function deleteArea() {
@@ -324,13 +311,6 @@ const Atividades = ({ toastMessage, modalMessage, modalInfo, openPage }) => {
                   <span>{activity.activity}</span>
                   <span>{activity.totalSubActivities}</span>
                   <styled.controllButtonsDiv>
-                    <styled.EditButton
-                      onClick={() =>
-                        handleEditButtonClick(area._id, "area")
-                      }
-                    >
-                      <SVGEdit width="20" height="20" />
-                    </styled.EditButton>
                     <styled.DeleteButton
                       onClick={() =>
                         handleDeleteButtonClick(
@@ -358,16 +338,6 @@ const Atividades = ({ toastMessage, modalMessage, modalInfo, openPage }) => {
                       <span>{activity.activity}</span>
                       <span>{subactivity.subactivity}</span>
                       <styled.controllButtonsDiv>
-                        <styled.EditButton
-                          onClick={() =>
-                            handleEditButtonClick(
-                              subactivity._id,
-                              "subatividade"
-                            )
-                          }
-                        >
-                          <SVGEdit width="20" height="20" />
-                        </styled.EditButton>
                         <styled.DeleteButton
                           onClick={() =>
                             handleDeleteButtonClick(
@@ -398,11 +368,8 @@ const Atividades = ({ toastMessage, modalMessage, modalInfo, openPage }) => {
       </styled.headerUsersDiv>
       <styled.filterOptionsDiv>
         <styled.addNewOneDiv>
-          <styled.addNewOneButton onClick={() => handleAddOne("area")}>
-            <span>+</span> Nova área
-          </styled.addNewOneButton>
-          <styled.addNewOneButton onClick={() => handleAddOne("subatividade")}>
-            <span>+</span> Nova sub atividade
+          <styled.addNewOneButton onClick={() => handleAddOne()}>
+            <span>+</span> Nova atividade
           </styled.addNewOneButton>
         </styled.addNewOneDiv>
         <styled.filterAndInfoDiv>

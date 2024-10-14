@@ -62,6 +62,50 @@ export const formDiv = styled.div`
   }
 `;
 
+export const formSwitchDiv = styled.div`
+  width: 80%;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`;
+
+export const switchButton = styled.div`
+  width: 230px;
+  min-height: 40px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  justify-content: space-between;
+  padding: 0 15px;
+  background: linear-gradient(
+    90deg,
+    ${(props) =>
+        props.$isNewRecord ? props.theme.colors.primary_2 : "rgba(0,0,0,0)"}
+      50%,
+    ${(props) =>
+        !props.$isNewRecord ? props.theme.colors.secondary_1 : "rgba(0,0,0,0)"}
+      50%
+  );
+
+  span {
+    font-size: 14px;
+  }
+  span:first-child {
+    color: ${(props) =>
+      !props.$isNewRecord
+        ? props.theme.colors.primary_dark
+        : props.theme.fonts.color};
+  }
+  span:last-child {
+    color: ${(props) =>
+      props.$isNewRecord
+        ? props.theme.colors.primary_dark
+        : props.theme.fonts.color};
+  }
+`;
+
 export const formInput = styled.input`
   width: 100%;
   min-height: 40px;

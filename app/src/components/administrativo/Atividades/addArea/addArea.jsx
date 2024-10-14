@@ -3,8 +3,12 @@ import { innovaApi } from "../../../../services/http.js";
 import * as styled from "./addAreaStyles.js";
 
 const AddArea = ({ toastMessage, editData }) => {
+  const [editActivity, setEditActivity] = useState(true);
+
   const [areaError, setAreaError] = useState(false);
   const [activitiesError, setActivitiesError] = useState([]);
+
+  const [selectedActivity, setSelectedActivity] = useState();
 
   const [areaInfo, setAreaInfo] = useState({
     area: "",
@@ -31,6 +35,12 @@ const AddArea = ({ toastMessage, editData }) => {
     }));
   };
 
+  const handleRemoveSubactivity = (index) => {
+    const newActivities = [...areaInfo.activities];
+    newActivities[selectedActivity].subactivities.splice(index, 1);
+    setAreaInfo({ ...areaInfo, activities: newActivities });
+  };
+
   const handleAddNewEmpityActivity = () => {
     setAreaInfo((prevInfo) => ({
       ...prevInfo,
@@ -48,6 +58,35 @@ const AddArea = ({ toastMessage, editData }) => {
     }, 10);
   };
 
+  const handleAddNewEmpitySubactivity = () => {
+    if (!selectedActivity) {
+      toastMessage({
+        danger: true,
+        title: "Atenção",
+        message: "É necessário escolher uma atividade primeiro",
+      });
+      return;
+    }
+    setAreaInfo((prevInfo) => ({
+      ...prevInfo,
+      activities: prevInfo.activities.map((activity, index) => {
+        if (index == selectedActivity) {
+          return {
+            activity: activity.activity,
+            subactivities: [
+              ...activity.subactivities,
+              {
+                subactivity: "",
+                haveIndicative: false,
+              },
+            ],
+          };
+        }
+        return activity;
+      }),
+    }));
+  };
+
   const handleActivitySelect = (value, index) => {
     const newActivities = [...areaInfo.activities];
     newActivities[index] = {
@@ -57,10 +96,17 @@ const AddArea = ({ toastMessage, editData }) => {
     setAreaInfo({ ...areaInfo, activities: newActivities });
   };
 
+  const handleSubactivitySelect = (value, index) => {
+    const newActivities = [...areaInfo.activities];
+    newActivities[selectedActivity].subactivities[index].subactivity = value;
+    setAreaInfo({ ...areaInfo, activities: newActivities });
+  };
+
   const handleSubmit = async () => {
     if (fieldValidator()) {
       try {
         let response;
+
         if (editData) {
           response = await innovaApi.put(
             `/activity/update/${editData}`,
@@ -151,6 +197,15 @@ const AddArea = ({ toastMessage, editData }) => {
         {editData ? "Editar" : "Adicionar"} Área
       </styled.formTitle>
       <styled.formContainer>
+        <styled.formSwitchDiv>
+          <styled.switchButton
+            $isNewRecord={editActivity}
+            onClick={() => setEditActivity((prev) => !prev)}
+          >
+            <span>Atividade</span>
+            <span>Subatividade</span>
+          </styled.switchButton>
+        </styled.formSwitchDiv>
         <styled.formDiv $required={true}>
           <styled.formLabel>Nome da área</styled.formLabel>
           <styled.formInput
@@ -160,31 +215,76 @@ const AddArea = ({ toastMessage, editData }) => {
             onChange={(e) => handleInputChange(e)}
           />
         </styled.formDiv>
+        {!editActivity && (
+          <styled.formDiv>
+            <styled.formLabel>Atividade</styled.formLabel>
+            <styled.formManagerSelect
+              name="activities"
+              value={selectedActivity}
+              onChange={(e) => setSelectedActivity(e.target.value)}
+            >
+              <option value="">Selecionar atividade</option>
+              {areaInfo.activities.map((activity, index) => (
+                <option key={index} value={index}>
+                  {activity.activity}
+                </option>
+              ))}
+            </styled.formManagerSelect>
+          </styled.formDiv>
+        )}
         <styled.formManagerAndSubmitButtonDiv>
           <styled.formManagerDiv>
-            {areaInfo.activities.map((activity, index) => (
-              <styled.managerAndButtonDiv key={index}>
-                <styled.formInput
-                  name="activities"
-                  $error={activitiesError[index]}
-                  value={activity.activity}
-                  onChange={(e) => handleActivitySelect(e.target.value, index)}
-                />
-                <styled.formManagerButton
-                  onClick={() => handleRemoveActivity(index)}
-                >
-                  -
-                </styled.formManagerButton>
-              </styled.managerAndButtonDiv>
-            ))}
+            {editActivity
+              ? areaInfo.activities.map((activity, index) => (
+                  <styled.managerAndButtonDiv key={index}>
+                    <styled.formInput
+                      name="activities"
+                      $error={activitiesError[index]}
+                      value={activity.activity}
+                      onChange={(e) =>
+                        handleActivitySelect(e.target.value, index)
+                      }
+                    />
+                    <styled.formManagerButton
+                      onClick={() => handleRemoveActivity(index)}
+                    >
+                      -
+                    </styled.formManagerButton>
+                  </styled.managerAndButtonDiv>
+                ))
+              : selectedActivity &&
+                areaInfo.activities[selectedActivity].subactivities.map(
+                  (subactivity, index) => (
+                    <styled.managerAndButtonDiv key={index}>
+                      <styled.formInput
+                        name="activities"
+                        value={subactivity.subactivity}
+                        onChange={(e) =>
+                          handleSubactivitySelect(e.target.value, index)
+                        }
+                      />
+                      <styled.formManagerButton
+                        onClick={() => handleRemoveSubactivity(index)}
+                      >
+                        -
+                      </styled.formManagerButton>
+                    </styled.managerAndButtonDiv>
+                  )
+                )}
             <styled.managerAndButtonDiv>
               {areaInfo.activities.length === 0 && (
-                <styled.addNewText>Adicionar atividade</styled.addNewText>
+                <styled.addNewText>
+                  Adicionar {editActivity ? "atividade" : "subatividade"}
+                </styled.addNewText>
               )}
               <styled.formManagerButton
                 style={{ borderRadius: "5pc" }}
                 $new={true}
-                onClick={() => handleAddNewEmpityActivity()}
+                onClick={() =>
+                  editActivity
+                    ? handleAddNewEmpityActivity()
+                    : handleAddNewEmpitySubactivity()
+                }
                 ref={addActivityRef}
               >
                 +

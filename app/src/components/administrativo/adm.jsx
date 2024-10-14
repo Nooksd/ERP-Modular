@@ -29,7 +29,6 @@ import Departments from "./Departments/departments.jsx";
 import AddFunction from "./Departments/addDepartments/addDepartments.jsx";
 import Atividades from "./Atividades/Atv.jsx";
 import AddArea from "./Atividades/addArea/addArea.jsx";
-import AddSubactivity from "./Atividades/addSubactivity/addSubactivity.jsx";
 
 export const Adm = ({
   windowHeight,
@@ -113,14 +112,9 @@ export const Adm = ({
             modalInfo={modalInfo}
           />
         );
-      case "Adicionar Área":
-      case "Editar Área":
+      case "Adicionar Atividade":
+      case "Editar Atividade":
         return <AddArea toastMessage={toastMessage} editData={editData} />;
-      case "Adicionar Subatividade":
-      case "Editar Subatividade":
-        return (
-          <AddSubactivity toastMessage={toastMessage} editData={editData} />
-        );
       case "Usuários":
         return (
           <Users
