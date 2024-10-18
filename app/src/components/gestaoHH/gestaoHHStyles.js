@@ -96,6 +96,24 @@ export const year = styled.button`
   display: flex;
   align-items: center;
   justify-content: center;
+  position: relative;
+
+  &:first-child {
+    width: 40px;
+    border-radius: 50%;
+    margin-right: 10px;
+    &:after {
+      content: "";
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background-color: ${(props) => props.theme.colors.primary_dark};
+    }
+  }
 `;
 
 export const filter = styled.button`
@@ -202,24 +220,134 @@ export const summaryContainer = styled.div`
   }
 `;
 
+export const IconContainer = styled.div`
+  position: absolute;
+  z-index: 999;
+  top: 50%;
+  left: 50px;
+  transform: translateY(-50%);
+`;
+
+export const cardContentContainer = styled.div`
+  width: 60%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  margin-left: 38%;
+  padding-right: 20px;
+`;
+
+export const cardTitle = styled.div`
+  font-size: 20px;
+  font-weight: 700;
+  align-self: center;
+  margin-bottom: 7px;
+  color: ${(props) => props.theme.fonts.color};
+`;
+
+export const cardValue = styled.div`
+  font-size: 48px;
+  font-weight: 700;
+  color: ${(props) => props.theme.fonts.color};
+  position: relative;
+
+  &:after {
+    content: "HH";
+    font-size: 24px;
+    font-weight: 700;
+    color: ${(props) => props.theme.fonts.color};
+    position: absolute;
+    right: -40px;
+    top: 40%;
+  }
+`;
+
+export const smallCardValue = styled.div`
+  font-size: 20px;
+  font-weight: 800;
+  align-self: end;
+  margin-top: 10px;
+  z-index: 1000;
+  color: ${(props) => props.theme.fonts.color};
+
+  span {
+    font-size: 16px;
+    font-weight: 500;
+    color: ${(props) => props.theme.fonts.color};
+  }
+`;
+
 export const bigGraphContainer = styled.div`
   width: 100%;
   height: 100%;
   grid-column: span 2;
   border-radius: 20px;
   background-color: ${(props) => props.theme.colors.grey};
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  max-height: 200px;
+  padding: 10px 20px;
+  overflow: hidden;
 `;
+
 export const smallGraphContainer = styled.div`
   width: 100%;
   height: 100%;
   border-radius: 20px;
   background-color: ${(props) => props.theme.colors.grey};
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  max-height: 200px;
+  overflow: hidden;
 `;
 
 export const monthSelectorContainer = styled.div`
   width: 100%;
-  height: 100%;
   grid-column: span 3;
   border-radius: 20px;
-  background-color: ${(props) => props.theme.colors.grey};
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+`;
+
+export const monthAndLine = styled.div`
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+`;
+
+export const monthSelect = styled.button`
+  width: auto;
+  height: 40px;
+  cursor: pointer;
+  font-weight: 400;
+  font-size: 12px;
+  padding: 0 15px;
+  border-radius: 5px;
+  font-family: "Inter", sans-serif;
+  color: ${(props) =>
+    props.$selected || props.$between
+      ? props.theme.fonts.color
+      : props.theme.colors.primary_dark};
+  background-color: ${(props) =>
+    props.$selected
+      ? props.theme.colors.secondary_1
+      : props.$between
+      ? props.theme.colors.secondary_2
+      : props.theme.colors.grey};
+  appearance: none;
+`;
+
+export const monthLine = styled.div`
+  width: 100%;
+  height: 3px;
+  background-color: ${(props) =>
+    props.$between
+      ? props.theme.colors.secondary_1
+      : props.theme.colors.primary_dark};
 `;

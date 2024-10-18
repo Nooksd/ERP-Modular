@@ -432,6 +432,41 @@ class HHControllController {
       });
     }
   }
+
+  static async getStatistics(req, res) {
+    try {
+      const { projectId } = req.params;
+
+      if (!projectId) {
+        return res.status(400).json({
+          message: "Id da obra é obrigatório.",
+          status: false,
+        });
+      }
+
+      const hhRecords = await HHrecords.find({
+        projectId: projectId,
+      });
+
+      if (!hhRecords.length) {
+        return res.status(404).json({
+          message: "Nenhum registro encontrado para o projeto.",
+          status: false,
+        });
+      }
+
+      res.status(200).json({
+        message: "Registros encontrados com sucesso.",
+        hhRecords,
+        status: true,
+      });
+    } catch (e) {
+      res.status(500).json({
+        message: "Erro interno do servidor.",
+        status: false,
+      });
+    }
+  }
 }
 
 export default HHControllController;

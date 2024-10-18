@@ -24,7 +24,7 @@ HHControllerRoutes.get(
   JWT.validateAccessToken,
   HHControllController.getHHRecordsByProject
 );
- HHControllerRoutes.put(
+HHControllerRoutes.put(
   "/update/:recordId",
   JWT.validateAccessToken,
   HHControllController.updateRecord
@@ -33,6 +33,12 @@ HHControllerRoutes.delete(
   "/delete-record/:recordId",
   JWT.validateAccessToken,
   HHControllController.deleteRecord
+);
+
+HHControllerRoutes.get(
+  "/get-statistics/:projectId",
+  JWT.validateAccessToken,
+  HHControllController.getStatistics
 );
 
 export default HHControllerRoutes;
