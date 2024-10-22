@@ -444,11 +444,11 @@ class HHControllController {
         });
       }
 
-      const hhRecords = await HHrecords.find({
-        projectId: projectId,
-      });
+      const hhRecords = await HHrecords.find({ projectId: projectId })
+        .select(" -createdAt -updatedAt -userId ")
+        .exec();
 
-      if (!hhRecords.length) {
+      if (!hhRecords) {
         return res.status(404).json({
           message: "Nenhum registro encontrado para o projeto.",
           status: false,
