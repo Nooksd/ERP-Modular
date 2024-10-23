@@ -90,8 +90,12 @@ export const year = styled.button`
   font-weight: 500;
   font-family: "Inter", sans-serif;
   border-radius: 5px;
-  color: ${(props) => props.theme.colors.primary_dark};
-  background-color: ${(props) => props.theme.fonts.color};
+  color: ${(props) =>
+    props.$selected
+      ? props.theme.fonts.color
+      : props.theme.colors.primary_dark};
+  background-color: ${(props) =>
+    props.$selected ? props.theme.colors.primary_2 : props.theme.fonts.color};
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -111,9 +115,27 @@ export const year = styled.button`
       width: 20px;
       height: 20px;
       border-radius: 50%;
-      background-color: ${(props) => props.theme.colors.primary_dark};
+      background-color: ${(props) =>
+        props.$selected
+          ? props.theme.fonts.color
+          : props.theme.colors.primary_dark};
     }
   }
+`;
+
+export const filterRole = styled.button`
+  width: 250px;
+  height: 40px;
+  font-size: 16px;
+  font-weight: 400;
+  cursor: pointer;
+  font-family: "Inter", sans-serif;
+  border-radius: 5px;
+  color: ${(props) => props.theme.colors.primary_dark};
+  background-color: ${(props) => props.theme.fonts.color};
+  position: relative;
+  text-align: start;
+  padding-left: 20px;
 `;
 
 export const filter = styled.button`
@@ -158,7 +180,7 @@ export const dashboardContainer = styled.div`
   display: grid;
   justify-items: center;
   grid-template-columns: 1fr 1fr 1fr 1fr;
-  grid-template-rows: 1.1fr 1.5fr 1.5fr 0.3fr;
+  grid-template-rows: 0.9fr 1.5fr 1.5fr 0.3fr;
   grid-auto-flow: dense;
   gap: 24px 70px;
   padding: 24px 70px;
@@ -183,9 +205,12 @@ export const summaryContainer = styled.div`
   min-width: 300px;
   overflow: hidden;
   height: 100%;
+  cursor: pointer;
   border-radius: 20px;
   background-color: ${(props) => props.theme.colors.primary_2};
   position: relative;
+  border: ${(props) => (props.$selected ? "5px" : "0px")} solid
+    ${(props) => props.theme.colors.primary_dark};
 
   &::before {
     content: "";
@@ -237,6 +262,7 @@ export const cardContentContainer = styled.div`
   justify-content: center;
   margin-left: 38%;
   padding-right: 20px;
+  position: relative;
 `;
 
 export const cardTitle = styled.div`
@@ -330,16 +356,13 @@ export const monthSelect = styled.button`
   padding: 0 15px;
   border-radius: 5px;
   font-family: "Inter", sans-serif;
-  color: ${(props) =>
-    props.$selected || props.$between
-      ? props.theme.fonts.color
-      : props.theme.colors.primary_dark};
+  color: ${(props) => props.theme.fonts.color};
   background-color: ${(props) =>
     props.$selected
       ? props.theme.colors.secondary_1
       : props.$between
       ? props.theme.colors.secondary_2
-      : props.theme.colors.grey};
+      : props.theme.colors.primary_2};
   appearance: none;
 `;
 
