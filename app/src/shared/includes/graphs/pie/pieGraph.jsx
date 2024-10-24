@@ -1,18 +1,22 @@
-import { Pie } from "react-chartjs-2";
-import { Chart as ChartJS, ArcElement, Title, Tooltip, Legend } from "chart.js";
+import { Doughnut } from "react-chartjs-2";
+import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
+import ChartDataLabels from "chartjs-plugin-datalabels";
+import { darkTheme } from "../../../../styles/theme";
 
-ChartJS.register(ArcElement, Title, Tooltip, Legend);
+ChartJS.register(ArcElement, Tooltip, Legend, ChartDataLabels);
 
 const PieGraph = ({ importedData }) => {
   const data = {
-    labels: importedData?.labels,
+    labels: ["HH Normal", "HH Extra I", "HH Extra II"],
     datasets: [
       {
         label: "Series A",
-        data: importedData?.data,
-        backgroundColor: "rgba(75, 192, 192, 0.2)",
-        borderColor: "rgba(75, 192, 192, 1)",
-        borderWidth: 1,
+        data: [900, 342, 803],
+        backgroundColor: [darkTheme.colors.secondary_3, darkTheme.colors.secondary_2, darkTheme.colors.secondary_1],
+        borderWidth: 0,
+        cutout: "60%",
+        circumference: 360,
+        rotation: 0,
       },
     ],
   };
@@ -20,14 +24,40 @@ const PieGraph = ({ importedData }) => {
   const options = {
     responsive: true,
     maintainAspectRatio: false,
-    scales: {
-      y: {
-        beginAtZero: true,
+    layout: {
+      padding: {
+        left: 30,
+        right: 30,
+        top: 30,
+        bottom: 40,
+      },
+    },
+    plugins: {
+      legend: {
+        display: false,
+      },
+      tooltip: {
+        enabled: false,
+      },
+      datalabels: {
+        color: "#fff",
+        formatter: (value, context) => {
+          const label = context.chart.data.labels[context.dataIndex];
+          return label;
+        },
+        anchor: "end",
+        align: "end",
+        offset: 10,
+        borderColor: "#fff",
+        borderWidth: 2,
+        borderRadius: 4,
+        borderDash: [5, 5],
+        clamp: true,
       },
     },
   };
 
-  return <Pie data={data} options={options} />;
+  return <Doughnut data={data} options={options} />;
 };
 
 export default PieGraph;

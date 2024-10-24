@@ -1,7 +1,7 @@
 // Página de gestão de HH
 
 // -imports Ract, Redux- >
-import { Fragment, useEffect, useState } from "react";
+import { Fragment, useEffect, useState, useCallback } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { fetchUserWorks } from "../../store/slicers/worksSlicer.js";
 import { innovaApi } from "../../services/http.js";
@@ -10,35 +10,47 @@ import * as styled from "./gestaoHHStyles.js";
 
 import LineGraph from "../../shared/includes/graphs/line/lineGraph.jsx";
 import BarGraph from "../../shared/includes/graphs/bar/barGraph.jsx";
+import GaugeGraph from "../../shared/includes/graphs/score metter/gaugeGraph.jsx";
+import DoughnutGraph from "../../shared/includes/graphs/doughnut/doughnutGraph.jsx";
 import PieGraph from "../../shared/includes/graphs/pie/pieGraph.jsx";
+import VerticalBarGraph from "../../shared/includes/graphs/verticalBar/verticalBar.jsx";
 
 import SVGFilter from "../../shared/icons/gestaoHH/Filter_icon.jsx";
 import SVGEraseFilter from "../../shared/icons/gestaoHH/EraseFilter_icon.jsx";
 import SVGTime from "../../shared/icons/gestaoHH/Time_icon.jsx";
 import SVGTimeE1 from "../../shared/icons/gestaoHH/TimeE1_icon.jsx";
 import SVGTimeE2 from "../../shared/icons/gestaoHH/TimeE2.jsx";
+import SVGArrowDown from "../../shared/icons/header/Arrow_icon.jsx";
 
 export const GestaoHH = ({ windowHeight, toastMessage }) => {
   const works = useSelector((state) => state.works);
   const [workData, setWorkData] = useState();
+
   const [activities, setActivities] = useState([]);
+  const [recordDate, setRecordDate] = useState([]);
+  const [importedData, setImportedData] = useState({});
+  const [importedDataRoles, setImportedDataRoles] = useState({});
+  const [roles, setRoles] = useState([]);
 
   const [totalNormal, setTotalNormal] = useState(0);
   const [totalExtra1, setTotalExtra1] = useState(0);
   const [totalExtra2, setTotalExtra2] = useState(0);
 
-  const [recordDate, setRecordDate] = useState([]);
-  const [importedData, setImportedData] = useState({});
-
+  const [openWindow, setOpenWindow] = useState(false);
   const [filterType, setFilterType] = useState(0);
-  const [selectedComparison, setSelectedComparison] = useState(0);
-  const [selectedStartDate, setSelectedStartDate] = useState("");
-  const [selectedEndDate, setSelectedEndDate] = useState("");
+
   const [selectedWork, setSelectedWork] = useState("");
-  const [selectedYear, setSelectedYear] = useState("");
-  const [selectedArea, setSelectedArea] = useState("");
-  const [selectedActivity, setSelectedActivity] = useState("");
-  const [selectedSubactivity, setSelectedSubactivity] = useState("");
+
+  const [filter, setFilter] = useState({
+    startDate: "",
+    endDate: "",
+    year: "",
+    area: "",
+    activity: "",
+    subactivity: "",
+    roles: [],
+    comparison: 0,
+  });
 
   const dispatch = useDispatch();
 
@@ -66,124 +78,126 @@ export const GestaoHH = ({ windowHeight, toastMessage }) => {
   useEffect(() => {
     if (workData) {
       organizeGraph(workData);
-    }
-  }, [
-    workData,
-    selectedStartDate,
-    selectedEndDate,
-    selectedYear,
-    selectedComparison,
-    selectedArea,
-    selectedActivity,
-    selectedSubactivity,
-  ]);
-
-  useEffect(() => {
-    if (workData) {
+      organizeSecondGraph(workData);
       organizeValues(workData);
     }
-  }, [selectedStartDate, selectedEndDate, selectedYear]);
+  }, [workData, filter]);
 
   useEffect(() => {
+    let isMounted = true;
+
     async function getWork() {
       try {
         const { data } = await innovaApi.get(
           `/hhcontroll/get-statistics/${selectedWork}`
         );
-
-        setWorkData(data.hhRecords);
-        organizeDate(data.hhRecords);
-        organizeValues(data.hhRecords);
-        organizeActivities(data.hhRecords);
-        toastMessage({
-          danger: false,
-          title: "Sucesso",
-          message: data.message,
-        });
+        if (isMounted) {
+          setWorkData(data.hhRecords);
+          getDate(data.hhRecords);
+          getActivities(data.hhRecords);
+          getRoles(data.hhRecords);
+          toastMessage({
+            danger: false,
+            title: "Sucesso",
+            message: data.message,
+          });
+        }
       } catch (e) {
-        toastMessage({
-          danger: true,
-          title: "Erro",
-          message: e.message,
-        });
+        if (isMounted) {
+          toastMessage({
+            danger: true,
+            title: "Erro",
+            message: e.message,
+          });
+        }
       }
     }
 
     if (selectedWork) {
       getWork();
     }
+
+    return () => {
+      isMounted = false;
+    };
   }, [selectedWork]);
 
-  const handleSelectWork = (work) => {
-    setSelectedStartDate("");
-    setSelectedEndDate("");
-    setSelectedYear("");
-    setSelectedArea("");
-    setSelectedActivity("");
-    setSelectedSubactivity("");
+  const handleSelectWork = useCallback((work) => {
+    handleEraseFilter();
     setTotalNormal(0);
     setTotalExtra1(0);
     setTotalExtra2(0);
     setRecordDate([]);
     setActivities([]);
-    setSelectedWork(work);
+    setRoles([]);
     setWorkData();
     setImportedData({});
+    setSelectedWork(work);
+  }, []);
+
+  const handleSelectRole = (role) => {
+    let updatedRoles = [...filter.roles];
+
+    const isRoleSelected = updatedRoles.some(
+      (selectedRole) => selectedRole === role
+    );
+
+    if (isRoleSelected) {
+      updatedRoles = updatedRoles.filter(
+        (selectedRole) => selectedRole !== role
+      );
+    } else {
+      updatedRoles.push(role);
+    }
+
+    setFilter({ ...filter, roles: updatedRoles });
   };
 
   const handleSelectType = (type) => {
     if (selectedWork) {
-      if (selectedComparison === type) {
-        setSelectedComparison(0);
+      if (filter.comparison === type) {
+        setFilter({ ...filter, comparison: 0 });
       } else {
-        setSelectedComparison(type);
+        setFilter({ ...filter, comparison: type });
       }
-      organizeGraph(workData);
     }
   };
 
   const handleSelectDate = (mes) => {
-    if (selectedStartDate === undefined) {
-      setSelectedStartDate(mes);
-    } else if (selectedEndDate === undefined) {
-      if (mes > selectedStartDate) {
-        setSelectedEndDate(mes);
-      } else if (mes <= selectedStartDate) {
-        setSelectedStartDate(mes);
+    if (filter.startDate === undefined) {
+      setFilter({ ...filter, startDate: mes });
+    } else if (filter.endDate === undefined) {
+      if (mes > filter.startDate) {
+        setFilter({ ...filter, endDate: mes });
+      } else if (mes <= filter.startDate) {
+        setFilter({ ...filter, startDate: mes });
       }
     } else {
-      if (mes === selectedStartDate) {
-        setSelectedStartDate(undefined);
-        setSelectedEndDate(undefined);
-      } else if (mes === selectedEndDate) {
-        setSelectedStartDate(undefined);
-        setSelectedEndDate(undefined);
+      if (mes === filter.startDate) {
+        setFilter({ ...filter, startDate: undefined, endDate: undefined });
+      } else if (mes === filter.endDate) {
+        setFilter({ ...filter, startDate: undefined, endDate: undefined });
       } else {
-        setSelectedStartDate(mes);
-        setSelectedEndDate(undefined);
+        setFilter({ ...filter, startDate: mes, endDate: undefined });
       }
     }
   };
 
+  const handleEraseFilter = () => {
+    setFilterType(0);
+    setFilter({
+      startDate: "",
+      endDate: "",
+      year: "",
+      area: "",
+      activity: "",
+      subactivity: "",
+      roles: [],
+      comparison: 0,
+    });
+  };
+
   function organizeGraph(response) {
-    function activityFilter(area, activity, subactivity) {
-      if (
-        selectedSubactivity &&
-        (area !== selectedArea ||
-          activity !== selectedActivity ||
-          subactivity !== selectedSubactivity)
-      )
-        return true;
-      if (
-        selectedActivity &&
-        (area !== selectedArea || activity !== selectedActivity)
-      )
-        return true;
-      if (selectedArea && area !== selectedArea) return true;
-
-      return false;
-    }
-
     const labels = [];
     const data = [];
 
@@ -201,135 +215,35 @@ export const GestaoHH = ({ windowHeight, toastMessage }) => {
           ? hhRecord.date.substring(6, 7)
           : hhRecord.date.substring(5, 7);
 
-      if (selectedYear && year !== selectedYear) return;
-      if (selectedStartDate) {
-        const selectedMonth = recordDate.find(
-          (date) => date.ano === selectedStartDate.slice(0, 4)
-        ).meses[selectedStartDate.slice(5, 7)];
+      if (timeFilter(year, monthNumber)) return;
 
-        if (year < selectedStartDate.slice(0, 4)) return;
-
-        if (
-          year === selectedStartDate.slice(0, 4) &&
-          monthNumber < meses.indexOf(selectedMonth) + 1
-        )
-          return;
-      }
-      if (selectedEndDate) {
-        const selectedMonth = recordDate.find(
-          (date) => date.ano === selectedEndDate.slice(0, 4)
-        ).meses[selectedEndDate.slice(5, 7)];
-
-        if (year > selectedEndDate.slice(0, 4)) return;
-        if (
-          year === selectedEndDate.slice(0, 4) &&
-          monthNumber > meses.indexOf(selectedMonth) + 1
-        )
-          return;
-      }
-
-      const uniqueIndex = selectedYear ? fullMonth : `${month}-${year}`;
+      const uniqueIndex = filter.year ? fullMonth : `${month}-${year}`;
 
       let labelIndex = labels.indexOf(uniqueIndex);
 
-      if (labelIndex !== -1) {
-        if (dayOfWeek === 5 || dayOfWeek === 6) {
-          hhRecord.hhRecords.forEach((hhRecord) => {
-            if (
-              activityFilter(
-                hhRecord.area,
-                hhRecord.activity,
-                hhRecord.subactivity
-              )
-            )
-              return;
-            hhRecord.roles.forEach((role) => {
-              if (selectedComparison === 3 || selectedComparison === 0)
-                data[labelIndex] += role.quantity * role.hours;
-            });
-          });
-        } else {
-          hhRecord.hhRecords.forEach((hhRecord) => {
-            if (
-              activityFilter(
-                hhRecord.area,
-                hhRecord.activity,
-                hhRecord.subactivity
-              )
-            )
-              return;
-            hhRecord.roles.forEach((role) => {
-              if (role.hours <= 9) {
-                if (selectedComparison === 1 || selectedComparison === 0)
-                  data[labelIndex] += role.quantity * role.hours;
-              } else if (role.hours <= 11) {
-                if (selectedComparison === 1 || selectedComparison === 0)
-                  data[labelIndex] += role.quantity * 9;
-                if (selectedComparison === 2 || selectedComparison === 0)
-                  data[labelIndex] += role.quantity * (role.hours - 9);
-              } else {
-                if (selectedComparison === 1 || selectedComparison === 0)
-                  data[labelIndex] += role.quantity * 9;
-                if (selectedComparison === 2 || selectedComparison === 0)
-                  data[labelIndex] += role.quantity * 2;
-                if (selectedComparison === 3 || selectedComparison === 0)
-                  data[labelIndex] += role.quantity * (role.hours - 11);
-              }
-            });
-          });
-        }
-      } else {
+      if (labelIndex === -1) {
         labels.push(uniqueIndex);
-        let totalHours = 0;
-
-        if (dayOfWeek === 5 || dayOfWeek === 6) {
-          hhRecord.hhRecords.forEach((hhRecord) => {
-            if (
-              activityFilter(
-                hhRecord.area,
-                hhRecord.activity,
-                hhRecord.subactivity
-              )
-            )
-              return;
-            hhRecord.roles.forEach((role) => {
-              if (selectedComparison === 3 || selectedComparison === 0)
-                totalHours += role.quantity * role.hours;
-            });
-          });
-        } else {
-          hhRecord.hhRecords.forEach((hhRecord) => {
-            if (
-              activityFilter(
-                hhRecord.area,
-                hhRecord.activity,
-                hhRecord.subactivity
-              )
-            )
-              return;
-            hhRecord.roles.forEach((role) => {
-              if (role.hours <= 9) {
-                if (selectedComparison === 1 || selectedComparison === 0)
-                  totalHours += role.quantity * role.hours;
-              } else if (role.hours <= 11) {
-                if (selectedComparison === 1 || selectedComparison === 0)
-                  totalHours += role.quantity * 9;
-                if (selectedComparison === 2 || selectedComparison === 0)
-                  totalHours += role.quantity * (role.hours - 9);
-              } else {
-                if (selectedComparison === 1 || selectedComparison === 0)
-                  totalHours += role.quantity * 9;
-                if (selectedComparison === 2 || selectedComparison === 0)
-                  totalHours += role.quantity * 2;
-                if (selectedComparison === 3 || selectedComparison === 0)
-                  totalHours += role.quantity * (role.hours - 11);
-              }
-            });
-          });
-        }
-
-        data.push(totalHours);
+        data.push(0);
+        labelIndex = labels.length - 1;
       }
+
+      hhRecord.hhRecords.forEach((record) => {
+        if (activityFilter(record.area, record.activity, record.subactivity))
+          return;
+        record.roles.forEach((role) => {
+          if (!roleFilter(role.role)) return;
+          calculateHours(
+            role,
+            dayOfWeek,
+            {
+              normal: (value) => (data[labelIndex] += value),
+              extra1: (value) => (data[labelIndex] += value),
+              extra2: (value) => (data[labelIndex] += value),
+            },
+            true
+          );
+        });
+      });
     });
 
     const sortedIndices = labels
@@ -354,7 +268,56 @@ export const GestaoHH = ({ windowHeight, toastMessage }) => {
     });
   }
 
-  function organizeValues(data) {
+  const organizeSecondGraph = (response) => {
+    const labels = [];
+    const data = [];
+
+    response.forEach((hhRecord) => {
+      const date = new Date(hhRecord.date);
+      const dayOfWeek = date.getDay();
+      const year = hhRecord.date.substring(0, 4);
+      const monthNumber =
+        hhRecord.date.substring(5, 6) == 0
+          ? hhRecord.date.substring(6, 7)
+          : hhRecord.date.substring(5, 7);
+
+      if (timeFilter(year, monthNumber)) return;
+
+      hhRecord.hhRecords.forEach((record) => {
+        if (activityFilter(record.area, record.activity, record.subactivity))
+          return;
+        record.roles.forEach((role) => {
+          if (!roleFilter(role.role)) return;
+
+          let labelIndex = labels.indexOf(role.role);
+
+          if (labelIndex === -1) {
+            labels.push(role.role);
+            data.push(0);
+            labelIndex = labels.length - 1;
+          }
+
+          calculateHours(
+            role,
+            dayOfWeek,
+            {
+              normal: (value) => (data[labelIndex] += value),
+              extra1: (value) => (data[labelIndex] += value),
+              extra2: (value) => (data[labelIndex] += value),
+            },
+            true
+          );
+        });
+      });
+    });
+
+    setImportedDataRoles({
+      labels: labels,
+      data: data,
+    });
+  };
+
+  const organizeValues = (data) => {
     let totalHHNormal = 0;
     let totalHHExtra1 = 0;
     let totalHHExtra2 = 0;
@@ -368,100 +331,57 @@ export const GestaoHH = ({ windowHeight, toastMessage }) => {
           ? hhRecord.date.substring(6, 7)
           : hhRecord.date.substring(5, 7);
 
-      if (selectedYear && year !== selectedYear) return;
-      if (selectedStartDate) {
-        const selectedMonth = recordDate.find(
-          (date) => date.ano === selectedStartDate.slice(0, 4)
-        ).meses[selectedStartDate.slice(5, 7)];
+      if (timeFilter(year, monthNumber)) return;
 
-        if (year < selectedStartDate.slice(0, 4)) return;
-
-        if (
-          year === selectedStartDate.slice(0, 4) &&
-          monthNumber < meses.indexOf(selectedMonth) + 1
-        )
+      hhRecord.hhRecords.forEach((record) => {
+        if (activityFilter(record.area, record.activity, record.subactivity))
           return;
-      }
-      if (selectedEndDate) {
-        const selectedMonth = recordDate.find(
-          (date) => date.ano === selectedEndDate.slice(0, 4)
-        ).meses[selectedEndDate.slice(5, 7)];
-
-        if (year > selectedEndDate.slice(0, 4)) return;
-        if (
-          year === selectedEndDate.slice(0, 4) &&
-          monthNumber > meses.indexOf(selectedMonth) + 1
-        )
-          return;
-      }
-
-      if (dayOfWeek === 5 || dayOfWeek === 6) {
-        hhRecord.hhRecords.forEach((hhRecord) => {
-          hhRecord.roles.forEach((role) => {
-            totalHHExtra2 += role.quantity * role.hours;
+        record.roles.forEach((role) => {
+          if (!roleFilter(role.role)) return;
+          calculateHours(role, dayOfWeek, {
+            normal: (value) => (totalHHNormal += value),
+            extra1: (value) => (totalHHExtra1 += value),
+            extra2: (value) => (totalHHExtra2 += value),
           });
         });
-      } else {
-        hhRecord.hhRecords.forEach((hhRecord) => {
-          hhRecord.roles.forEach((role) => {
-            if (role.hours <= 9) {
-              totalHHNormal += role.quantity * role.hours;
-            } else if (role.hours <= 11) {
-              totalHHNormal += role.quantity * 9;
-              totalHHExtra1 += role.quantity * (role.hours - 9);
-            } else {
-              totalHHNormal += role.quantity * 9;
-              totalHHExtra1 += role.quantity * 2;
-              totalHHExtra2 += role.quantity * (role.hours - 11);
-            }
-          });
-        });
-      }
+      });
     });
 
     setTotalNormal(totalHHNormal);
     setTotalExtra1(totalHHExtra1);
     setTotalExtra2(totalHHExtra2);
-  }
+  };
 
-  function organizeActivities(data) {
+  function getActivities(data) {
     let newActivities = [];
 
     data.forEach((hhRecord) => {
       hhRecord.hhRecords.forEach((record) => {
-        let newActivity = true;
-
         const area = record.area;
         const activity = record.activity;
         const subactivity = record.subactivity;
 
         let areaRecord = newActivities.find(
-          (activity) => activity.area == area
+          (activity) => activity.area === area
         );
-
         if (areaRecord) {
-          areaRecord.activities.forEach((currentActivity) => {
-            if (currentActivity.activity == activity) {
-              newActivity = false;
-              if (!currentActivity.subactivities.includes(subactivity))
-                currentActivity.subactivities.push(subactivity);
+          const currentActivity = areaRecord.activities.find(
+            (a) => a.activity === activity
+          );
+          if (currentActivity) {
+            if (!currentActivity.subactivities.includes(subactivity)) {
+              currentActivity.subactivities.push(subactivity);
             }
-          });
-
-          if (newActivity)
+          } else {
             areaRecord.activities.push({
               activity,
               subactivities: [subactivity],
             });
+          }
         } else {
           newActivities.push({
             area,
-            activities: [
-              {
-                activity,
-                subactivities: [subactivity],
-              },
-            ],
+            activities: [{ activity, subactivities: [subactivity] }],
           });
         }
       });
@@ -470,7 +390,23 @@ export const GestaoHH = ({ windowHeight, toastMessage }) => {
     setActivities(newActivities);
   }
 
-  function organizeDate(data) {
+  function getRoles(data) {
+    let newRoles = [];
+
+    data.forEach((hhRecord) => {
+      hhRecord.hhRecords.forEach((record) => {
+        record.roles.forEach((role) => {
+          const foundRole = newRoles.find((roles) => roles === role.role);
+
+          if (!foundRole) newRoles.push(role.role);
+        });
+      });
+    });
+
+    setRoles(newRoles);
+  }
+
+  function getDate(data) {
     let newRecordDate = [...recordDate];
 
     data.forEach((hhRecord) => {
@@ -494,9 +430,89 @@ export const GestaoHH = ({ windowHeight, toastMessage }) => {
 
     newRecordDate.sort((a, b) => a.ano - b.ano);
 
-    if (newRecordDate.length === 1) setSelectedYear(newRecordDate[0].ano);
+    if (newRecordDate.length === 1)
+      setFilter({ ...filter, year: newRecordDate[0].ano });
 
     setRecordDate(newRecordDate);
+  }
+
+  function calculateHours(role, dayOfWeek, accumulators, comparison = false) {
+    if (dayOfWeek === 5 || dayOfWeek === 6) {
+      if (filter.comparison === 3 || filter.comparison === 0 || !comparison)
+        accumulators.extra2(role.quantity * role.hours);
+    } else {
+      if (role.hours <= 9) {
+        if (filter.comparison === 1 || filter.comparison === 0 || !comparison)
+          accumulators.normal(role.quantity * role.hours);
+      } else if (role.hours <= 11) {
+        if (filter.comparison === 1 || filter.comparison === 0 || !comparison)
+          accumulators.normal(role.quantity * 9);
+        if (filter.comparison === 2 || filter.comparison === 0 || !comparison)
+          accumulators.extra1(role.quantity * (role.hours - 9));
+      } else {
+        if (filter.comparison === 1 || filter.comparison === 0 || !comparison)
+          accumulators.normal(role.quantity * 9);
+        if (filter.comparison === 2 || filter.comparison === 0 || !comparison)
+          accumulators.extra1(role.quantity * 2);
+        if (filter.comparison === 3 || filter.comparison === 0 || !comparison)
+          accumulators.extra2(role.quantity * (role.hours - 11));
+      }
+    }
+  }
+
+  function timeFilter(year, monthNumber) {
+    if (filter.year && year !== filter.year) return true;
+    if (filter.startDate) {
+      const selectedMonth = recordDate.find(
+        (date) => date.ano === filter.startDate.slice(0, 4)
+      ).meses[filter.startDate.slice(5, 7)];
+
+      if (year < filter.startDate.slice(0, 4)) return true;
+
+      if (
+        year === filter.startDate.slice(0, 4) &&
+        monthNumber < meses.indexOf(selectedMonth) + 1
+      )
+        return true;
+    }
+    if (filter.endDate) {
+      const selectedMonth = recordDate.find(
+        (date) => date.ano === filter.endDate.slice(0, 4)
+      ).meses[filter.endDate.slice(5, 7)];
+
+      if (year > filter.endDate.slice(0, 4)) return true;
+      if (
+        year === filter.endDate.slice(0, 4) &&
+        monthNumber > meses.indexOf(selectedMonth) + 1
+      )
+        return true;
+    }
+
+    return false;
+  }
+
+  function activityFilter(area, activity, subactivity) {
+    if (
+      filter.subactivity &&
+      (area !== filter.area ||
+        activity !== filter.activity ||
+        subactivity !== filter.subactivity)
+    )
+      return true;
+    if (
+      filter.activity &&
+      (area !== filter.area || activity !== filter.activity)
+    )
+      return true;
+    if (filter.area && area !== filter.area) return true;
+
+    return false;
+  }
+
+  function roleFilter(role) {
+    if (filter.roles.length === 0) return true;
+
+    return filter.roles.some((selectedRole) => selectedRole === role);
   }
 
   return (
@@ -510,16 +526,16 @@ export const GestaoHH = ({ windowHeight, toastMessage }) => {
                 <styled.yearSelector>
                   <styled.year
                     disabled={recordDate.length === 1}
-                    onClick={() => setSelectedYear("")}
-                    $selected={selectedYear === ""}
+                    onClick={() => setFilter({ ...filter, year: "" })}
+                    $selected={filter.year === ""}
                   ></styled.year>
                   {recordDate &&
                     recordDate.map((date) => (
                       <styled.year
                         key={date.ano}
                         disabled={recordDate.length === 1}
-                        onClick={() => setSelectedYear(date.ano)}
-                        $selected={selectedYear === date.ano}
+                        onClick={() => setFilter({ ...filter, year: date.ano })}
+                        $selected={filter.year === date.ano}
                       >
                         {date.ano}
                       </styled.year>
@@ -530,11 +546,14 @@ export const GestaoHH = ({ windowHeight, toastMessage }) => {
                 <styled.yearSelector>
                   <styled.workSelect
                     name="area"
-                    value={selectedArea}
+                    value={filter.area}
                     onChange={(e) => {
-                      setSelectedArea(e.target.value);
-                      setSelectedActivity("");
-                      setSelectedSubactivity("");
+                      setFilter({
+                        ...filter,
+                        area: e.target.value,
+                        activity: "",
+                        subactivity: "",
+                      });
                     }}
                   >
                     <option value="">Selecionar Área</option>
@@ -544,18 +563,21 @@ export const GestaoHH = ({ windowHeight, toastMessage }) => {
                       </option>
                     ))}
                   </styled.workSelect>
-                  {selectedArea && (
+                  {filter.area && (
                     <styled.workSelect
                       name="atividade"
-                      value={selectedActivity}
+                      value={filter.activity}
                       onChange={(e) => {
-                        setSelectedActivity(e.target.value);
-                        setSelectedSubactivity("");
+                        setFilter({
+                          ...filter,
+                          activity: e.target.value,
+                          subactivity: "",
+                        });
                       }}
                     >
                       <option value="">Selecionar Atividade</option>
                       {activities.map((activity) => {
-                        if (activity.area === selectedArea) {
+                        if (activity.area === filter.area) {
                           return activity.activities.map((activity) => (
                             <option
                               key={activity.activity}
@@ -568,17 +590,22 @@ export const GestaoHH = ({ windowHeight, toastMessage }) => {
                       })}
                     </styled.workSelect>
                   )}
-                  {selectedArea && selectedActivity && (
+                  {filter.area && filter.activity && (
                     <styled.workSelect
                       name="subatividade"
-                      value={selectedSubactivity}
-                      onChange={(e) => setSelectedSubactivity(e.target.value)}
+                      value={filter.subactivity}
+                      onChange={(e) =>
+                        setFilter({
+                          ...filter,
+                          subactivity: e.target.value,
+                        })
+                      }
                     >
                       <option value="">Selecionar Subatividade</option>
                       {activities.map((activity) => {
-                        if (activity.area === selectedArea) {
+                        if (activity.area === filter.area) {
                           return activity.activities.map((activity) => {
-                            if (activity.activity === selectedActivity) {
+                            if (activity.activity === filter.activity) {
                               return activity.subactivities.map(
                                 (subactivity) => (
                                   <option key={subactivity} value={subactivity}>
@@ -595,11 +622,36 @@ export const GestaoHH = ({ windowHeight, toastMessage }) => {
                 </styled.yearSelector>
               )}
               {filterType === 2 && (
-                <styled.filterRole>Selecionar Funções</styled.filterRole>
+                <styled.filterRole>
+                  Selecionar Funções
+                  <styled.openSvgContainer
+                    onClick={() => setOpenWindow((prev) => !prev)}
+                  >
+                    <SVGArrowDown open={openWindow} width="25" />
+                  </styled.openSvgContainer>
+                  {openWindow && (
+                    <styled.rolesContainer>
+                      {roles.map((role, index) => (
+                        <styled.roleCheckContainer key={index}>
+                          {role}
+                          <input
+                            type="checkbox"
+                            checked={filter.roles.some(
+                              (selectedRole) => selectedRole === role
+                            )}
+                            onChange={() => handleSelectRole(role)}
+                          />
+                          <span></span>
+                        </styled.roleCheckContainer>
+                      ))}
+                    </styled.rolesContainer>
+                  )}
+                </styled.filterRole>
               )}
               <styled.filter
                 onClick={() =>
                   setFilterType((prev) => {
+                    setOpenWindow(false);
                     if (prev >= 2) {
                       return 0;
                     } else {
@@ -623,16 +675,48 @@ export const GestaoHH = ({ windowHeight, toastMessage }) => {
                     </option>
                   ))}
               </styled.workSelect>
-              <styled.eraseFilter onClick={() => handleSelectWork("")}>
+              <styled.eraseFilter onClick={() => handleEraseFilter()}>
                 <SVGEraseFilter />
               </styled.eraseFilter>
             </styled.controllContainer>
           </styled.titleContainer>
         </styled.greenBackground>
         <styled.dashboardContainer>
-          <styled.sideGrapchContainer></styled.sideGrapchContainer>
+          <styled.sideGrapchContainer>
+            <styled.graphTitleBlue>
+              HH Normal x HH Extra I x HH Extra II
+              <styled.pieContainer>
+                {importedData?.labels ? (
+                  <PieGraph importedData={importedData} />
+                ) : (
+                  "Usina não selecionada"
+                )}
+              </styled.pieContainer>
+            </styled.graphTitleBlue>
+            <styled.graphTitleBlue>
+              HH Utilizado x Função
+              <styled.barContainer>
+                {importedData?.labels ? (
+                  <VerticalBarGraph importedData={importedDataRoles} />
+                ) : (
+                  "Usina não selecionada"
+                )}
+              </styled.barContainer>
+            </styled.graphTitleBlue>
+            <styled.exportButton>
+              Exportar relatório{" "}
+              <svg width="30px" height="30px" viewBox="0 0 24 24" fill="none">
+                <path
+                  d="M4 12H20M20 12L16 8M20 12L16 16"
+                  strokeWidth="`1"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </styled.exportButton>
+          </styled.sideGrapchContainer>
           <styled.summaryContainer
-            $selected={selectedComparison === 1}
+            $selected={filter.comparison === 1}
             onClick={() => handleSelectType(1)}
           >
             <styled.IconContainer>
@@ -647,7 +731,7 @@ export const GestaoHH = ({ windowHeight, toastMessage }) => {
             </styled.cardContentContainer>
           </styled.summaryContainer>
           <styled.summaryContainer
-            $selected={selectedComparison === 2}
+            $selected={filter.comparison === 2}
             onClick={() => handleSelectType(2)}
           >
             <styled.IconContainer>
@@ -662,7 +746,7 @@ export const GestaoHH = ({ windowHeight, toastMessage }) => {
             </styled.cardContentContainer>
           </styled.summaryContainer>
           <styled.summaryContainer
-            $selected={selectedComparison === 3}
+            $selected={filter.comparison === 3}
             onClick={() => handleSelectType(3)}
           >
             <styled.IconContainer>
@@ -677,6 +761,7 @@ export const GestaoHH = ({ windowHeight, toastMessage }) => {
             </styled.cardContentContainer>
           </styled.summaryContainer>
           <styled.bigGraphContainer>
+            <styled.graphTitle>HH Realizado x Orçado</styled.graphTitle>
             {importedData?.labels ? (
               <BarGraph importedData={importedData} />
             ) : (
@@ -684,29 +769,33 @@ export const GestaoHH = ({ windowHeight, toastMessage }) => {
             )}
           </styled.bigGraphContainer>
           <styled.smallGraphContainer>
+            <styled.graphTitle>Termômetro do desvio</styled.graphTitle>
             {importedData?.labels ? (
-              <PieGraph importedData={importedData} />
+              <GaugeGraph importedData={importedData} />
             ) : (
               "Usina não selecionada"
             )}
           </styled.smallGraphContainer>
           <styled.bigGraphContainer>
+            <styled.graphTitle>HH Realizado x Orçado</styled.graphTitle>
             {importedData?.labels ? (
               <LineGraph importedData={importedData} />
             ) : (
               "Usina não selecionada"
             )}
           </styled.bigGraphContainer>
-          <styled.smallGraphContainer>
+          <styled.smallGraphContainer style={{ padding: "20px" }}>
+            <styled.graphTitle>Progresso total</styled.graphTitle>
+            <styled.indicator>80%</styled.indicator>
             {importedData?.labels ? (
-              <PieGraph importedData={importedData} />
+              <DoughnutGraph importedData={importedData} />
             ) : (
               "Usina não selecionada"
             )}
           </styled.smallGraphContainer>
           <styled.monthSelectorContainer>
             {recordDate.map((date, dateIndex) => {
-              if (date.ano === selectedYear || selectedYear === "") {
+              if (date.ano === filter.year || filter.year === "") {
                 return date.meses.map((mes, monthIndex) => {
                   const uniqueIndex = `${date.ano}-${monthIndex}`;
                   return (
@@ -714,28 +803,27 @@ export const GestaoHH = ({ windowHeight, toastMessage }) => {
                       <styled.monthSelect
                         key={`month-select-${uniqueIndex}`}
                         $selected={
-                          selectedStartDate === uniqueIndex ||
-                          selectedEndDate === uniqueIndex
+                          filter.startDate === uniqueIndex ||
+                          filter.endDate === uniqueIndex
                         }
                         $between={
-                          uniqueIndex > selectedStartDate &&
-                          uniqueIndex < selectedEndDate
+                          uniqueIndex > filter.startDate &&
+                          uniqueIndex < filter.endDate
                         }
                         onClick={() => handleSelectDate(uniqueIndex)}
                       >
-                        {selectedYear ? mes : mes.slice(0, 3)}
+                        {filter.year ? mes : mes.slice(0, 3)}
                       </styled.monthSelect>
 
                       {(monthIndex + 1 !== date.meses.length ||
                         (dateIndex + 1 !== recordDate.length &&
-                          !selectedYear)) && (
+                          !filter.year)) && (
                         <styled.monthLine
                           key={`monthLine-${uniqueIndex}`}
                           $between={
-                            (uniqueIndex > selectedStartDate &&
-                              uniqueIndex < selectedEndDate) ||
-                            (selectedStartDate === uniqueIndex &&
-                              selectedEndDate)
+                            (uniqueIndex > filter.startDate &&
+                              uniqueIndex < filter.endDate) ||
+                            (filter.startDate === uniqueIndex && filter.endDate)
                           }
                         />
                       )}

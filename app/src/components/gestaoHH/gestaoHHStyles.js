@@ -128,7 +128,6 @@ export const filterRole = styled.button`
   height: 40px;
   font-size: 16px;
   font-weight: 400;
-  cursor: pointer;
   font-family: "Inter", sans-serif;
   border-radius: 5px;
   color: ${(props) => props.theme.colors.primary_dark};
@@ -136,6 +135,121 @@ export const filterRole = styled.button`
   position: relative;
   text-align: start;
   padding-left: 20px;
+`;
+
+export const openSvgContainer = styled.div`
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  display: flex;
+  justify-content: end;
+  cursor: pointer;
+  top: 50%;
+  transform: translateY(-50%);
+  right: 10px;
+
+  svg {
+    fill: ${(props) => props.theme.colors.primary_dark};
+  }
+`;
+
+export const rolesContainer = styled.div`
+  width: auto;
+  max-width: 700px;
+  height: auto;
+  padding: 20px 13px;
+  max-height: 600px;
+  background-color: ${(props) => props.theme.fonts.color};
+  box-shadow: 5px 5px 0 ${(props) => props.theme.colors.primary_dark};
+  font-size: 16px;
+  font-weight: 400;
+  font-family: "Inter", sans-serif;
+  border-radius: 5px;
+  position: absolute;
+  top: 110%;
+  left: 10%;
+  z-index: 2000;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  overflow: auto;
+
+  &::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: ${(props) => props.theme.colors.primary_2};
+    border-radius: 10px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: ${(props) => props.theme.colors.secondary_2};
+    border-radius: 10px;
+  }
+
+  &::-webkit-scrollbar-thumb:hover {
+    background: ${(props) => props.theme.colors.secondary_1};
+  }
+`;
+
+export const roleCheckContainer = styled.label`
+  display: block;
+  position: relative;
+  padding-left: 35px;
+  margin-bottom: 12px;
+  cursor: pointer;
+  font-size: 16px;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+
+  input {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+    height: 0;
+    width: 0;
+  }
+
+  span {
+    border-radius: 5px;
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 22px;
+    width: 22px;
+    background-color: #eee;
+
+    &:after {
+      border-radius: 3px;
+      content: "";
+      position: absolute;
+      display: none;
+      top: 15%;
+      left: 35%;
+      transform: translate(-50%, -50%);
+      width: 5px;
+      height: 10px;
+      border: solid white;
+      border-width: 0 3px 3px 0;
+      -webkit-transform: rotate(45deg);
+      -ms-transform: rotate(45deg);
+      transform: rotate(45deg);
+    }
+  }
+
+  &:hover input ~ span {
+    background-color: ${(props) => props.theme.colors.grey};
+  }
+
+  input:checked ~ span {
+    background-color: ${(props) => props.theme.colors.primary_2};
+  }
+
+  input:checked ~ span:after {
+    display: block;
+  }
 `;
 
 export const filter = styled.button`
@@ -198,6 +312,93 @@ export const sideGrapchContainer = styled.div`
     ${(props) => props.theme.colors.primary_2},
     ${(props) => props.theme.colors.primary_1}
   );
+
+  display: grid;
+  grid-template-rows: 1.2fr 2fr 0.5fr;
+  align-items: center;
+  justify-content: center;
+  padding: 20px 0;
+`;
+
+export const graphTitleBlue = styled.div`
+  font-size: 14px;
+  font-weight: 500;
+  color: ${(props) => props.theme.fonts.color};
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+`;
+
+export const pieContainer = styled.div`
+  width: 260px;
+  height: auto;
+  position: relative;
+  margin: 0 auto;
+  color: ${(props) => props.theme.fonts.color};
+  white-space: nowrap;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
+
+export const barContainer = styled.div`
+  width: 100%;
+  height: 300px;
+  color: ${(props) => props.theme.fonts.color};
+  white-space: nowrap;
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  overflow: auto;
+
+  &::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: ${(props) => props.theme.colors.primary_2};
+    border-radius: 10px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: ${(props) => props.theme.colors.secondary_2};
+    border-radius: 10px;
+  }
+
+  &::-webkit-scrollbar-thumb:hover {
+    background: ${(props) => props.theme.colors.secondary_1};
+  }
+`;
+
+export const exportButton = styled.button`
+  width: 300px;
+  height: 45px;
+  border-radius: 5px;
+  background-color: ${(props) => props.theme.fonts.color};
+  color: ${(props) => props.theme.colors.primary_dark};
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 400;
+  gap: 5px;
+  font-family: "Inter", sans-serif;
+  padding-left: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: start;
+  transition: gap 0.1s;
+
+  svg {
+    path {
+      stroke: ${(props) => props.theme.colors.primary_dark};
+    }
+  }
+
+  &:hover {
+    gap: 15px;
+  }
 `;
 
 export const summaryContainer = styled.div`
@@ -310,25 +511,49 @@ export const bigGraphContainer = styled.div`
   height: 100%;
   grid-column: span 2;
   border-radius: 20px;
-  background-color: ${(props) => props.theme.colors.grey};
+  background-color: ${(props) => props.theme.fonts.color};
+  box-shadow: 5px 5px 0 ${(props) => props.theme.colors.primary_dark};
   display: flex;
   justify-content: center;
   align-items: center;
   max-height: 200px;
   padding: 10px 20px;
   overflow: hidden;
+  position: relative;
 `;
 
 export const smallGraphContainer = styled.div`
   width: 100%;
   height: 100%;
   border-radius: 20px;
-  background-color: ${(props) => props.theme.colors.grey};
+  padding: 50px 30px 0 30px;
+  background-color: ${(props) => props.theme.fonts.color};
+  box-shadow: 5px 5px 0 ${(props) => props.theme.colors.primary_dark};
   display: flex;
   justify-content: center;
   align-items: center;
   max-height: 200px;
   overflow: hidden;
+  position: relative;
+`;
+
+export const graphTitle = styled.h2`
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  font-size: 14px;
+  font-weight: 500;
+  color: ${(props) => props.theme.colors.primary_dark};
+`;
+
+export const indicator = styled.h1`
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 20px;
+  font-weight: 700;
+  color: ${(props) => props.theme.colors.secondary_1};
 `;
 
 export const monthSelectorContainer = styled.div`
