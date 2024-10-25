@@ -1,5 +1,11 @@
 import HHrecords from "../Models/hhrecordsModel.js";
 import Work from "../Models/workModel.js";
+import fs from "fs";
+import path from "path";
+import { fileURLToPath } from "url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 async function isManegerOnWork(projectId, userId) {
   try {
@@ -463,6 +469,40 @@ class HHControllController {
     } catch (e) {
       res.status(500).json({
         message: "Erro interno do servidor.",
+        status: false,
+      });
+    }
+  }
+
+  static async getPdf(req, res) {
+    try {
+      const pdfPath = path.join(
+        __dirname,
+        "../../static",
+        "Folha_InnovaEnergy_vazia.pdf"
+      );
+
+      if (!fs.existsSync(pdfPath)) {
+        return res.status(404).json({
+          message: "Arquivo PDF não encontrado.",
+          status: false,
+        });
+      }
+
+      const pdfFile = fs.readFileSync(pdfPath);
+
+      res.setHeader("Content-Type", "application/pdf");
+      res.setHeader(
+        "Content-Disposition",
+        'attachment; filename="Folha_InnovaEnergy_vazia.pdf"'
+      );
+      res.setHeader("Content-Length", pdfFile.length);
+
+      res.send(pdfFile);
+    } catch (e) {
+      console.error("Erro ao gerar PDF:", e);
+      res.status(500).json({
+        message: "Erro interno do servidor: " + e.message,
         status: false,
       });
     }

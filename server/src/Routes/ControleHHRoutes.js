@@ -41,4 +41,10 @@ HHControllerRoutes.get(
   HHControllController.getStatistics
 );
 
+HHControllerRoutes.get(
+  "/get-pdf-base",
+  JWT.validateAccessToken,
+  HHControllController.getPdf
+);
+
 export default HHControllerRoutes;

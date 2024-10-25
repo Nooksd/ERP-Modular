@@ -5,14 +5,18 @@ import { darkTheme } from "../../../../styles/theme";
 
 ChartJS.register(ArcElement, Tooltip, Legend, ChartDataLabels);
 
-const PieGraph = ({ importedData }) => {
+const PieGraph = ({ normal, extra1, extra2 }) => {
   const data = {
     labels: ["HH Normal", "HH Extra I", "HH Extra II"],
     datasets: [
       {
         label: "Series A",
-        data: [900, 342, 803],
-        backgroundColor: [darkTheme.colors.secondary_3, darkTheme.colors.secondary_2, darkTheme.colors.secondary_1],
+        data: [normal, extra1, extra2],
+        backgroundColor: [
+          darkTheme.colors.secondary_3,
+          darkTheme.colors.secondary_2,
+          darkTheme.colors.secondary_1,
+        ],
         borderWidth: 0,
         cutout: "60%",
         circumference: 360,
@@ -35,9 +39,6 @@ const PieGraph = ({ importedData }) => {
     plugins: {
       legend: {
         display: false,
-      },
-      tooltip: {
-        enabled: false,
       },
       datalabels: {
         color: "#fff",

@@ -351,7 +351,7 @@ export const barContainer = styled.div`
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  align-items: center;
+  align-items: ${props => props.$position ? "start" : "center"};
   overflow: auto;
 
   &::-webkit-scrollbar {
@@ -384,7 +384,7 @@ export const exportButton = styled.button`
   font-weight: 400;
   gap: 5px;
   font-family: "Inter", sans-serif;
-  padding-left: 50px;
+  padding-left: 70px;
   display: flex;
   align-items: center;
   justify-content: start;

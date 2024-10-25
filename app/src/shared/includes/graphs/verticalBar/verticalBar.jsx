@@ -19,7 +19,7 @@ ChartJS.register(
   Legend
 );
 
-const VerticalBarGraph = ({ importedData }) => {
+const VerticalBarGraph = ({ importedData, chartRef }) => {
   const sortedData =
     importedData?.labels &&
     importedData?.labels
@@ -56,12 +56,36 @@ const VerticalBarGraph = ({ importedData }) => {
         ticks: {
           color: "#fff",
           autoSkip: false,
+
+          callback: function (value) {
+            const label = this.getLabelForValue(value);
+
+            const maxLineLength = 21;
+
+            const words = label.split(" ");
+
+            if (label.length > maxLineLength) {
+              let lines = [];
+              let fitWords = "";
+
+              words.forEach((word) => {
+                if (fitWords.length + word.length + 1 < maxLineLength) {
+                  fitWords += `${word} `;
+                } else {
+                  lines.push(fitWords.trim());
+                  fitWords = word + " ";
+                }
+              });
+              lines.push(fitWords.trim());
+
+              return lines;
+            }
+
+            return label;
+          },
         },
         grid: {
           display: false,
-        },
-        afterFit: (axis) => {
-          axis.width = 100;
         },
       },
     },
@@ -88,12 +112,12 @@ const VerticalBarGraph = ({ importedData }) => {
   };
 
   const numberOfBars = importedData?.labels ? importedData?.labels.length : 0;
-  const barHeight = 35;
-  const chartHeight = numberOfBars * barHeight;
+  const barHeight = 45;
+  const chartHeight = numberOfBars === 1 ? 100 : numberOfBars * barHeight;
 
   return (
     <div style={{ width: "100%", height: `${chartHeight}px` }}>
-      <Bar data={data} options={options} />
+      <Bar data={data} options={options} ref={chartRef} />
     </div>
   );
 };

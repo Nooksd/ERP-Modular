@@ -20,7 +20,7 @@ ChartJS.register(
   Legend
 );
 
-const BarGraph = ({ importedData }) => {
+const BarGraph = ({ importedData, chartRef }) => {
   const data = {
     labels: importedData?.labels,
     datasets: [
@@ -72,7 +72,7 @@ const BarGraph = ({ importedData }) => {
     },
   };
 
-  return <Bar data={data} options={options} />;
+  return <Bar data={data} options={options} ref={chartRef} />;
 };
 
 export default BarGraph;

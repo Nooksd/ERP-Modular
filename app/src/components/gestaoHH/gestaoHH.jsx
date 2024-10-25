@@ -1,10 +1,11 @@
 // Página de gestão de HH
 
 // -imports Ract, Redux- >
-import { Fragment, useEffect, useState, useCallback } from "react";
+import { Fragment, useEffect, useState, useCallback, useRef } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { fetchUserWorks } from "../../store/slicers/worksSlicer.js";
 import { innovaApi } from "../../services/http.js";
+import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
 
 import * as styled from "./gestaoHHStyles.js";
 
@@ -41,6 +42,7 @@ export const GestaoHH = ({ windowHeight, toastMessage }) => {
 
   const [selectedWork, setSelectedWork] = useState("");
 
+  const chartRef = useRef(null);
   const [filter, setFilter] = useState({
     startDate: "",
     endDate: "",
@@ -124,6 +126,7 @@ export const GestaoHH = ({ windowHeight, toastMessage }) => {
 
   const handleSelectWork = useCallback((work) => {
     handleEraseFilter();
+
     setTotalNormal(0);
     setTotalExtra1(0);
     setTotalExtra2(0);
@@ -132,6 +135,7 @@ export const GestaoHH = ({ windowHeight, toastMessage }) => {
     setRoles([]);
     setWorkData();
     setImportedData({});
+    setImportedDataRoles({});
     setSelectedWork(work);
   }, []);
 
@@ -515,6 +519,107 @@ export const GestaoHH = ({ windowHeight, toastMessage }) => {
     return filter.roles.some((selectedRole) => selectedRole === role);
   }
 
+  const generatePDF = async () => {
+    try {
+      const { data } = await innovaApi.get("/hhcontroll/get-pdf-base", {
+        responseType: "arraybuffer",
+      });
+
+      const pdfDoc = await PDFDocument.load(data);
+      const pages = pdfDoc.getPages();
+      const page = pages[0];
+
+      const { width, height } = page.getSize();
+      const blackColor = rgb(0, 0, 0);
+      const greenColor = rgb(176 / 255, 209 / 255, 89 / 255);
+
+      const timesRomanFont = await pdfDoc.embedFont(StandardFonts.TimesRoman);
+
+      const selectedWorkDetails = works.works.userWorks.find(
+        (work) => work._id === selectedWork
+      );
+
+      const titleConfig = {
+        text: selectedWorkDetails.name,
+        size: 25,
+        averageCharacterWidth: 0.45,
+        yOffset: 150,
+      };
+
+      titleConfig.width =
+        titleConfig.size *
+        titleConfig.text.length *
+        titleConfig.averageCharacterWidth;
+
+      titleConfig.x = width / 2 - titleConfig.width / 2;
+      titleConfig.y = height - titleConfig.yOffset;
+
+      page.drawText(titleConfig.text, {
+        x: titleConfig.x,
+        y: titleConfig.y,
+        size: titleConfig.size,
+        color: blackColor,
+        font: timesRomanFont,
+      });
+
+      const subtitleConfig = {
+        text: `${importedData.labels[0]} - ${
+          importedData.labels[importedData.labels.length - 1]
+        }`,
+        size: 15,
+        averageCharacterWidth: 0.45,
+      };
+
+      subtitleConfig.width =
+        subtitleConfig.size *
+        subtitleConfig.text.length *
+        subtitleConfig.averageCharacterWidth;
+
+      subtitleConfig.x = width / 2 - subtitleConfig.width / 2;
+      subtitleConfig.y = titleConfig.y - 70;
+
+      page.drawText(subtitleConfig.text, {
+        x: subtitleConfig.x,
+        y: subtitleConfig.y + 50,
+        size: subtitleConfig.size,
+        color: greenColor,
+        font: timesRomanFont,
+      });
+
+      const canvas = chartRef.current?.canvas;
+      const dataURL = canvas.toDataURL("image/png");
+      const imageBytes = Uint8Array.from(atob(dataURL.split(",")[1]), (c) =>
+        c.charCodeAt(0)
+      );
+
+      const pngImage = await pdfDoc.embedPng(imageBytes);
+      const imgWidth = 400;
+      const imgHeight = (imgWidth / pngImage.width) * pngImage.height;
+
+      page.drawImage(pngImage, {
+        x: width / 2 - imgWidth / 2,
+        y: titleConfig.y - imgHeight - 50,
+        width: imgWidth,
+        height: imgHeight,
+      });
+
+      const pdfBytes = await pdfDoc.save();
+      const blob = new Blob([pdfBytes], { type: "application/pdf" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `Relatorio_HH_${titleConfig.text}.pdf`;
+      a.click();
+    } catch (e) {
+      console.error("Erro ao gerar PDF", e);
+      toastMessage({
+        danger: true,
+        title: "Erro",
+        message: "Não foi possível gerar o PDF.",
+      });
+    }
+  };
+
   return (
     <styled.contentDiv $windowHeight={windowHeight}>
       <styled.content>
@@ -686,8 +791,12 @@ export const GestaoHH = ({ windowHeight, toastMessage }) => {
             <styled.graphTitleBlue>
               HH Normal x HH Extra I x HH Extra II
               <styled.pieContainer>
-                {importedData?.labels ? (
-                  <PieGraph importedData={importedData} />
+                {totalNormal || totalExtra1 || totalExtra2 ? (
+                  <PieGraph
+                    normal={totalNormal}
+                    extra1={totalExtra1}
+                    extra2={totalExtra2}
+                  />
                 ) : (
                   "Usina não selecionada"
                 )}
@@ -695,15 +804,15 @@ export const GestaoHH = ({ windowHeight, toastMessage }) => {
             </styled.graphTitleBlue>
             <styled.graphTitleBlue>
               HH Utilizado x Função
-              <styled.barContainer>
-                {importedData?.labels ? (
+              <styled.barContainer $position={importedDataRoles?.labels}>
+                {importedDataRoles?.labels ? (
                   <VerticalBarGraph importedData={importedDataRoles} />
                 ) : (
                   "Usina não selecionada"
                 )}
               </styled.barContainer>
             </styled.graphTitleBlue>
-            <styled.exportButton>
+            <styled.exportButton onClick={() => generatePDF()}>
               Exportar relatório{" "}
               <svg width="30px" height="30px" viewBox="0 0 24 24" fill="none">
                 <path
@@ -763,7 +872,7 @@ export const GestaoHH = ({ windowHeight, toastMessage }) => {
           <styled.bigGraphContainer>
             <styled.graphTitle>HH Realizado x Orçado</styled.graphTitle>
             {importedData?.labels ? (
-              <BarGraph importedData={importedData} />
+              <BarGraph importedData={importedData} chartRef={chartRef} />
             ) : (
               "Usina não selecionada"
             )}
