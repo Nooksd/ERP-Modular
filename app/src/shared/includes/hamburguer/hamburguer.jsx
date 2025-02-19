@@ -18,28 +18,55 @@ const Hamburguer = ({ user, pageIcons }) => {
 
   const renderMenuItems = () => {
     if (!user || !user.pages) return null;
+    const groups = [];
+    const pages = [];
+
+    user.pages.map((page, i) => {
+      const formattedPage = normalizeString(page);
+
+      const pageData = pageIcons.find(
+        (p) => normalizeString(p.path) === formattedPage
+      );
+
+      if (!pageData) return null;
+
+      const isActive = location.pathname === `/${formattedPage}`;
+
+      if (pageData.group) {
+        const located = groups.find((group) => group.group === pageData.group);
+
+        if (located) {
+          located.page.push(pageData);
+          return null;
+        }
+
+        groups.push({ group: pageData.group, page: [pageData] });
+      }
+    });
 
     return (
       <>
-        {user.pages.map((page) => {
-          const formattedPage = normalizeString(page);
+        {groups.map((group) => {
+          return group.page.map((page) => {
+            const formattedPage = normalizeString(page.name);
 
-          const pageData = pageIcons.find(
-            (p) => normalizeString(p.path) === formattedPage
-          );
+            const pageData = pageIcons.find(
+              (p) => normalizeString(p.path) === formattedPage
+            );
 
-          if (!pageData) return null;
+            if (!pageData) return null;
 
-          const isActive = location.pathname === `/${formattedPage}`;
+            const isActive = location.pathname === `/${formattedPage}`;
 
-          return (
-            <Link to={`/${formattedPage}`} key={formattedPage}>
-              <styled.MenuIten $isActive={isActive}>
-                <styled.IconWrapper>{pageData.small}</styled.IconWrapper>
-                <styled.ItenText $active={openMenu}>{page}</styled.ItenText>
-              </styled.MenuIten>
-            </Link>
-          );
+            return (
+              <Link to={`/${formattedPage}`} key={formattedPage}>
+                <styled.MenuIten $isActive={isActive}>
+                  <styled.IconWrapper>{pageData.small}</styled.IconWrapper>
+                  <styled.ItenText $active={openMenu}>{page.name}</styled.ItenText>
+                </styled.MenuIten>
+              </Link>
+            );
+          });
         })}
       </>
     );

@@ -5,7 +5,7 @@ export const loginUser = createAsyncThunk(
   "user/login",
   async (loginCredentials, { rejectWithValue }) => {
     try {
-      const response = await innovaApi.post("/user/login", loginCredentials);
+      const response = await innovaApi.post("/auth/login", loginCredentials);
 
       return response.data;
     } catch (error) {
@@ -22,7 +22,7 @@ export const refreshAccessToken = createAsyncThunk(
   "user/refreshToken",
   async (_, { rejectWithValue }) => {
     try {
-      const response = await innovaApi.get("/user/refresh-token");
+      const response = await innovaApi.get("/auth/refresh-token");
 
       return response.data;
     } catch (error) {
@@ -51,7 +51,7 @@ export const logoutUser = createAsyncThunk(
   "user/logout",
   async (_, { rejectWithValue }) => {
     try {
-      const response = await innovaApi.post("/user/logout");
+      const response = await innovaApi.post("/auth/logout");
       return response.data;
     } catch (error) {
       if (error.response && error.response.data) {

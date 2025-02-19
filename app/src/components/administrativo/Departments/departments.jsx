@@ -118,11 +118,11 @@ const Departments = ({ toastMessage, modalMessage, modalInfo, openPage }) => {
             {role.isField ? "Campo" : "Escritório"}
           </styled.userDataSpan>
           <styled.controllButtonsDiv>
-            <styled.EditButton onClick={() => handleEditButtonClick(role._id)}>
+            <styled.EditButton onClick={() => handleEditButtonClick(role.id)}>
               <SVGEdit width="20" height="20" />
             </styled.EditButton>
             <styled.DeleteButton
-              onClick={() => handleDeleteButtonClick(role._id, role.role)}
+              onClick={() => handleDeleteButtonClick(role.id, role.role)}
             >
               <SVGDelete width="16" height="16" />
             </styled.DeleteButton>
@@ -183,8 +183,8 @@ const Departments = ({ toastMessage, modalMessage, modalInfo, openPage }) => {
         </styled.filterAndInfoDiv>
       </styled.filterOptionsDiv>
       <styled.resultsDiv>
-        {roles.length > 0 && RenderResultsOnPege()}
-        {roles.length > 0 && (
+        {roles && roles.length > 0 && RenderResultsOnPege()}
+        {roles && roles.length > 0 && (
           <styled.paginationDiv>
             <button
               disabled={page === 1}

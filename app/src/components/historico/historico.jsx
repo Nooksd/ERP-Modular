@@ -125,7 +125,7 @@ export const Historico = ({
     ).padStart(2, "0")}${date.getUTCFullYear()}`;
 
     const recordData = {
-      recordId: record.recordId,
+      recordId: record.id,
       projectId: selectedWork,
       date: localDate,
     };
@@ -146,12 +146,12 @@ export const Historico = ({
     });
 
     const workName = works.works.userWorks.find(
-      (obj) => obj._id === selectedWork
+      (obj) => obj.id === selectedWork
     ).name;
 
     setWhatDelete({
       projectId: selectedWork,
-      recordId: record.recordId,
+      recordId: record.id,
     });
 
     modalMessage({
@@ -200,7 +200,7 @@ export const Historico = ({
   async function deleteRecord() {
     try {
       await innovaApi.delete(
-        `/hhcontroll/delete-record/${whatDelete.recordId}`
+        `/hhcontroll/delete/${whatDelete.recordId}`
       );
       toastMessage({
         danger: false,
@@ -220,7 +220,7 @@ export const Historico = ({
 
   // -Dinamic page Content Renders- >
   const renderHHRecords = () => {
-    if (hhRecords.length === 0) {
+    if (hhRecords && hhRecords.length === 0) {
       return (
         <styled.empityHHRecordP>
           Selecione os parâmetros para buscar HH
@@ -229,10 +229,11 @@ export const Historico = ({
     }
 
     return (
-      hhRecords.length > 0 &&
+      hhRecords && hhRecords.length > 0 &&
       hhRecords.map((record, index) => {
         const date = new Date(record.date);
         const localDate = new Date(
+
           date.getUTCFullYear(),
           date.getUTCMonth(),
           date.getUTCDate()
@@ -250,13 +251,14 @@ export const Historico = ({
               <styled.recordDateH4>{localDate}</styled.recordDateH4>
               <styled.Division />
               <styled.recordActivitiesDiv>
-                {record.activities}
+                {record.totals.totalActivities}
               </styled.recordActivitiesDiv>
               <styled.Division />
-              <styled.recordRolesDiv>{record.roles}</styled.recordRolesDiv>
+              <styled.recordRolesDiv>{record.totals.totalRoles}</styled.recordRolesDiv>
               <styled.Division />
-              <styled.recordHoursDiv>{record.hours}</styled.recordHoursDiv>
+              <styled.recordHoursDiv>{record.totals.totalHours}</styled.recordHoursDiv>
               <styled.Division />
+
             </styled.RecordDiv>
             <styled.EditButton onClick={() => handleEditClick(record)}>
               <SVGEdit width="20" height="20" />
@@ -297,11 +299,12 @@ export const Historico = ({
           >
             <option value="">Selecionar Obra</option>
             {works.status === "succeeded" &&
-              works.works.userWorks.map((work) => (
-                <option key={work._id} value={work._id}>
+              works.works.userWorks.map((work, index) => (
+                <option key={index} value={work.id}>
                   {work.name}
                 </option>
               ))}
+
           </styled.WorkSelect>
           <styled.Division $error={error} />
           <styled.containerWrapper onClick={() => setOrder((prev) => !prev)}>
@@ -327,12 +330,13 @@ export const Historico = ({
             onChange={(e) => setPage(parseInt(e.target.value))}
           >
             {Array.from({ length: pages }, (_, index) => index + 1).map(
-              (page) => (
-                <option key={page} value={page}>
+              (page, index) => (
+                <option key={index} value={page}>
                   {page}
                 </option>
               )
             )}
+
           </styled.controllSelect>
           <styled.controllSelect
             value={limit}

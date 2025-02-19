@@ -9,7 +9,7 @@ const AddFunction = ({ toastMessage, editData }) => {
   const employees = useSelector((state) => state.employees);
   const [additives, setAdditives] = useState([
     {
-      _id: 1,
+      id: 1,
       additive: "periculosidade",
     },
   ]);
@@ -270,7 +270,7 @@ const AddFunction = ({ toastMessage, editData }) => {
                     )
                       return null;
                     return (
-                      <option key={additive._id} value={additive.additive}>
+                      <option key={additive.id} value={additive.additive}>
                         {additive.additive}
                       </option>
                     );

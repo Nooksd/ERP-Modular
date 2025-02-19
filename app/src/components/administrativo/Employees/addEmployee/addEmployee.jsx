@@ -218,8 +218,6 @@ const AddEmployee = ({ toastMessage, editData }) => {
 
       setSelectedDay(formatDate2(result.startDate));
 
-      console.log(formatDate2(result.startDate));
-
       setEmployeeInfo(newEmployeeInfo);
 
       toastMessage({
@@ -327,7 +325,7 @@ const AddEmployee = ({ toastMessage, editData }) => {
               <option value="">Selecionar funcionário</option>
               {roles.length &&
                 roles.map((role) => (
-                  <option key={role._id} value={role.role}>
+                  <option key={role.id} value={role.role}>
                     {role.role}
                   </option>
                 ))}
@@ -346,13 +344,13 @@ const AddEmployee = ({ toastMessage, editData }) => {
                   <option value="">Selecionar página</option>
                   {managerIds.map((managerId) => {
                     if (
-                      (employeeInfo.managerIds.includes(managerId._id) &&
-                        employeeInfo.managerIds[index] !== managerId._id) ||
+                      (employeeInfo.managerIds.includes(managerId.id) &&
+                        employeeInfo.managerIds[index] !== managerId.id) ||
                       editData == managerId.employeeId
                     )
                       return null;
                     return (
-                      <option key={managerId._id} value={managerId._id}>
+                      <option key={managerId.id} value={managerId.id}>
                         {managerId.name}
                       </option>
                     );

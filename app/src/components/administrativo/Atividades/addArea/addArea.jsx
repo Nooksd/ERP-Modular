@@ -116,8 +116,6 @@ const AddArea = ({ toastMessage, editData }) => {
           response = await innovaApi.post("/activity/create", areaInfo);
         }
 
-        console.log(areaInfo);
-
         toastMessage({
           danger: false,
           title: "Sucesso",

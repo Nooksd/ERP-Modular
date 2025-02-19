@@ -536,7 +536,7 @@ export const GestaoHH = ({ windowHeight, toastMessage }) => {
       const timesRomanFont = await pdfDoc.embedFont(StandardFonts.TimesRoman);
 
       const selectedWorkDetails = works.works.userWorks.find(
-        (work) => work._id === selectedWork
+        (work) => work.id === selectedWork
       );
 
       const titleConfig = {
@@ -775,7 +775,7 @@ export const GestaoHH = ({ windowHeight, toastMessage }) => {
                 <option value="">Selecionar Usina</option>
                 {works.status === "succeeded" &&
                   works.works.userWorks.map((work) => (
-                    <option key={work._id} value={work._id}>
+                    <option key={work.id} value={work.id}>
                       {work.name}
                     </option>
                   ))}

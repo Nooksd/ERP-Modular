@@ -122,7 +122,7 @@ const Users = ({ toastMessage, modalMessage, modalInfo, openPage }) => {
 
   async function disableUser() {
     try {
-      await innovaApi.put(`/user/update-user/${whatDisable}`, {
+      await innovaApi.put(`/user/update/${whatDisable}`, {
         isActive: !activeMode,
       });
 
@@ -156,16 +156,16 @@ const Users = ({ toastMessage, modalMessage, modalInfo, openPage }) => {
           <styled.userDataSpan>{user.email}</styled.userDataSpan>
           <styled.userDataSpan>{user.pages.length}</styled.userDataSpan>
           <styled.controllButtonsDiv>
-            <styled.EditButton onClick={() => handleEditButtonClick(user._id)}>
+            <styled.EditButton onClick={() => handleEditButtonClick(user.id)}>
               <SVGEdit width="20" height="20" />
             </styled.EditButton>
             <styled.DeleteButton
-              onClick={() => handleDeleteButtonClick(user._id, user.name)}
+              onClick={() => handleDeleteButtonClick(user.id, user.name)}
             >
               <SVGDelete width="16" height="16" />
             </styled.DeleteButton>
             <styled.disableButton
-              onClick={() => handleDisableToggle(user._id, user.name)}
+              onClick={() => handleDisableToggle(user.id, user.name)}
             />
           </styled.controllButtonsDiv>
         </styled.UserDiv>
@@ -240,8 +240,8 @@ const Users = ({ toastMessage, modalMessage, modalInfo, openPage }) => {
         </styled.filterAndInfoDiv>
       </styled.filterOptionsDiv>
       <styled.resultsDiv>
-        {users.length > 0 && RenderResultsOnPege()}
-        {users.length > 0 && (
+        {users && users.length > 0 && RenderResultsOnPege()}
+        {users && users.length > 0 && (
           <styled.paginationDiv>
             <button
               disabled={page === 1}

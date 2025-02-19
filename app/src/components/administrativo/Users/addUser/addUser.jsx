@@ -154,7 +154,7 @@ const AddUser = ({ toastMessage, editData }) => {
 
   async function getUserInfo() {
     try {
-      const response = await innovaApi.get(`/user/get-one/${editData}`);
+      const response = await innovaApi.get(`/user/${editData}`);
       const result = response.data.user;
 
       const newUserInfo = {
@@ -249,7 +249,7 @@ const AddUser = ({ toastMessage, editData }) => {
             >
               <option value="">Selecionar funcionário</option>
               {employees.employees.map((employee) => (
-                <option key={employee.name} value={employee._id}>
+                <option key={employee.name} value={employee.id}>
                   {employee.name}
                 </option>
               ))}

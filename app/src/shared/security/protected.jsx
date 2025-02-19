@@ -11,6 +11,7 @@ import {
 import Header from "../includes/header/header";
 import Hamburger from "../includes/hamburguer/hamburguer";
 import Toast from "../includes/toast/toast";
+import Modal from "../includes/modal/modal";
 
 import { Home } from "../../components/home/home";
 import { ControleHH } from "../../components/controleHH/controleHH";
@@ -23,7 +24,6 @@ import SVGHome from "../icons/home/Home_icon";
 import SVGHHControll from "../icons/hamburguer/HHControll_icon";
 import SVGHistory from "../icons/hamburguer/History_icon";
 import SVGControll from "../icons/hamburguer/Controll_icon";
-import Modal from "../includes/modal/modal";
 import SVGPersonConfig from "../icons/hamburguer/PersonConfig_icon";
 
 const ProtectedRouter = () => {
@@ -66,6 +66,7 @@ const ProtectedRouter = () => {
     {
       path: "controlehh",
       name: "Controle HH",
+      group: "HH campo",
       isRestricted: true,
       component: (
         <ControleHH
@@ -79,6 +80,7 @@ const ProtectedRouter = () => {
     {
       path: "historicohh",
       name: "Histórico HH",
+      group: "HH campo",
       isRestricted: true,
       component: (
         <Historico
@@ -94,6 +96,7 @@ const ProtectedRouter = () => {
     {
       path: "gestaohh",
       name: "Gestão HH",
+      group: "HH campo",
       isRestricted: true,
       component: (
         <GestaoHH
@@ -109,6 +112,7 @@ const ProtectedRouter = () => {
     {
       path: "administrativo",
       name: "Administrativo",
+      group: "Administração",
       isRestricted: true,
       component: (
         <Adm

@@ -20,7 +20,6 @@ const appUsersSlicer = createSlice({
       })
       .addCase(fetchAppUsers.fulfilled, (state, action) => {
         state.status = "succeeded";
-        console.log(action.payload)
         state.appUsers = action.payload.users;
       })
       .addCase(fetchAppUsers.rejected, (state, action) => {

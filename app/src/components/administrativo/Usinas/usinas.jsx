@@ -121,7 +121,7 @@ const Usinas = ({ toastMessage, modalMessage, modalInfo, openPage }) => {
 
   async function disableUsina() {
     try {
-      await innovaApi.put(`/work/update-work/${whatDisable}`, {
+      await innovaApi.put(`/work/update/${whatDisable}`, {
         isActive: !activeMode,
       });
 
@@ -180,16 +180,16 @@ const Usinas = ({ toastMessage, modalMessage, modalInfo, openPage }) => {
           <styled.usinaDataSpan>{startDate}</styled.usinaDataSpan>
           <styled.usinaDataSpan>{endDate}</styled.usinaDataSpan>
           <styled.controllButtonsDiv>
-            <styled.EditButton onClick={() => handleEditButtonClick(usina._id)}>
+            <styled.EditButton onClick={() => handleEditButtonClick(usina.id)}>
               <SVGEdit width="20" height="20" />
             </styled.EditButton>
             <styled.DeleteButton
-              onClick={() => handleDeleteButtonClick(usina._id, usina.name)}
+              onClick={() => handleDeleteButtonClick(usina.id, usina.name)}
             >
               <SVGDelete width="16" height="16" />
             </styled.DeleteButton>
             <styled.disableButton
-              onClick={() => handleDisableUsina(usina._id, usina.name)}
+              onClick={() => handleDisableUsina(usina.id, usina.name)}
             />
           </styled.controllButtonsDiv>
         </styled.usinaDiv>
@@ -267,10 +267,11 @@ const Usinas = ({ toastMessage, modalMessage, modalInfo, openPage }) => {
         </styled.filterAndInfoDiv>
       </styled.filterOptionsDiv>
       <styled.resultsDiv>
-        {usinas.length > 0 && RenderResultsOnPege()}
-        {usinas.length > 0 && (
+        {usinas && usinas.length > 0 && RenderResultsOnPege()}
+        {usinas && usinas.length > 0 && (
           <styled.paginationDiv>
             <button
+
               disabled={page === 1}
               onClick={() => setPage((prev) => prev - 1)}
             >

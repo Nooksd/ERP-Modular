@@ -37,10 +37,6 @@ const AddUsina = ({ toastMessage, editData }) => {
   const addManagerRef = useRef(null);
 
   useEffect(() => {
-    console.log(appUsers.get);
-  }, [appUsers]);
-
-  useEffect(() => {
     if (!appUsers || appUsers.status !== "succeeded") {
       dispatch(fetchAppUsers());
     }
@@ -128,7 +124,8 @@ const AddUsina = ({ toastMessage, editData }) => {
   };
 
   const handleSubmit = async () => {
-    if (fieldValidator()) {
+    console.log(usinaInfo);
+    if (false) {
       try {
         const formatDate = (dateStr) => {
           const [day, month, year] = dateStr.split("/");
@@ -148,7 +145,7 @@ const AddUsina = ({ toastMessage, editData }) => {
             newUsinaInfo
           );
         } else {
-          response = await innovaApi.post("/work/add-work", newUsinaInfo);
+          response = await innovaApi.post("/work/create", newUsinaInfo);
         }
 
         toastMessage({
@@ -367,12 +364,12 @@ const AddUsina = ({ toastMessage, editData }) => {
                     <option value="">Selecionar usuário gestor</option>
                     {appUsers.appUsers.map((user) => {
                       if (
-                        usinaInfo.managerIds.includes(user._id) &&
-                        usinaInfo.managerIds[index] !== user._id
+                        usinaInfo.managerIds.includes(user.id) &&
+                        usinaInfo.managerIds[index] !== user.id
                       )
                         return null;
                       return (
-                        <option key={user._id} value={user._id}>
+                        <option key={user.id} value={user.id}>
                           {user.name}
                         </option>
                       );
