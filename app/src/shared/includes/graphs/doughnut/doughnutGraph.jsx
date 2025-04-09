@@ -4,13 +4,16 @@ import { darkTheme } from "../../../../styles/theme";
 
 ChartJS.register(ArcElement, Title, Tooltip, Legend);
 
-const DoughnutGraph = ({ importedData }) => {
+const DoughnutGraph = ({ progress }) => {
+  const adjustedProgress = Math.min(Math.max(progress, 0), 100);
+  const remaining = 100 - adjustedProgress;
+
   const data = {
-    labels: importedData?.labels,
+    labels: [],
     datasets: [
       {
-        label: "Series A",
-        data: [80, 20],
+        label: "Progresso",
+        data: [adjustedProgress, remaining],
         backgroundColor: [darkTheme.colors.secondary_2, darkTheme.colors.grey],
         borderWidth: 0,
         cutout: "80%",

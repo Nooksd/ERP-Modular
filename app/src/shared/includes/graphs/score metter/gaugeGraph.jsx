@@ -4,14 +4,23 @@ import { darkTheme } from "../../../../styles/theme";
 
 ChartJS.register(ArcElement, Title, Tooltip, Legend);
 
-const GaugeGraph = ({ importedData }) => {
+const GaugeGraph = ({ desvio }) => {
+  const getColor = () => {
+    if (desvio <= 25) return "#339900";
+    if (desvio <= 50) return "#FFCC00";
+    return "#CC3300";
+  };
+
   const data = {
-    labels: importedData?.labels,
+    labels: [],
     datasets: [
       {
-        label: "Series A",
-        data: [80, 20],
-        backgroundColor: [darkTheme.colors.secondary_2, darkTheme.colors.grey],
+        label: "Desvio",
+        data: [
+          Math.min(desvio, 100).toFixed(2),
+          Math.max(100 - desvio, 0).toFixed(2),
+        ],
+        backgroundColor: [getColor(), darkTheme.colors.grey],
         borderWidth: 0,
         cutout: "80%",
         circumference: 180,
@@ -23,28 +32,30 @@ const GaugeGraph = ({ importedData }) => {
   const options = {
     responsive: true,
     maintainAspectRatio: false,
-    scales: {
-      y: {
-        display: false,
-      },
-    },
     plugins: {
-      legend: {
-        display: false,
-      },
-      tooltip: {
-        enabled: false,
-      },
-      datalabels: {
-        display: false,
-      },
-    },
-    hover: {
-      mode: null,
+      legend: { display: false },
+      tooltip: { enabled: false },
     },
   };
 
-  return <Doughnut data={data} options={options} />;
+  return (
+    <div style={{ position: "relative", width: "100%", height: "100%" }}>
+      <Doughnut data={data} options={options} />
+      <div
+        style={{
+          position: "absolute",
+          top: "70%",
+          left: "50%",
+          transform: "translate(-50%, -50%)",
+          textAlign: "center",
+          color: getColor(),
+          fontWeight: "bold",
+        }}
+      >
+        {desvio}%
+      </div>
+    </div>
+  );
 };
 
 export default GaugeGraph;

@@ -79,10 +79,7 @@ const AddUser = ({ toastMessage, editData }) => {
       try {
         let response;
         if (editData) {
-          response = await innovaApi.put(
-            `/user/update/${editData}`,
-            userInfo
-          );
+          response = await innovaApi.put(`/user/update/${editData}`, userInfo);
         } else {
           response = await innovaApi.post("/user/create", userInfo);
         }
@@ -248,11 +245,12 @@ const AddUser = ({ toastMessage, editData }) => {
               onChange={(e) => handleInputChange(e)}
             >
               <option value="">Selecionar funcionário</option>
-              {employees.employees.map((employee) => (
-                <option key={employee.name} value={employee.id}>
-                  {employee.name}
-                </option>
-              ))}
+              {employees.employees &&
+                employees.employees.map((employee) => (
+                  <option key={employee.name} value={employee._id}>
+                    {employee.name}
+                  </option>
+                ))}
             </styled.formManagerSelect>
           </styled.formDiv>
           <styled.formDiv style={{ width: 100 }}>

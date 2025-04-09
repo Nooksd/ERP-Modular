@@ -26,6 +26,7 @@ import SVGArrowDown from "../../shared/icons/header/Arrow_icon.jsx";
 export const GestaoHH = ({ windowHeight, toastMessage }) => {
   const works = useSelector((state) => state.works);
   const [workData, setWorkData] = useState();
+  const [predictedData, setPredictedData] = useState();
 
   const [activities, setActivities] = useState([]);
   const [recordDate, setRecordDate] = useState([]);
@@ -54,6 +55,16 @@ export const GestaoHH = ({ windowHeight, toastMessage }) => {
     comparison: 0,
   });
 
+  const [desvioPercentual, setDesvioPercentual] = useState(0);
+
+  const totalRealizado =
+    importedData.data?.reduce((acc, curr) => acc + curr, 0) || 0;
+  const totalPrevisto =
+    importedData.data2?.reduce((acc, curr) => acc + curr, 0) || 0;
+
+  const progressoTotal =
+    totalPrevisto !== 0 ? (totalRealizado / totalPrevisto) * 100 : 0;
+
   const dispatch = useDispatch();
 
   const meses = [
@@ -78,30 +89,44 @@ export const GestaoHH = ({ windowHeight, toastMessage }) => {
   }, [dispatch]);
 
   useEffect(() => {
-    if (workData) {
-      organizeGraph(workData);
-      organizeSecondGraph(workData);
-      organizeValues(workData);
+    if ((workData && predictedData) || workData) {
+      organizeGraph();
+      organizeSecondGraph();
+      organizeValues();
+      desvio();
     }
-  }, [workData, filter]);
+  }, [workData, predictedData, filter]);
 
   useEffect(() => {
     let isMounted = true;
 
     async function getWork() {
       try {
-        const { data } = await innovaApi.get(
+        let predicted;
+        try {
+          const { data } = await innovaApi.get(`/predicted/${selectedWork}`);
+          predicted = data.predicted.data;
+        } catch (error) {
+          predicted = null;
+        }
+
+        const { data: realData } = await innovaApi.get(
           `/hhcontroll/get-statistics/${selectedWork}`
         );
+
         if (isMounted) {
-          setWorkData(data.hhRecords);
-          getDate(data.hhRecords);
-          getActivities(data.hhRecords);
-          getRoles(data.hhRecords);
+          const real = realData.hhRecords;
+
+          setWorkData(real);
+          setPredictedData(predicted);
+
+          getDate(predicted, real);
+          getActivities(predicted, real);
+          getRoles(predicted, real);
           toastMessage({
             danger: false,
             title: "Sucesso",
-            message: data.message,
+            message: realData.message,
           });
         }
       } catch (e) {
@@ -168,21 +193,25 @@ export const GestaoHH = ({ windowHeight, toastMessage }) => {
   };
 
   const handleSelectDate = (mes) => {
-    if (filter.startDate === undefined) {
-      setFilter({ ...filter, startDate: mes });
-    } else if (filter.endDate === undefined) {
-      if (mes > filter.startDate) {
-        setFilter({ ...filter, endDate: mes });
-      } else if (mes <= filter.startDate) {
-        setFilter({ ...filter, startDate: mes });
-      }
+    if (!filter.startDate && !filter.endDate) {
+      setFilter({ ...filter, startDate: mes, endDate: mes });
     } else {
-      if (mes === filter.startDate) {
-        setFilter({ ...filter, startDate: undefined, endDate: undefined });
-      } else if (mes === filter.endDate) {
-        setFilter({ ...filter, startDate: undefined, endDate: undefined });
+      if (mes === filter.startDate || mes === filter.endDate) {
+        setFilter({ ...filter, startDate: "", endDate: "" });
       } else {
-        setFilter({ ...filter, startDate: mes, endDate: undefined });
+        const startYear = parseInt(filter.startDate.split("-")[0]);
+        const startMonth = parseInt(filter.startDate.split("-")[1]);
+        const clickedYear = parseInt(mes.split("-")[0]);
+        const clickedMonth = parseInt(mes.split("-")[1]);
+
+        if (
+          clickedYear > startYear ||
+          (clickedYear === startYear && clickedMonth > startMonth)
+        ) {
+          setFilter({ ...filter, endDate: mes });
+        } else {
+          setFilter({ ...filter, startDate: mes });
+        }
       }
     }
   };
@@ -201,11 +230,70 @@ export const GestaoHH = ({ windowHeight, toastMessage }) => {
     });
   };
 
-  function organizeGraph(response) {
+  function desvio() {
+    let totalPrevisto = 0;
+    let totalNormal = 0;
+    let desvio = 0;
+
+    if (predictedData) {
+      predictedData.forEach((record) => {
+        const year = record.date.substring(0, 4);
+        const monthNumber =
+          record.date.substring(5, 6) == 0
+            ? record.date.substring(6, 7)
+            : record.date.substring(5, 7);
+
+        if (timeFilter(year, monthNumber)) return;
+
+        if (filter?.comparison === 1 || filter?.comparison === 0)
+          totalPrevisto += record.hours;
+        if (filter?.comparison === 3 || filter?.comparison === 0)
+          totalPrevisto += record.extras;
+      });
+
+      workData.forEach((record) => {
+        const date = new Date(record.date);
+        const year = record.date.substring(0, 4);
+        const dayOfWeek = date.getDay();
+        const monthNumber =
+          record.date.substring(5, 6) == 0
+            ? record.date.substring(6, 7)
+            : record.date.substring(5, 7);
+
+        if (timeFilter(year, monthNumber)) return;
+
+        record.hhRecords.forEach((hhRecord) => {
+          hhRecord.roles.forEach((role) => {
+            calculateHours(
+              role,
+              dayOfWeek,
+              {
+                normal: (value) => (totalNormal += value),
+                extra1: (value) => (totalNormal += value),
+                extra2: (value) => (totalNormal += value),
+              },
+              true
+            );
+          });
+        });
+      });
+
+      if (totalPrevisto === 0) totalPrevisto = 1;
+
+      desvio =
+        ((totalNormal - totalPrevisto) / totalPrevisto) * 100 > 0
+          ? (((totalNormal - totalPrevisto) / totalPrevisto) * 100).toFixed(2)
+          : 0;
+    }
+
+    setDesvioPercentual(desvio);
+  }
+
+  function processRealData(realData) {
     const labels = [];
     const data = [];
 
-    response.forEach((hhRecord) => {
+    realData.forEach((hhRecord) => {
       const date = new Date(hhRecord.date);
       const dayOfWeek = date.getDay();
       const year = hhRecord.date.substring(0, 4);
@@ -250,6 +338,58 @@ export const GestaoHH = ({ windowHeight, toastMessage }) => {
       });
     });
 
+    return { labels, data };
+  }
+  function processPredictedData(predicted) {
+    const labels2 = [];
+    const data2 = [];
+
+    predicted.forEach((record) => {
+      const year = record.date.substring(0, 4);
+      const month = meses[parseInt(record.date.substring(5, 7)) - 1].slice(
+        0,
+        3
+      );
+
+      const fullMonth = meses[parseInt(record.date.substring(5, 7)) - 1];
+      const monthNumber =
+        record.date.substring(5, 6) == 0
+          ? record.date.substring(6, 7)
+          : record.date.substring(5, 7);
+
+      if (timeFilter(year, monthNumber)) return;
+
+      const uniqueIndex = filter.year ? fullMonth : `${month}-${year}`;
+
+      let labelIndex = labels2.indexOf(uniqueIndex);
+
+      if (labelIndex === -1) {
+        labels2.push(uniqueIndex);
+        data2.push(0);
+        labelIndex = labels2.length - 1;
+      }
+
+      if (activityFilter(record.area, record.activity, record.subactivity))
+        return;
+
+      if (!roleFilter(record.role)) return;
+
+      if (filter?.comparison === 3 || filter?.comparison === 0)
+        data2[labelIndex] += record.extras;
+
+      if (filter?.comparison === 1 || filter?.comparison === 0)
+        data2[labelIndex] += record.hours;
+    });
+
+    return {
+      labels2,
+      data2,
+    };
+  }
+
+  function organizeGraph() {
+    const { labels, data } = processRealData(workData || []);
+
     const sortedIndices = labels
       .map((label, index) => {
         const [month, year] = label.split("-");
@@ -266,17 +406,43 @@ export const GestaoHH = ({ windowHeight, toastMessage }) => {
     const sortedLabels = sortedIndices.map((i) => labels[i]);
     const sortedData = sortedIndices.map((i) => data[i]);
 
-    setImportedData({
-      labels: sortedLabels,
-      data: sortedData,
-    });
+    if (predictedData) {
+      const { labels2, data2 } = processPredictedData(predictedData || []);
+
+      const sortedIndices2 = labels2
+        .map((label, index) => {
+          const [month, year] = label.split("-");
+          return {
+            label,
+            year: parseInt(year),
+            monthIndex: meses.findIndex((m) => m.startsWith(month)),
+            index,
+          };
+        })
+        .sort((a, b) => a.year - b.year || a.monthIndex - b.monthIndex)
+        .map((item) => item.index);
+
+      const sortedLabels2 = sortedIndices2.map((i) => labels2[i]);
+      const sortedData2 = sortedIndices2.map((i) => data2[i]);
+
+      setImportedData({
+        labels: sortedLabels2,
+        data: sortedData,
+        data2: sortedData2,
+      });
+    } else {
+      setImportedData({
+        labels: sortedLabels,
+        data: sortedData,
+      });
+    }
   }
 
-  const organizeSecondGraph = (response) => {
+  const organizeSecondGraph = () => {
     const labels = [];
     const data = [];
 
-    response.forEach((hhRecord) => {
+    workData.forEach((hhRecord) => {
       const date = new Date(hhRecord.date);
       const dayOfWeek = date.getDay();
       const year = hhRecord.date.substring(0, 4);
@@ -321,12 +487,12 @@ export const GestaoHH = ({ windowHeight, toastMessage }) => {
     });
   };
 
-  const organizeValues = (data) => {
+  const organizeValues = () => {
     let totalHHNormal = 0;
     let totalHHExtra1 = 0;
     let totalHHExtra2 = 0;
 
-    data.forEach((hhRecord) => {
+    workData.forEach((hhRecord) => {
       const date = new Date(hhRecord.date);
       const dayOfWeek = date.getDay();
       const year = hhRecord.date.substring(0, 4);
@@ -356,10 +522,42 @@ export const GestaoHH = ({ windowHeight, toastMessage }) => {
     setTotalExtra2(totalHHExtra2);
   };
 
-  function getActivities(data) {
+  function getActivities(predicted, actual) {
     let newActivities = [];
 
-    data.forEach((hhRecord) => {
+    if (predicted) {
+      predicted.forEach((record) => {
+        const area = record.area;
+        const activity = record.activity;
+        const subactivity = record.subactivity;
+
+        let areaRecord = newActivities.find(
+          (activity) => activity.area === area
+        );
+        if (areaRecord) {
+          const currentActivity = areaRecord.activities.find(
+            (a) => a.activity === activity
+          );
+          if (currentActivity) {
+            if (!currentActivity.subactivities.includes(subactivity)) {
+              currentActivity.subactivities.push(subactivity);
+            }
+          } else {
+            areaRecord.activities.push({
+              activity,
+              subactivities: [subactivity],
+            });
+          }
+        } else {
+          newActivities.push({
+            area,
+            activities: [{ activity, subactivities: [subactivity] }],
+          });
+        }
+      });
+    }
+
+    actual.forEach((hhRecord) => {
       hhRecord.hhRecords.forEach((record) => {
         const area = record.area;
         const activity = record.activity;
@@ -394,10 +592,18 @@ export const GestaoHH = ({ windowHeight, toastMessage }) => {
     setActivities(newActivities);
   }
 
-  function getRoles(data) {
+  function getRoles(predicted, actual) {
     let newRoles = [];
 
-    data.forEach((hhRecord) => {
+    if (predicted) {
+      predicted.forEach((record) => {
+        const foundRole = newRoles.find((roles) => roles === record.role);
+
+        if (!foundRole) newRoles.push(record.role);
+      });
+    }
+
+    actual.forEach((hhRecord) => {
       hhRecord.hhRecords.forEach((record) => {
         record.roles.forEach((role) => {
           const foundRole = newRoles.find((roles) => roles === role.role);
@@ -410,10 +616,33 @@ export const GestaoHH = ({ windowHeight, toastMessage }) => {
     setRoles(newRoles);
   }
 
-  function getDate(data) {
+  function getDate(predicted, actual) {
     let newRecordDate = [...recordDate];
 
-    data.forEach((hhRecord) => {
+    if (predicted) {
+      predicted.forEach((hhRecord) => {
+        const year = hhRecord.date.substring(0, 4);
+        const month = meses[parseInt(hhRecord.date.substring(5, 7)) - 1];
+
+        let yearRecord = newRecordDate.find((date) => date.ano == year);
+
+        if (yearRecord) {
+          if (!yearRecord.meses.includes(month)) {
+            yearRecord.meses.push(month);
+            yearRecord.meses.sort(
+              (a, b) => meses.indexOf(a) - meses.indexOf(b)
+            );
+          }
+        } else {
+          newRecordDate.push({
+            ano: year,
+            meses: [month],
+          });
+        }
+      });
+    }
+
+    actual.forEach((hhRecord) => {
       const year = hhRecord.date.substring(0, 4);
       const month = meses[parseInt(hhRecord.date.substring(5, 7)) - 1];
 
@@ -536,7 +765,7 @@ export const GestaoHH = ({ windowHeight, toastMessage }) => {
       const timesRomanFont = await pdfDoc.embedFont(StandardFonts.TimesRoman);
 
       const selectedWorkDetails = works.works.userWorks.find(
-        (work) => work.id === selectedWork
+        (work) => work._id === selectedWork
       );
 
       const titleConfig = {
@@ -611,11 +840,70 @@ export const GestaoHH = ({ windowHeight, toastMessage }) => {
       a.download = `Relatorio_HH_${titleConfig.text}.pdf`;
       a.click();
     } catch (e) {
-      console.error("Erro ao gerar PDF", e);
       toastMessage({
         danger: true,
         title: "Erro",
         message: "Não foi possível gerar o PDF.",
+      });
+    }
+  };
+
+  const sendPredicted = async () => {
+    try {
+      const input = document.createElement("input");
+      input.type = "file";
+      input.accept = ".xlsx, .xls";
+
+      input.onchange = async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        if (!selectedWork) {
+          toastMessage({
+            danger: true,
+            title: "Erro",
+            message: "Selecione uma usina primeiro",
+          });
+          return;
+        }
+
+        const formData = new FormData();
+        formData.append("data", file);
+
+        try {
+          const response = await innovaApi.post(
+            `/predicted/send/${selectedWork}`,
+            formData,
+            {
+              headers: {
+                "Content-Type": "multipart/form-data",
+              },
+            }
+          );
+
+          toastMessage({
+            danger: false,
+            title: "Sucesso",
+            message: response.data.message,
+          });
+
+          const { data } = await innovaApi.get(`/predicted/${selectedWork}`);
+          setPredictedData(data.predicted.data);
+        } catch (error) {
+          toastMessage({
+            danger: true,
+            title: "Erro",
+            message: error.response?.data?.message || "Falha ao enviar arquivo",
+          });
+        }
+      };
+
+      input.click();
+    } catch (e) {
+      toastMessage({
+        danger: true,
+        title: "Erro",
+        message: e.message,
       });
     }
   };
@@ -775,7 +1063,7 @@ export const GestaoHH = ({ windowHeight, toastMessage }) => {
                 <option value="">Selecionar Usina</option>
                 {works.status === "succeeded" &&
                   works.works.userWorks.map((work) => (
-                    <option key={work.id} value={work.id}>
+                    <option key={work._id} value={work._id}>
                       {work.name}
                     </option>
                   ))}
@@ -812,8 +1100,8 @@ export const GestaoHH = ({ windowHeight, toastMessage }) => {
                 )}
               </styled.barContainer>
             </styled.graphTitleBlue>
-            <styled.exportButton onClick={() => generatePDF()}>
-              Exportar relatório{" "}
+            <styled.exportButton onClick={() => sendPredicted()}>
+              Enviar previsto{" "}
               <svg width="30px" height="30px" viewBox="0 0 24 24" fill="none">
                 <path
                   d="M4 12H20M20 12L16 8M20 12L16 16"
@@ -823,6 +1111,17 @@ export const GestaoHH = ({ windowHeight, toastMessage }) => {
                 />
               </svg>
             </styled.exportButton>
+            {/* <styled.exportButton onClick={() => generatePDF()}>
+              Exportar relatório{" "}
+              <svg width="30px" height="30px" viewBox="0 0 24 24" fill="none">
+                <path
+                  d="M4 12H20M20 12L16 8M20 12L16 16"
+                  strokeWidth="`1"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </styled.exportButton> */}
           </styled.sideGrapchContainer>
           <styled.summaryContainer
             $selected={filter.comparison === 1}
@@ -880,7 +1179,7 @@ export const GestaoHH = ({ windowHeight, toastMessage }) => {
           <styled.smallGraphContainer>
             <styled.graphTitle>Termômetro do desvio</styled.graphTitle>
             {importedData?.labels ? (
-              <GaugeGraph importedData={importedData} />
+              <GaugeGraph desvio={desvioPercentual} />
             ) : (
               "Usina não selecionada"
             )}
@@ -895,9 +1194,17 @@ export const GestaoHH = ({ windowHeight, toastMessage }) => {
           </styled.bigGraphContainer>
           <styled.smallGraphContainer style={{ padding: "20px" }}>
             <styled.graphTitle>Progresso total</styled.graphTitle>
-            <styled.indicator>80%</styled.indicator>
+            <styled.indicator>
+              {totalPrevisto !== 0
+                ? `${
+                    Math.round(progressoTotal) > 100
+                      ? 100
+                      : Math.round(progressoTotal)
+                  }%`
+                : "0%"}
+            </styled.indicator>
             {importedData?.labels ? (
-              <DoughnutGraph importedData={importedData} />
+              <DoughnutGraph progress={progressoTotal} />
             ) : (
               "Usina não selecionada"
             )}
@@ -932,7 +1239,9 @@ export const GestaoHH = ({ windowHeight, toastMessage }) => {
                           $between={
                             (uniqueIndex > filter.startDate &&
                               uniqueIndex < filter.endDate) ||
-                            (filter.startDate === uniqueIndex && filter.endDate)
+                            (filter.startDate === uniqueIndex &&
+                              filter.endDate &&
+                              filter.startDate !== filter.endDate)
                           }
                         />
                       )}

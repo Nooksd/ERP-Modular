@@ -21,22 +21,25 @@ ChartJS.register(
 );
 
 const BarGraph = ({ importedData, chartRef }) => {
+  const datasets = [
+    {
+      label: "HH Utilizado",
+      data: importedData?.data,
+      backgroundColor: ["#2257A8"],
+      borderWidth: 1,
+    },
+  ];
+  if (importedData?.data2) {
+    datasets.push({
+      label: "HH Orçado",
+      data: importedData?.data2,
+      backgroundColor: ["#95C11F"],
+      borderWidth: 1,
+    });
+  }
   const data = {
     labels: importedData?.labels,
-    datasets: [
-      {
-        label: "HH Utilizado",
-        data: importedData?.data,
-        backgroundColor: ["#2257A8"],
-        borderWidth: 1,
-      },
-      {
-        label: "HH Orçado",
-        data: importedData?.data2,
-        backgroundColor: ["#95C11F"],
-        borderWidth: 1,
-      },
-    ],
+    datasets: datasets,
   };
 
   const options = {
@@ -48,25 +51,25 @@ const BarGraph = ({ importedData, chartRef }) => {
       },
       x: {
         ticks: {
-          color: '#172242',
+          color: "#172242",
         },
         grid: {
           display: false,
         },
-      }
+      },
     },
     plugins: {
       legend: {
         labels: {
           padding: 5,
-          color: '#172242',
+          color: "#172242",
         },
       },
       datalabels: {
         display: true,
-        color: '#172242', 
-        align: 'end',
-        anchor: 'end',
+        color: "#172242",
+        align: "end",
+        anchor: "end",
         formatter: (value) => `${value} h`,
       },
     },

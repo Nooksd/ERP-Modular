@@ -11,7 +11,7 @@ import SVGDelete from "../../../shared/icons/controleHH/Delete_icon.jsx";
 
 const Usinas = ({ toastMessage, modalMessage, modalInfo, openPage }) => {
   const [usinas, setUsinas] = useState([]);
-  
+
   const [activeMode, setActiveMode] = useState(true);
   const [order, setOrder] = useState(true);
   const [search, setSearch] = useState("");
@@ -180,16 +180,16 @@ const Usinas = ({ toastMessage, modalMessage, modalInfo, openPage }) => {
           <styled.usinaDataSpan>{startDate}</styled.usinaDataSpan>
           <styled.usinaDataSpan>{endDate}</styled.usinaDataSpan>
           <styled.controllButtonsDiv>
-            <styled.EditButton onClick={() => handleEditButtonClick(usina.id)}>
+            <styled.EditButton onClick={() => handleEditButtonClick(usina._id)}>
               <SVGEdit width="20" height="20" />
             </styled.EditButton>
             <styled.DeleteButton
-              onClick={() => handleDeleteButtonClick(usina.id, usina.name)}
+              onClick={() => handleDeleteButtonClick(usina._id, usina.name)}
             >
               <SVGDelete width="16" height="16" />
             </styled.DeleteButton>
             <styled.disableButton
-              onClick={() => handleDisableUsina(usina.id, usina.name)}
+              onClick={() => handleDisableUsina(usina._id, usina.name)}
             />
           </styled.controllButtonsDiv>
         </styled.usinaDiv>
@@ -248,9 +248,7 @@ const Usinas = ({ toastMessage, modalMessage, modalInfo, openPage }) => {
               >
                 <SVGUpDown width="25" height="25" decrescent={order} />
               </button>
-              <styled.searchButton
-                onClick={() => handleSearch(true)}
-              >
+              <styled.searchButton onClick={() => handleSearch(true)}>
                 <SVGSearch width="15" height="15" />
                 Buscar
               </styled.searchButton>
@@ -271,7 +269,6 @@ const Usinas = ({ toastMessage, modalMessage, modalInfo, openPage }) => {
         {usinas && usinas.length > 0 && (
           <styled.paginationDiv>
             <button
-
               disabled={page === 1}
               onClick={() => setPage((prev) => prev - 1)}
             >

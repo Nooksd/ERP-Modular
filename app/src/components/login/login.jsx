@@ -13,6 +13,7 @@ import SVGWarning from "../../shared/icons/login/Warning_icon.jsx";
 import SVGArrowDown from "../../shared/icons/header/Arrow_icon.jsx";
 
 export const Login = () => {
+  const [isMobile, setIsMobile] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [keepConnection, setkeepConnection] = useState(false);
@@ -26,6 +27,21 @@ export const Login = () => {
   const navigate = useNavigate();
 
   const errorTimerRef = useRef(null);
+
+  const checkScreenSize = () => {
+    setIsMobile(window.innerWidth <= 768);
+  };
+
+  useEffect(() => {
+    checkScreenSize();
+    window.addEventListener("resize", checkScreenSize);
+
+    if (isMobile) {
+      navigate("/download-mobile");
+    }
+
+    return () => window.removeEventListener("resize", checkScreenSize);
+  }, [isMobile, navigate]);
 
   const validateEmail = (email) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -119,10 +135,11 @@ export const Login = () => {
     }
   }, [error]);
 
+  if (isMobile) return null;
+
   return (
     <styled.LoginContainer>
       <styled.GreenLoginBlock>
-        <styled.BlueLoginBlockBefore />
         <styled.BlueLoginBlock>
           <Link to="/home">
             <styled.SkipButton>
@@ -210,7 +227,6 @@ export const Login = () => {
             </styled.ErrorMessage>
           )}
         </styled.BlueLoginBlock>
-        <styled.BlueLoginBlockAfter />
       </styled.GreenLoginBlock>
     </styled.LoginContainer>
   );

@@ -21,24 +21,25 @@ ChartJS.register(
 );
 
 const LineGraph = ({ importedData }) => {
+  const datasets = [
+    {
+      label: "HH Utilizado",
+      data: importedData?.data,
+      backgroundColor: ["#2257A8"],
+      borderWidth: 1,
+    },
+  ];
+  if (importedData?.data2) {
+    datasets.push({
+      label: "HH Orçado",
+      data: importedData?.data2,
+      backgroundColor: ["#95C11F"],
+      borderWidth: 1,
+    });
+  }
   const data = {
     labels: importedData?.labels,
-    datasets: [
-      {
-        label: "HH Utilizado",
-        data: importedData?.data,
-        backgroundColor: "#2257A8",
-        borderColor: "#2257A8",
-        borderWidth: 2,
-      },
-      {
-        label: "HH Orçado",
-        data: importedData?.data2,
-        backgroundColor: "#95C11F",
-        borderColor: "#95C11F",
-        borderWidth: 2,
-      },
-    ],
+    datasets: datasets,
   };
 
   const options = {
@@ -60,7 +61,7 @@ const LineGraph = ({ importedData }) => {
     plugins: {
       legend: {
         labels: {
-          padding: 15,
+          padding: 1,
           color: "#172242",
         },
       },

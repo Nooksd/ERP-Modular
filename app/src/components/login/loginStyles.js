@@ -2,27 +2,31 @@
 
 import styled, { keyframes } from "styled-components";
 
-const ProgressBarAnimation = keyframes`
-  0% {
-    width: 100%;
-  }
-  100% {
-    width: 0%;
-  }
-`;
-
 export const LoginContainer = styled.div`
-  width: 100%;
-  height: 100dvh;
-  overflow: hidden;
+  width: 100vw;
+  height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
+  transform: scale(1);
+  transform-origin: center center;
+
+  @media (max-width: 1600px) {
+    transform: scale(0.9);
+  }
+  @media (max-width: 1440px) {
+    transform: scale(0.8);
+  }
+  @media (max-width: 1280px) {
+    transform: scale(0.7);
+  }
 `;
 
 export const GreenLoginBlock = styled.div`
-  width: 1147px;
-  height: 527px;
+  width: 60vw;
+  height: 55vh;
+  min-width: 1000px;
+  min-height: 500px;
   border-radius: 40px;
   position: relative;
   background-image: linear-gradient(
@@ -33,12 +37,14 @@ export const GreenLoginBlock = styled.div`
 `;
 
 export const BlueLoginBlock = styled.div`
-  width: 533px;
-  height: 753px;
+  width: 30vw;
+  height: 80vh;
+  min-width: 500px;
+  min-height: 700px;
   position: absolute;
-  top: -113px;
-  right: 50%;
-  transform: translateX(50%);
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
   background-image: linear-gradient(
     to bottom right,
     ${(props) => props.theme.colors.primary_1},
@@ -48,30 +54,6 @@ export const BlueLoginBlock = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-`;
-
-export const BlueLoginBlockBefore = styled.div`
-  position: absolute;
-  top: -226.3px;
-  right: calc(50% - 266px);
-  transform: translateX(50%);
-  border-top: 113px solid transparent;
-  border-right: 113px solid transparent;
-  border-left: 113px solid transparent;
-  border-bottom: 113px solid ${(props) => props.theme.colors.primary_dark};
-  z-index: -1;
-`;
-
-export const BlueLoginBlockAfter = styled.div`
-  position: absolute;
-  bottom: -226.3px;
-  left: calc(50% - 493px);
-  transform: translateX(50%);
-  border-top: 113px solid ${(props) => props.theme.colors.primary_dark};
-  border-right: 113px solid transparent;
-  border-left: 113px solid transparent;
-  border-bottom: 113px solid transparent;
-  z-index: -1;
 `;
 
 export const LoginTitle = styled.h1`
@@ -87,11 +69,10 @@ export const LoginForm = styled.form`
   width: 100%;
   max-width: 427px;
   height: 300px;
-  padding 30px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-bottom: 20px;	
+  margin-bottom: 20px;
 `;
 
 export const LoginInput = styled.input`
@@ -247,19 +228,8 @@ export const ErrorMessage = styled.div`
   border-radius: 10px;
   font-size: 16px;
   margin-top: 15px;
-  position: relative; 
+  position: relative;
   overflow: hidden;
-
-  &::after {
-    content: "";
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    height: 5px;
-    background-color: white; 
-    animation: ${ProgressBarAnimation} 2s linear forwards; 
-    border-radius: 0 0 10px 10px; 
 `;
 
 export const SkipButton = styled.button`

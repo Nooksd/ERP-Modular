@@ -124,8 +124,7 @@ const AddUsina = ({ toastMessage, editData }) => {
   };
 
   const handleSubmit = async () => {
-    console.log(usinaInfo);
-    if (false) {
+    if (fieldValidator()) {
       try {
         const formatDate = (dateStr) => {
           const [day, month, year] = dateStr.split("/");
@@ -353,38 +352,42 @@ const AddUsina = ({ toastMessage, editData }) => {
         </styled.formInputDiv>
         <styled.formManagerAndSubmitButtonDiv>
           <styled.formManagerDiv>
-            {usinaInfo.managerIds.map((managerId, index) => {
-              return (
-                <styled.managerAndButtonDiv key={index}>
-                  <styled.formManagerSelect
-                    $error={managerError[index]}
-                    value={managerId}
-                    onChange={(e) => handleSelectManager(e.target.value, index)}
-                  >
-                    <option value="">Selecionar usuário gestor</option>
-                    {appUsers.appUsers.map((user) => {
-                      if (
-                        usinaInfo.managerIds.includes(user.id) &&
-                        usinaInfo.managerIds[index] !== user.id
-                      )
-                        return null;
-                      return (
-                        <option key={user.id} value={user.id}>
-                          {user.name}
-                        </option>
-                      );
-                    })}
-                  </styled.formManagerSelect>
-                  <styled.formManagerButton
-                    onClick={() => handleRemoveManagerId(index)}
-                  >
-                    -
-                  </styled.formManagerButton>
-                </styled.managerAndButtonDiv>
-              );
-            })}
+            {usinaInfo.managerIds &&
+              usinaInfo.managerIds.map((managerId, index) => {
+                return (
+                  <styled.managerAndButtonDiv key={index}>
+                    <styled.formManagerSelect
+                      $error={managerError[index]}
+                      value={managerId}
+                      onChange={(e) =>
+                        handleSelectManager(e.target.value, index)
+                      }
+                    >
+                      <option value="">Selecionar usuário gestor</option>
+                      {appUsers.appUsers.map((user) => {
+                        if (
+                          usinaInfo.managerIds &&
+                          usinaInfo.managerIds.includes(user._id) &&
+                          usinaInfo.managerIds[index] !== user._id
+                        )
+                          return null;
+                        return (
+                          <option key={user._id} value={user._id}>
+                            {user.name}
+                          </option>
+                        );
+                      })}
+                    </styled.formManagerSelect>
+                    <styled.formManagerButton
+                      onClick={() => handleRemoveManagerId(index)}
+                    >
+                      -
+                    </styled.formManagerButton>
+                  </styled.managerAndButtonDiv>
+                );
+              })}
             <styled.managerAndButtonDiv>
-              {usinaInfo.managerIds.length === 0 && (
+              {usinaInfo.managerIds && usinaInfo.managerIds.length === 0 && (
                 <styled.addNewText>
                   Adicionar usuário gestor da usina
                 </styled.addNewText>

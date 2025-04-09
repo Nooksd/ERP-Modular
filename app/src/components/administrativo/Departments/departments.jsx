@@ -118,11 +118,11 @@ const Departments = ({ toastMessage, modalMessage, modalInfo, openPage }) => {
             {role.isField ? "Campo" : "Escritório"}
           </styled.userDataSpan>
           <styled.controllButtonsDiv>
-            <styled.EditButton onClick={() => handleEditButtonClick(role.id)}>
+            <styled.EditButton onClick={() => handleEditButtonClick(role._id)}>
               <SVGEdit width="20" height="20" />
             </styled.EditButton>
             <styled.DeleteButton
-              onClick={() => handleDeleteButtonClick(role.id, role.role)}
+              onClick={() => handleDeleteButtonClick(role._id, role.role)}
             >
               <SVGDelete width="16" height="16" />
             </styled.DeleteButton>

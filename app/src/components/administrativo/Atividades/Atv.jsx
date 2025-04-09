@@ -133,7 +133,7 @@ const Atividades = ({ toastMessage, modalMessage, modalInfo, openPage }) => {
 
       setWhatDeleteArea("");
       setActivities((prev) =>
-        prev.filter((area) => area.id !== whatDeleteArea)
+        prev.filter((area) => area._id !== whatDeleteArea)
       );
     } catch (e) {
       toastMessage({
@@ -147,12 +147,12 @@ const Atividades = ({ toastMessage, modalMessage, modalInfo, openPage }) => {
   async function deleteActivity() {
     try {
       const areaToUpdate = activities.find(
-        (area) => area.id === whatDeleteArea
+        (area) => area._id === whatDeleteArea
       );
 
       if (areaToUpdate) {
         const updatedActivities = areaToUpdate.activities.filter(
-          (activity) => activity.id !== whatDeleteActivity
+          (activity) => activity._id !== whatDeleteActivity
         );
 
         const newArea = {
@@ -174,7 +174,7 @@ const Atividades = ({ toastMessage, modalMessage, modalInfo, openPage }) => {
         });
         setWhatDeleteArea("");
         setActivities((prev) =>
-          prev.map((area) => (area.id === whatDeleteArea ? newArea : area))
+          prev.map((area) => (area._id === whatDeleteArea ? newArea : area))
         );
       }
     } catch (e) {
@@ -189,17 +189,17 @@ const Atividades = ({ toastMessage, modalMessage, modalInfo, openPage }) => {
   async function deleteSubactivity() {
     try {
       const areaToUpdate = activities.find(
-        (area) => area.id === whatDeleteArea
+        (area) => area._id === whatDeleteArea
       );
 
       if (areaToUpdate) {
         const activityToUpdate = areaToUpdate.activities.find(
-          (activity) => activity.id === whatDeleteActivity
+          (activity) => activity._id === whatDeleteActivity
         );
 
         if (activityToUpdate) {
           const updatedSubactivities = activityToUpdate.subactivities.filter(
-            (subactivity) => subactivity.id !== whatDeleteSubactivity
+            (subactivity) => subactivity._id !== whatDeleteSubactivity
           );
 
           const newActivity = {
@@ -211,11 +211,11 @@ const Atividades = ({ toastMessage, modalMessage, modalInfo, openPage }) => {
           const newArea = {
             ...areaToUpdate,
             activities: areaToUpdate.activities.map((activity) =>
-              activity.id === whatDeleteActivity ? newActivity : activity
+              activity._id === whatDeleteActivity ? newActivity : activity
             ),
             totalSubactivities: areaToUpdate.activities.reduce(
               (count, act) =>
-                act.id === whatDeleteActivity
+                act._id === whatDeleteActivity
                   ? count + updatedSubactivities.length
                   : count + act.totalSubActivities,
               0
@@ -232,7 +232,7 @@ const Atividades = ({ toastMessage, modalMessage, modalInfo, openPage }) => {
 
           setWhatDeleteArea("");
           setActivities((prev) =>
-            prev.map((area) => (area.id === whatDeleteArea ? newArea : area))
+            prev.map((area) => (area._id === whatDeleteArea ? newArea : area))
           );
         }
       }
@@ -269,13 +269,13 @@ const Atividades = ({ toastMessage, modalMessage, modalInfo, openPage }) => {
             <styled.userDataSpan>{area.totalSubactivities}</styled.userDataSpan>
             <styled.controllButtonsDiv>
               <styled.EditButton
-                onClick={() => handleEditButtonClick(area.id, "area")}
+                onClick={() => handleEditButtonClick(area._id, "area")}
               >
                 <SVGEdit width="20" height="20" />
               </styled.EditButton>
               <styled.DeleteButton
                 onClick={() =>
-                  handleDeleteButtonClick(area.id, "", "", area.area, "area")
+                  handleDeleteButtonClick(area._id, "", "", area.area, "area")
                 }
               >
                 <SVGDelete width="16" height="16" />
@@ -314,8 +314,8 @@ const Atividades = ({ toastMessage, modalMessage, modalInfo, openPage }) => {
                     <styled.DeleteButton
                       onClick={() =>
                         handleDeleteButtonClick(
-                          area.id,
-                          activity.id,
+                          area._id,
+                          activity._id,
                           "",
                           activity.activity,
                           "atividade"
@@ -341,9 +341,9 @@ const Atividades = ({ toastMessage, modalMessage, modalInfo, openPage }) => {
                         <styled.DeleteButton
                           onClick={() =>
                             handleDeleteButtonClick(
-                              area.id,
-                              activity.id,
-                              subactivity.id,
+                              area._id,
+                              activity._id,
+                              subactivity._id,
                               subactivity.subactivity,
                               "subatividade"
                             )

@@ -323,7 +323,7 @@ const AddEmployee = ({ toastMessage, editData }) => {
               onChange={(e) => handleInputChange(e)}
             >
               <option value="">Selecionar funcionário</option>
-              {roles.length &&
+              {roles &&
                 roles.map((role) => (
                   <option key={role.id} value={role.role}>
                     {role.role}
@@ -334,39 +334,44 @@ const AddEmployee = ({ toastMessage, editData }) => {
         </styled.formManagerAndSubmitButtonDiv>
         <styled.formManagerAndSubmitButtonDiv>
           <styled.formManagerDiv>
-            {employeeInfo.managerIds.map((managerId, index) => (
-              <styled.managerAndButtonDiv key={index}>
-                <styled.formManagerSelect
-                  $error={managerIdsError[index]}
-                  value={managerId}
-                  onChange={(e) => handleSelectManagerId(e.target.value, index)}
-                >
-                  <option value="">Selecionar página</option>
-                  {managerIds.map((managerId) => {
-                    if (
-                      (employeeInfo.managerIds.includes(managerId.id) &&
-                        employeeInfo.managerIds[index] !== managerId.id) ||
-                      editData == managerId.employeeId
-                    )
-                      return null;
-                    return (
-                      <option key={managerId.id} value={managerId.id}>
-                        {managerId.name}
-                      </option>
-                    );
-                  })}
-                </styled.formManagerSelect>
-                <styled.formManagerButton
-                  onClick={() => handleRemoveManagerId(index)}
-                >
-                  -
-                </styled.formManagerButton>
-              </styled.managerAndButtonDiv>
-            ))}
+            {employeeInfo.managerIds &&
+              employeeInfo.managerIds.map((managerId, index) => (
+                <styled.managerAndButtonDiv key={index}>
+                  <styled.formManagerSelect
+                    $error={managerIdsError[index]}
+                    value={managerId}
+                    onChange={(e) =>
+                      handleSelectManagerId(e.target.value, index)
+                    }
+                  >
+                    <option value="">Selecionar página</option>
+                    {managerIds &&
+                      managerIds.map((managerId) => {
+                        if (
+                          (employeeInfo.managerIds.includes(managerId.id) &&
+                            employeeInfo.managerIds[index] !== managerId.id) ||
+                          editData == managerId.employeeId
+                        )
+                          return null;
+                        return (
+                          <option key={managerId.id} value={managerId.id}>
+                            {managerId.name}
+                          </option>
+                        );
+                      })}
+                  </styled.formManagerSelect>
+                  <styled.formManagerButton
+                    onClick={() => handleRemoveManagerId(index)}
+                  >
+                    -
+                  </styled.formManagerButton>
+                </styled.managerAndButtonDiv>
+              ))}
             <styled.managerAndButtonDiv>
-              {employeeInfo.managerIds.length === 0 && (
-                <styled.addNewText>Adicionar gestor</styled.addNewText>
-              )}
+              {employeeInfo.managerIds &&
+                employeeInfo.managerIds.length === 0 && (
+                  <styled.addNewText>Adicionar gestor</styled.addNewText>
+                )}
               <styled.formManagerButton
                 style={{ borderRadius: "5pc" }}
                 $new={true}

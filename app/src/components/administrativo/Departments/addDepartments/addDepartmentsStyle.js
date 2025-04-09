@@ -80,10 +80,6 @@ export const formInput = styled.input`
     -webkit-appearance: none;
     margin: 0;
   }
-
-  &: [type=number] {
-    -moz-appearance: textfield;
-  }
 `;
 
 export const formLabel = styled.label`

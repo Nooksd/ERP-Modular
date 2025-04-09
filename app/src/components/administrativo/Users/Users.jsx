@@ -156,16 +156,16 @@ const Users = ({ toastMessage, modalMessage, modalInfo, openPage }) => {
           <styled.userDataSpan>{user.email}</styled.userDataSpan>
           <styled.userDataSpan>{user.pages.length}</styled.userDataSpan>
           <styled.controllButtonsDiv>
-            <styled.EditButton onClick={() => handleEditButtonClick(user.id)}>
+            <styled.EditButton onClick={() => handleEditButtonClick(user._id)}>
               <SVGEdit width="20" height="20" />
             </styled.EditButton>
             <styled.DeleteButton
-              onClick={() => handleDeleteButtonClick(user.id, user.name)}
+              onClick={() => handleDeleteButtonClick(user._id, user.name)}
             >
               <SVGDelete width="16" height="16" />
             </styled.DeleteButton>
             <styled.disableButton
-              onClick={() => handleDisableToggle(user.id, user.name)}
+              onClick={() => handleDisableToggle(user._id, user.name)}
             />
           </styled.controllButtonsDiv>
         </styled.UserDiv>

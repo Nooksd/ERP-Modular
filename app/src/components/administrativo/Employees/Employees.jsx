@@ -160,19 +160,19 @@ const Employees = ({ toastMessage, modalMessage, modalInfo, openPage }) => {
           <styled.userDataSpan>{employee.role}</styled.userDataSpan>
           <styled.controllButtonsDiv>
             <styled.EditButton
-              onClick={() => handleEditButtonClick(employee.id)}
+              onClick={() => handleEditButtonClick(employee._id)}
             >
               <SVGEdit width="20" height="20" />
             </styled.EditButton>
             <styled.DeleteButton
               onClick={() =>
-                handleDeleteButtonClick(employee.id, employee.name)
+                handleDeleteButtonClick(employee._id, employee.name)
               }
             >
               <SVGDelete width="16" height="16" />
             </styled.DeleteButton>
             <styled.disableButton
-              onClick={() => handleDisableToggle(employee.id, employee.name)}
+              onClick={() => handleDisableToggle(employee._id, employee.name)}
             />
           </styled.controllButtonsDiv>
         </styled.UserDiv>
@@ -251,7 +251,6 @@ const Employees = ({ toastMessage, modalMessage, modalInfo, openPage }) => {
         {employees && employees.length > 0 && (
           <styled.paginationDiv>
             <button
-
               disabled={page === 1}
               onClick={() => setPage((prev) => prev - 1)}
             >

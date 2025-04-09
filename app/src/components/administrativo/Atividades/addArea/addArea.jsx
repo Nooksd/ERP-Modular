@@ -74,7 +74,7 @@ const AddArea = ({ toastMessage, editData }) => {
           return {
             activity: activity.activity,
             subactivities: [
-              ...activity.subactivities,
+              ...(activity?.subactivities ? activity.subactivities : []),
               {
                 subactivity: "",
                 haveIndicative: false,
@@ -222,18 +222,20 @@ const AddArea = ({ toastMessage, editData }) => {
               onChange={(e) => setSelectedActivity(e.target.value)}
             >
               <option value="">Selecionar atividade</option>
-              {areaInfo.activities.map((activity, index) => (
-                <option key={index} value={index}>
-                  {activity.activity}
-                </option>
-              ))}
+              {areaInfo.activities &&
+                areaInfo.activities.map((activity, index) => (
+                  <option key={index} value={index}>
+                    {activity.activity}
+                  </option>
+                ))}
             </styled.formManagerSelect>
           </styled.formDiv>
         )}
         <styled.formManagerAndSubmitButtonDiv>
           <styled.formManagerDiv>
             {editActivity
-              ? areaInfo.activities.map((activity, index) => (
+              ? areaInfo.activities &&
+                areaInfo.activities.map((activity, index) => (
                   <styled.managerAndButtonDiv key={index}>
                     <styled.formInput
                       name="activities"
@@ -251,6 +253,7 @@ const AddArea = ({ toastMessage, editData }) => {
                   </styled.managerAndButtonDiv>
                 ))
               : selectedActivity &&
+                areaInfo?.activities[selectedActivity]?.subactivities &&
                 areaInfo.activities[selectedActivity].subactivities.map(
                   (subactivity, index) => (
                     <styled.managerAndButtonDiv key={index}>

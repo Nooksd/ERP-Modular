@@ -81,6 +81,10 @@ export const ControleHH = ({ toastMessage, windowHeight }) => {
 
   const activitiesEndRef = useRef(null);
 
+  useEffect(() => {
+    console.log(hhRecords);
+  }, [hhRecords]);
+
   // -Whachers de mudancas useEffect- >
   useEffect(() => {
     if (recordData.projectId && recordData.recordId && recordData.date) {
@@ -112,7 +116,7 @@ export const ControleHH = ({ toastMessage, windowHeight }) => {
   useEffect(() => {
     if (works.works.userWorks) {
       const foundWork = works.works.userWorks.find(
-        (work) => work.id === selectedWork
+        (work) => work._id === selectedWork
       );
 
       if (foundWork) {
@@ -196,6 +200,8 @@ export const ControleHH = ({ toastMessage, windowHeight }) => {
 
         const { data } = response;
 
+        console.log(data);
+
         setHHRecords(data.hhRecord.hhRecords);
         toastMessage({
           danger: false,
@@ -203,6 +209,7 @@ export const ControleHH = ({ toastMessage, windowHeight }) => {
           message: data.message,
         });
       } catch (e) {
+        console.log(e);
         toastMessage({
           danger: true,
           title: "Error",
@@ -428,12 +435,9 @@ export const ControleHH = ({ toastMessage, windowHeight }) => {
           hhRecords: removeErrorAndOpen(hhRecords),
         };
         if (recordData.recordId) {
-          await innovaApi.put(
-            `/hhcontroll/update/${recordData.recordId}`,
-            {
-              hhRecords: removeErrorAndOpen(hhRecords),
-            }
-          );
+          await innovaApi.put(`/hhcontroll/update/${recordData.recordId}`, {
+            hhRecords: removeErrorAndOpen(hhRecords),
+          });
           toastMessage({
             danger: false,
             title: "Sucesso",
@@ -566,14 +570,13 @@ export const ControleHH = ({ toastMessage, windowHeight }) => {
     } else if (works.status === "succeeded") {
       return (
         <ul>
-          {works.works.userWorks.map((work, index) => (
+          {works.works.userWorks.map((work) => (
             <styled.work
-              key={index}
-              $isSelected={selectedWork === work.id}
+              key={work._id}
+              $isSelected={selectedWork === work._id}
               onClick={() => {
-
                 if (!recordData.projectId) {
-                  setSelectedWork(work.id);
+                  setSelectedWork(work._id);
                   setWorkError(false);
                 }
               }}
@@ -616,12 +619,11 @@ export const ControleHH = ({ toastMessage, windowHeight }) => {
                   >
                     <option value="">Selecionar Área</option>
                     {activities &&
-                      activities.activities.map((activity, index) => (
-                        <option key={index} value={activity.area}>
+                      activities.activities.map((activity) => (
+                        <option key={activity._id} value={activity.area}>
                           {activity.area}
                         </option>
                       ))}
-
                   </styled.ActivitySelect>
                   <styled.ActivitySelect
                     value={activity.activity}
@@ -634,11 +636,10 @@ export const ControleHH = ({ toastMessage, windowHeight }) => {
                     {hhRecords[index].area &&
                       activities.activities.map((area) => {
                         if (area.area === hhRecords[index].area) {
-                          return area.activities.map((activity, index) => (
+                          return area.activities.map((activity) => (
                             <option
-                              key={index}
+                              key={activity._id}
                               value={activity.activity}
-
                             >
                               {activity.activity}
                             </option>
@@ -662,11 +663,10 @@ export const ControleHH = ({ toastMessage, windowHeight }) => {
                               activity.activity === hhRecords[index].activity
                             ) {
                               return activity.subactivities.map(
-                                (subactivity, index) => (
+                                (subactivity) => (
                                   <option
-                                    key={index}
+                                    key={subactivity._id}
                                     value={subactivity.subactivity}
-
                                   >
                                     {subactivity.subactivity}
                                   </option>
@@ -698,7 +698,7 @@ export const ControleHH = ({ toastMessage, windowHeight }) => {
                                 return (
                                   <styled.ActivityIndicativeInput
                                     style={{ borderRight: 0 }}
-                                    key={subactivity.id}
+                                    key={subactivity._id}
                                     type="number"
                                     value={hhRecords[index].indicative}
                                     name="indicative"
@@ -748,7 +748,7 @@ export const ControleHH = ({ toastMessage, windowHeight }) => {
                           <option value="">Selecionar Função</option>
                           {fieldRoles &&
                             fieldRoles.roles.map((role) => (
-                              <option key={role.id} value={role.role}>
+                              <option key={role._id} value={role.role}>
                                 {role.role}
                               </option>
                             ))}

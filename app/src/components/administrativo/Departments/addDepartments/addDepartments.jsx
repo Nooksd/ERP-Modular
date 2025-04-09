@@ -9,7 +9,7 @@ const AddFunction = ({ toastMessage, editData }) => {
   const employees = useSelector((state) => state.employees);
   const [additives, setAdditives] = useState([
     {
-      id: 1,
+      _id: 1,
       additive: "periculosidade",
     },
   ]);
@@ -49,7 +49,7 @@ const AddFunction = ({ toastMessage, editData }) => {
     if (name === "baseSalary") {
       const newBaseSalary = value.replace(/\D/g, "");
 
-      const slicedSalary = newBaseSalary.slice(0, 7)
+      const slicedSalary = newBaseSalary.slice(0, 7);
 
       const formattedSalary = (slicedSalary / 100)
         .toFixed(2)
@@ -72,7 +72,7 @@ const AddFunction = ({ toastMessage, editData }) => {
   const handleAddNewEmpityAdditive = () => {
     setRoleInfo((prevInfo) => ({
       ...prevInfo,
-      additives: [...prevInfo.additives, ""],
+      additives: [...(prevInfo?.additives ?? []), ""],
     }));
 
     setTimeout(() => {
@@ -255,36 +255,40 @@ const AddFunction = ({ toastMessage, editData }) => {
         </styled.formManagerAndSubmitButtonDiv>
         <styled.formManagerAndSubmitButtonDiv>
           <styled.formManagerDiv>
-            {roleInfo.additives.map((additive, index) => (
-              <styled.managerAndButtonDiv key={index}>
-                <styled.formManagerSelect
-                  $error={additivesError[index]}
-                  value={additive}
-                  onChange={(e) => handleSelectAdditive(e.target.value, index)}
-                >
-                  <option value="">Selecionar página</option>
-                  {additives.map((additive) => {
-                    if (
-                      roleInfo.additives.includes(additive.additive) &&
-                      roleInfo.additives[index] !== additive.additive
-                    )
-                      return null;
-                    return (
-                      <option key={additive.id} value={additive.additive}>
-                        {additive.additive}
-                      </option>
-                    );
-                  })}
-                </styled.formManagerSelect>
-                <styled.formManagerButton
-                  onClick={() => handleRemoveAdditive(index)}
-                >
-                  -
-                </styled.formManagerButton>
-              </styled.managerAndButtonDiv>
-            ))}
+            {roleInfo.additives &&
+              roleInfo.additives.map((additive, index) => (
+                <styled.managerAndButtonDiv key={index}>
+                  <styled.formManagerSelect
+                    $error={additivesError[index]}
+                    value={additive}
+                    onChange={(e) =>
+                      handleSelectAdditive(e.target.value, index)
+                    }
+                  >
+                    <option value="">Selecionar página</option>
+                    {additives &&
+                      additives.map((additive) => {
+                        if (
+                          roleInfo.additives.includes(additive.additive) &&
+                          roleInfo.additives[index] !== additive.additive
+                        )
+                          return null;
+                        return (
+                          <option key={additive._id} value={additive.additive}>
+                            {additive.additive}
+                          </option>
+                        );
+                      })}
+                  </styled.formManagerSelect>
+                  <styled.formManagerButton
+                    onClick={() => handleRemoveAdditive(index)}
+                  >
+                    -
+                  </styled.formManagerButton>
+                </styled.managerAndButtonDiv>
+              ))}
             <styled.managerAndButtonDiv>
-              {roleInfo.additives.length === 0 && (
+              {roleInfo.additives && roleInfo.additives.length === 0 && (
                 <styled.addNewText>Adicionar aditivo</styled.addNewText>
               )}
               <styled.formManagerButton
