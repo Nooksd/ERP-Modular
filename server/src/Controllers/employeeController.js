@@ -91,7 +91,7 @@ class EmployeeController {
 
       const {
         page = 1,
-        limit = 10,
+        limit = 10000,
         name,
         order = true,
         active = "true",

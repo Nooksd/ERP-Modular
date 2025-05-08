@@ -1,4 +1,4 @@
-import Role from "../Models/RoleModel.js";
+import Role from "../Models/roleModel.js";
 
 class RoleController {
   static async createRole(req, res) {
@@ -148,7 +148,7 @@ class RoleController {
         });
       }
 
-      const { page = 1, limit = 10, name, order = true } = req.query;
+      const { page = 1, limit = 100000, name, order = true } = req.query;
 
       let filter = name ? { name: { $regex: name, $options: "i" } } : {};
 

@@ -1134,7 +1134,7 @@ export const GestaoHH = ({ windowHeight, toastMessage }) => {
               <styled.cardTitle>Horas Normais</styled.cardTitle>
               <styled.cardValue>{totalNormal}</styled.cardValue>
               <styled.smallCardValue>
-                30% <span> Utilizado</span>
+                {/* 30% <span> Utilizado</span> */}
               </styled.smallCardValue>
             </styled.cardContentContainer>
           </styled.summaryContainer>
@@ -1149,7 +1149,7 @@ export const GestaoHH = ({ windowHeight, toastMessage }) => {
               <styled.cardTitle>Horas Extras I</styled.cardTitle>
               <styled.cardValue>{totalExtra1}</styled.cardValue>
               <styled.smallCardValue>
-                10% <span> Utilizado</span>
+                {/* 10% <span> Utilizado</span> */}
               </styled.smallCardValue>
             </styled.cardContentContainer>
           </styled.summaryContainer>
@@ -1164,7 +1164,7 @@ export const GestaoHH = ({ windowHeight, toastMessage }) => {
               <styled.cardTitle>Horas Extras II</styled.cardTitle>
               <styled.cardValue>{totalExtra2}</styled.cardValue>
               <styled.smallCardValue>
-                50% <span> Utilizado</span>
+                {/* 50% <span> Utilizado</span> */}
               </styled.smallCardValue>
             </styled.cardContentContainer>
           </styled.summaryContainer>

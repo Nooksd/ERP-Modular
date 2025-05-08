@@ -52,7 +52,15 @@ const hhrecordSchema = new mongoose.Schema(
               },
               hours: {
                 type: Number,
-                required: true,
+                required: false,
+              },
+              extra: {
+                type: Number,
+                required: false,
+              },
+              extra2: {
+                type: Number,
+                required: false,
               },
             },
           ],

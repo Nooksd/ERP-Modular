@@ -47,7 +47,7 @@ class ActivityController {
 
   static async getAllActivities(req, res) {
     try {
-      const { page = 1, limit = 10, name, order = true } = req.query;
+      const { page = 1, limit = 10000, name, order = true } = req.query;
 
       let filter = name ? { area: { $regex: name, $options: "i" } } : {};
 
