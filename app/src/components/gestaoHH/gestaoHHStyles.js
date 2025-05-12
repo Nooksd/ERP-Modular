@@ -37,7 +37,7 @@ export const content = styled.div`
 
 export const greenBackground = styled.div`
   width: 100%;
-  height: 170px;
+  min-height: 120px;
   background-image: linear-gradient(
     to bottom right,
     ${(props) => props.theme.colors.secondary_2},
@@ -257,6 +257,7 @@ export const filter = styled.button`
   height: 40px;
   display: flex;
   align-items: center;
+  z-index: 999;
   justify-content: center;
   border-radius: 5px;
   cursor: pointer;
@@ -265,6 +266,7 @@ export const filter = styled.button`
 
 export const workSelect = styled.select`
   width: 260px;
+  z-index: 999;
   height: 40px;
   cursor: pointer;
   font-weight: 400;
@@ -279,6 +281,7 @@ export const workSelect = styled.select`
 export const eraseFilter = styled.button`
   width: 40px;
   height: 40px;
+  z-index: 999;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -290,14 +293,14 @@ export const eraseFilter = styled.button`
 export const dashboardContainer = styled.div`
   width: 100%;
   height: 100%;
-  margin-top: -85px;
+  margin-top: -120px;
   display: grid;
   justify-items: center;
   grid-template-columns: 1fr 1fr 1fr 1fr;
   grid-template-rows: 0.9fr 1.5fr 1.5fr 0.3fr;
   grid-auto-flow: dense;
   gap: 24px 70px;
-  padding: 24px 70px;
+  padding: 70px 70px 24px 70px;
 `;
 
 export const sideGrapchContainer = styled.div`
@@ -305,7 +308,7 @@ export const sideGrapchContainer = styled.div`
   min-width: 300px;
   overflow: hidden;
   height: 100%;
-  grid-row: span 4;
+  grid-row: span 3;
   border-radius: 20px;
   background-image: linear-gradient(
     to bottom left,
@@ -314,8 +317,7 @@ export const sideGrapchContainer = styled.div`
   );
 
   display: grid;
-  grid-template-rows: 1.2fr 2fr 0.5fr;
-  align-items: center;
+  grid-template-rows: 2fr 0.3fr;
   justify-content: center;
   padding: 20px 0;
 `;
@@ -329,29 +331,15 @@ export const graphTitleBlue = styled.div`
   gap: 10px;
 `;
 
-export const pieContainer = styled.div`
-  width: 260px;
-  height: auto;
-  position: relative;
-  margin: 0 auto;
-  color: ${(props) => props.theme.fonts.color};
-  white-space: nowrap;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-`;
-
 export const barContainer = styled.div`
   width: 100%;
-  height: 300px;
+  max-height: 400px;
   color: ${(props) => props.theme.fonts.color};
   white-space: nowrap;
   position: relative;
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  align-items: ${props => props.$position ? "start" : "center"};
   overflow: auto;
 
   &::-webkit-scrollbar {

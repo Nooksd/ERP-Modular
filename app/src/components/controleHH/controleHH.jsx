@@ -63,6 +63,8 @@ export const ControleHH = ({ toastMessage, windowHeight }) => {
     role: "",
     quantity: "",
     hours: "",
+    extra: "",
+    extra2: "",
   };
 
   const emptyActivity = {
@@ -80,10 +82,6 @@ export const ControleHH = ({ toastMessage, windowHeight }) => {
   const [hhRecords, setHHRecords] = useState([{ ...emptyActivity }]);
 
   const activitiesEndRef = useRef(null);
-
-  useEffect(() => {
-    console.log(hhRecords);
-  }, [hhRecords]);
 
   // -Whachers de mudancas useEffect- >
   useEffect(() => {
@@ -200,8 +198,6 @@ export const ControleHH = ({ toastMessage, windowHeight }) => {
 
         const { data } = response;
 
-        console.log(data);
-
         setHHRecords(data.hhRecord.hhRecords);
         toastMessage({
           danger: false,
@@ -209,7 +205,6 @@ export const ControleHH = ({ toastMessage, windowHeight }) => {
           message: data.message,
         });
       } catch (e) {
-        console.log(e);
         toastMessage({
           danger: true,
           title: "Error",
@@ -424,6 +419,63 @@ export const ControleHH = ({ toastMessage, windowHeight }) => {
     setHHRecords(newHHRecords);
   };
 
+  const handleInputExtra = (index, roleIndex, value) => {
+    let extra = parseInt(value.replace(/[^0-9]/g, ""), 10);
+    if (isNaN(extra) || extra < 0) extra = "";
+    if (extra > 24) extra = 24;
+
+    const newHHRecords = hhRecords.map((activity, i) => {
+      if (i === index) {
+        return {
+          ...activity,
+          error: false,
+          roles: activity.roles.map((role, j) => {
+            if (j === roleIndex) {
+              return {
+                ...role,
+                error: false,
+                extra: extra,
+              };
+            }
+            return role;
+          }),
+        };
+      } else {
+        return activity;
+      }
+    });
+
+    setHHRecords(newHHRecords);
+  };
+
+  const handleInputExtra2 = (index, roleIndex, value) => {
+    let extra2 = parseInt(value.replace(/[^0-9]/g, ""), 10);
+    if (isNaN(extra2) || extra2 < 0) extra2 = "";
+    if (extra2 > 24) extra2 = 24;
+    const newHHRecords = hhRecords.map((activity, i) => {
+      if (i === index) {
+        return {
+          ...activity,
+          error: false,
+          roles: activity.roles.map((role, j) => {
+            if (j === roleIndex) {
+              return {
+                ...role,
+                error: false,
+                extra2: extra2,
+              };
+            }
+            return role;
+          }),
+        };
+      } else {
+        return activity;
+      }
+    });
+
+    setHHRecords(newHHRecords);
+  };
+
   const handleSendHHRecord = async () => {
     const isValid = validateHHRecord();
 
@@ -445,6 +497,7 @@ export const ControleHH = ({ toastMessage, windowHeight }) => {
           });
         } else {
           await innovaApi.post("/hhcontroll/sendHH", dataBody);
+
           toastMessage({
             danger: false,
             title: "Sucesso",
@@ -506,7 +559,9 @@ export const ControleHH = ({ toastMessage, windowHeight }) => {
 
       const newRoles = activity.roles.map((role) => {
         const roleHasError =
-          role.role.trim() === "" || role.quantity === "" || role.hours === "";
+          role.role.trim() === "" ||
+          role.quantity === "" ||
+          role.hours + role.extra + role.extra2 === "";
 
         if (roleHasError) {
           hasRoleError = true;
@@ -781,6 +836,40 @@ export const ControleHH = ({ toastMessage, windowHeight }) => {
                           placeholder="Escrever horas"
                           onChange={(e) =>
                             handleInputHours(index, roleIndex, e.target.value)
+                          }
+                          onKeyDown={(e) => {
+                            if (["e", "E", "+", "-"].includes(e.key))
+                              e.preventDefault();
+                          }}
+                        />
+                        <styled.ActivityIndicativeInput
+                          style={{
+                            width: "200px",
+                            borderRight: 0,
+                            borderLeft: 0,
+                          }}
+                          type="number"
+                          name="extra"
+                          max="24"
+                          value={role.extra}
+                          placeholder="Escrever extra"
+                          onChange={(e) =>
+                            handleInputExtra(index, roleIndex, e.target.value)
+                          }
+                          onKeyDown={(e) => {
+                            if (["e", "E", "+", "-"].includes(e.key))
+                              e.preventDefault();
+                          }}
+                        />
+                        <styled.ActivityIndicativeInput
+                          style={{ width: "200px" }}
+                          type="number"
+                          name="extra2"
+                          max="24"
+                          value={role.extra2}
+                          placeholder="Escrever extra 2"
+                          onChange={(e) =>
+                            handleInputExtra2(index, roleIndex, e.target.value)
                           }
                           onKeyDown={(e) => {
                             if (["e", "E", "+", "-"].includes(e.key))

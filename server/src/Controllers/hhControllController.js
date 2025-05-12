@@ -79,8 +79,10 @@ class HHControllController {
             typeof role.role !== "string" ||
             typeof role.quantity !== "number" ||
             role.quantity <= 0 ||
-            typeof role.hours !== "number" ||
-            role.hours <= 0
+            (typeof role.hours !== "number" &&
+              typeof role.extra !== "number" &&
+              typeof role.extra2 !== "number") ||
+            role.hours + role.extra + role.extra2 <= 0
           ) {
             return res.status(400).json({
               message:
@@ -401,8 +403,10 @@ class HHControllController {
             typeof role.role !== "string" ||
             typeof role.quantity !== "number" ||
             role.quantity <= 0 ||
-            typeof role.hours !== "number" ||
-            role.hours <= 0
+            (typeof role.hours !== "number" &&
+              typeof role.extra !== "number" &&
+              typeof role.extra2 !== "number") ||
+            role.hours + role.extra + role.extra2 <= 0
           ) {
             return res.status(400).json({
               message:

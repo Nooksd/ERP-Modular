@@ -255,7 +255,9 @@ export const Historico = ({
               <styled.Division />
               <styled.recordRolesDiv>{record.roles}</styled.recordRolesDiv>
               <styled.Division />
-              <styled.recordHoursDiv>{record.hours}</styled.recordHoursDiv>
+              <styled.recordHoursDiv>
+                {record.hours + record.extra + record.extra2}
+              </styled.recordHoursDiv>
               <styled.Division />
             </styled.RecordDiv>
             <styled.EditButton onClick={() => handleEditClick(record)}>

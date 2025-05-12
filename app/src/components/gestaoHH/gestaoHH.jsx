@@ -266,7 +266,6 @@ export const GestaoHH = ({ windowHeight, toastMessage }) => {
           hhRecord.roles.forEach((role) => {
             calculateHours(
               role,
-              dayOfWeek,
               {
                 normal: (value) => (totalNormal += value),
                 extra1: (value) => (totalNormal += value),
@@ -295,7 +294,6 @@ export const GestaoHH = ({ windowHeight, toastMessage }) => {
 
     realData.forEach((hhRecord) => {
       const date = new Date(hhRecord.date);
-      const dayOfWeek = date.getDay();
       const year = hhRecord.date.substring(0, 4);
       const month = meses[parseInt(hhRecord.date.substring(5, 7)) - 1].slice(
         0,
@@ -326,7 +324,6 @@ export const GestaoHH = ({ windowHeight, toastMessage }) => {
           if (!roleFilter(role.role)) return;
           calculateHours(
             role,
-            dayOfWeek,
             {
               normal: (value) => (data[labelIndex] += value),
               extra1: (value) => (data[labelIndex] += value),
@@ -469,7 +466,6 @@ export const GestaoHH = ({ windowHeight, toastMessage }) => {
 
           calculateHours(
             role,
-            dayOfWeek,
             {
               normal: (value) => (data[labelIndex] += value),
               extra1: (value) => (data[labelIndex] += value),
@@ -493,8 +489,6 @@ export const GestaoHH = ({ windowHeight, toastMessage }) => {
     let totalHHExtra2 = 0;
 
     workData.forEach((hhRecord) => {
-      const date = new Date(hhRecord.date);
-      const dayOfWeek = date.getDay();
       const year = hhRecord.date.substring(0, 4);
       const monthNumber =
         hhRecord.date.substring(5, 6) == 0
@@ -506,9 +500,11 @@ export const GestaoHH = ({ windowHeight, toastMessage }) => {
       hhRecord.hhRecords.forEach((record) => {
         if (activityFilter(record.area, record.activity, record.subactivity))
           return;
+
         record.roles.forEach((role) => {
           if (!roleFilter(role.role)) return;
-          calculateHours(role, dayOfWeek, {
+
+          calculateHours(role, {
             normal: (value) => (totalHHNormal += value),
             extra1: (value) => (totalHHExtra1 += value),
             extra2: (value) => (totalHHExtra2 += value),
@@ -669,27 +665,33 @@ export const GestaoHH = ({ windowHeight, toastMessage }) => {
     setRecordDate(newRecordDate);
   }
 
-  function calculateHours(role, dayOfWeek, accumulators, comparison = false) {
-    if (dayOfWeek === 5 || dayOfWeek === 6) {
-      if (filter.comparison === 3 || filter.comparison === 0 || !comparison)
-        accumulators.extra2(role.quantity * role.hours);
-    } else {
-      if (role.hours <= 9) {
-        if (filter.comparison === 1 || filter.comparison === 0 || !comparison)
-          accumulators.normal(role.quantity * role.hours);
-      } else if (role.hours <= 11) {
-        if (filter.comparison === 1 || filter.comparison === 0 || !comparison)
-          accumulators.normal(role.quantity * 9);
-        if (filter.comparison === 2 || filter.comparison === 0 || !comparison)
-          accumulators.extra1(role.quantity * (role.hours - 9));
-      } else {
-        if (filter.comparison === 1 || filter.comparison === 0 || !comparison)
-          accumulators.normal(role.quantity * 9);
-        if (filter.comparison === 2 || filter.comparison === 0 || !comparison)
-          accumulators.extra1(role.quantity * 2);
-        if (filter.comparison === 3 || filter.comparison === 0 || !comparison)
-          accumulators.extra2(role.quantity * (role.hours - 11));
-      }
+  function calculateHours(role, accumulators, comparison = false) {
+    if (!comparison) {
+      accumulators.normal(role.quantity * isNaN(role.hours) ? 0 : role.hours);
+      accumulators.extra1(role.quantity * isNaN(role.extra) ? 0 : role.extra);
+      accumulators.extra2(role.quantity * isNaN(role.extra2) ? 0 : role.extra2);
+      return;
+    }
+    switch (filter.comparison) {
+      case 1:
+        accumulators.normal(role.quantity * isNaN(role.hours) ? 0 : role.hours);
+        break;
+      case 2:
+        accumulators.extra1(role.quantity * isNaN(role.extra) ? 0 : role.extra);
+        break;
+      case 3:
+        accumulators.extra2(
+          role.quantity * isNaN(role.extra2) ? 0 : role.extra2
+        );
+        break;
+
+      default:
+        accumulators.normal(role.quantity * isNaN(role.hours) ? 0 : role.hours);
+        accumulators.extra1(role.quantity * isNaN(role.extra) ? 0 : role.extra);
+        accumulators.extra2(
+          role.quantity * isNaN(role.extra2) ? 0 : role.extra2
+        );
+        break;
     }
   }
 
@@ -748,105 +750,105 @@ export const GestaoHH = ({ windowHeight, toastMessage }) => {
     return filter.roles.some((selectedRole) => selectedRole === role);
   }
 
-  const generatePDF = async () => {
-    try {
-      const { data } = await innovaApi.get("/hhcontroll/get-pdf-base", {
-        responseType: "arraybuffer",
-      });
+  // const generatePDF = async () => {
+  //   try {
+  //     const { data } = await innovaApi.get("/hhcontroll/get-pdf-base", {
+  //       responseType: "arraybuffer",
+  //     });
 
-      const pdfDoc = await PDFDocument.load(data);
-      const pages = pdfDoc.getPages();
-      const page = pages[0];
+  //     const pdfDoc = await PDFDocument.load(data);
+  //     const pages = pdfDoc.getPages();
+  //     const page = pages[0];
 
-      const { width, height } = page.getSize();
-      const blackColor = rgb(0, 0, 0);
-      const greenColor = rgb(176 / 255, 209 / 255, 89 / 255);
+  //     const { width, height } = page.getSize();
+  //     const blackColor = rgb(0, 0, 0);
+  //     const greenColor = rgb(176 / 255, 209 / 255, 89 / 255);
 
-      const timesRomanFont = await pdfDoc.embedFont(StandardFonts.TimesRoman);
+  //     const timesRomanFont = await pdfDoc.embedFont(StandardFonts.TimesRoman);
 
-      const selectedWorkDetails = works.works.userWorks.find(
-        (work) => work._id === selectedWork
-      );
+  //     const selectedWorkDetails = works.works.userWorks.find(
+  //       (work) => work._id === selectedWork
+  //     );
 
-      const titleConfig = {
-        text: selectedWorkDetails.name,
-        size: 25,
-        averageCharacterWidth: 0.45,
-        yOffset: 150,
-      };
+  //     const titleConfig = {
+  //       text: selectedWorkDetails.name,
+  //       size: 25,
+  //       averageCharacterWidth: 0.45,
+  //       yOffset: 150,
+  //     };
 
-      titleConfig.width =
-        titleConfig.size *
-        titleConfig.text.length *
-        titleConfig.averageCharacterWidth;
+  //     titleConfig.width =
+  //       titleConfig.size *
+  //       titleConfig.text.length *
+  //       titleConfig.averageCharacterWidth;
 
-      titleConfig.x = width / 2 - titleConfig.width / 2;
-      titleConfig.y = height - titleConfig.yOffset;
+  //     titleConfig.x = width / 2 - titleConfig.width / 2;
+  //     titleConfig.y = height - titleConfig.yOffset;
 
-      page.drawText(titleConfig.text, {
-        x: titleConfig.x,
-        y: titleConfig.y,
-        size: titleConfig.size,
-        color: blackColor,
-        font: timesRomanFont,
-      });
+  //     page.drawText(titleConfig.text, {
+  //       x: titleConfig.x,
+  //       y: titleConfig.y,
+  //       size: titleConfig.size,
+  //       color: blackColor,
+  //       font: timesRomanFont,
+  //     });
 
-      const subtitleConfig = {
-        text: `${importedData.labels[0]} - ${
-          importedData.labels[importedData.labels.length - 1]
-        }`,
-        size: 15,
-        averageCharacterWidth: 0.45,
-      };
+  //     const subtitleConfig = {
+  //       text: `${importedData.labels[0]} - ${
+  //         importedData.labels[importedData.labels.length - 1]
+  //       }`,
+  //       size: 15,
+  //       averageCharacterWidth: 0.45,
+  //     };
 
-      subtitleConfig.width =
-        subtitleConfig.size *
-        subtitleConfig.text.length *
-        subtitleConfig.averageCharacterWidth;
+  //     subtitleConfig.width =
+  //       subtitleConfig.size *
+  //       subtitleConfig.text.length *
+  //       subtitleConfig.averageCharacterWidth;
 
-      subtitleConfig.x = width / 2 - subtitleConfig.width / 2;
-      subtitleConfig.y = titleConfig.y - 70;
+  //     subtitleConfig.x = width / 2 - subtitleConfig.width / 2;
+  //     subtitleConfig.y = titleConfig.y - 70;
 
-      page.drawText(subtitleConfig.text, {
-        x: subtitleConfig.x,
-        y: subtitleConfig.y + 50,
-        size: subtitleConfig.size,
-        color: greenColor,
-        font: timesRomanFont,
-      });
+  //     page.drawText(subtitleConfig.text, {
+  //       x: subtitleConfig.x,
+  //       y: subtitleConfig.y + 50,
+  //       size: subtitleConfig.size,
+  //       color: greenColor,
+  //       font: timesRomanFont,
+  //     });
 
-      const canvas = chartRef.current?.canvas;
-      const dataURL = canvas.toDataURL("image/png");
-      const imageBytes = Uint8Array.from(atob(dataURL.split(",")[1]), (c) =>
-        c.charCodeAt(0)
-      );
+  //     const canvas = chartRef.current?.canvas;
+  //     const dataURL = canvas.toDataURL("image/png");
+  //     const imageBytes = Uint8Array.from(atob(dataURL.split(",")[1]), (c) =>
+  //       c.charCodeAt(0)
+  //     );
 
-      const pngImage = await pdfDoc.embedPng(imageBytes);
-      const imgWidth = 400;
-      const imgHeight = (imgWidth / pngImage.width) * pngImage.height;
+  //     const pngImage = await pdfDoc.embedPng(imageBytes);
+  //     const imgWidth = 400;
+  //     const imgHeight = (imgWidth / pngImage.width) * pngImage.height;
 
-      page.drawImage(pngImage, {
-        x: width / 2 - imgWidth / 2,
-        y: titleConfig.y - imgHeight - 50,
-        width: imgWidth,
-        height: imgHeight,
-      });
+  //     page.drawImage(pngImage, {
+  //       x: width / 2 - imgWidth / 2,
+  //       y: titleConfig.y - imgHeight - 50,
+  //       width: imgWidth,
+  //       height: imgHeight,
+  //     });
 
-      const pdfBytes = await pdfDoc.save();
-      const blob = new Blob([pdfBytes], { type: "application/pdf" });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = `Relatorio_HH_${titleConfig.text}.pdf`;
-      a.click();
-    } catch (e) {
-      toastMessage({
-        danger: true,
-        title: "Erro",
-        message: "Não foi possível gerar o PDF.",
-      });
-    }
-  };
+  //     const pdfBytes = await pdfDoc.save();
+  //     const blob = new Blob([pdfBytes], { type: "application/pdf" });
+  //     const url = URL.createObjectURL(blob);
+  //     const a = document.createElement("a");
+  //     a.href = url;
+  //     a.download = `Relatorio_HH_${titleConfig.text}.pdf`;
+  //     a.click();
+  //   } catch (e) {
+  //     toastMessage({
+  //       danger: true,
+  //       title: "Erro",
+  //       message: "Não foi possível gerar o PDF.",
+  //     });
+  //   }
+  // };
 
   const sendPredicted = async () => {
     try {
@@ -1075,54 +1077,23 @@ export const GestaoHH = ({ windowHeight, toastMessage }) => {
           </styled.titleContainer>
         </styled.greenBackground>
         <styled.dashboardContainer>
-          <styled.sideGrapchContainer>
-            <styled.graphTitleBlue>
-              HH Normal x HH Extra I x HH Extra II
-              <styled.pieContainer>
-                {totalNormal || totalExtra1 || totalExtra2 ? (
-                  <PieGraph
-                    normal={totalNormal}
-                    extra1={totalExtra1}
-                    extra2={totalExtra2}
-                  />
-                ) : (
-                  "Usina não selecionada"
-                )}
-              </styled.pieContainer>
-            </styled.graphTitleBlue>
-            <styled.graphTitleBlue>
-              HH Utilizado x Função
-              <styled.barContainer $position={importedDataRoles?.labels}>
-                {importedDataRoles?.labels ? (
-                  <VerticalBarGraph importedData={importedDataRoles} />
-                ) : (
-                  "Usina não selecionada"
-                )}
-              </styled.barContainer>
-            </styled.graphTitleBlue>
-            <styled.exportButton onClick={() => sendPredicted()}>
-              Enviar previsto{" "}
-              <svg width="30px" height="30px" viewBox="0 0 24 24" fill="none">
-                <path
-                  d="M4 12H20M20 12L16 8M20 12L16 16"
-                  strokeWidth="`1"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            </styled.exportButton>
-            {/* <styled.exportButton onClick={() => generatePDF()}>
-              Exportar relatório{" "}
-              <svg width="30px" height="30px" viewBox="0 0 24 24" fill="none">
-                <path
-                  d="M4 12H20M20 12L16 8M20 12L16 16"
-                  strokeWidth="`1"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            </styled.exportButton> */}
-          </styled.sideGrapchContainer>
+          <styled.summaryContainer
+            $selected={filter.comparison === 0}
+            onClick={() => handleSelectType(0)}
+          >
+            <styled.IconContainer>
+              <SVGTime />
+            </styled.IconContainer>
+            <styled.cardContentContainer>
+              <styled.cardTitle>Horas Totais</styled.cardTitle>
+              <styled.cardValue>
+                {totalNormal + totalExtra1 + totalExtra2}
+              </styled.cardValue>
+              <styled.smallCardValue>
+                {/* 30% <span> Utilizado</span> */}
+              </styled.smallCardValue>
+            </styled.cardContentContainer>
+          </styled.summaryContainer>
           <styled.summaryContainer
             $selected={filter.comparison === 1}
             onClick={() => handleSelectType(1)}
@@ -1168,6 +1139,54 @@ export const GestaoHH = ({ windowHeight, toastMessage }) => {
               </styled.smallCardValue>
             </styled.cardContentContainer>
           </styled.summaryContainer>
+          <styled.sideGrapchContainer>
+            {/* <styled.graphTitleBlue>
+              HH Normal x HH Extra I x HH Extra II
+              <styled.pieContainer>
+                {totalNormal || totalExtra1 || totalExtra2 ? (
+                  <PieGraph
+                    normal={totalNormal}
+                    extra1={totalExtra1}
+                    extra2={totalExtra2}
+                  />
+                ) : (
+                  "Usina não selecionada"
+                )}
+              </styled.pieContainer>
+            </styled.graphTitleBlue> */}
+            <styled.graphTitleBlue>
+              HH Utilizado x Função
+              <styled.barContainer $position={importedDataRoles?.labels}>
+                {importedDataRoles?.labels ? (
+                  <VerticalBarGraph importedData={importedDataRoles} />
+                ) : (
+                  "Usina não selecionada"
+                )}
+              </styled.barContainer>
+            </styled.graphTitleBlue>
+            <styled.exportButton onClick={() => sendPredicted()}>
+              Enviar previsto{" "}
+              <svg width="30px" height="30px" viewBox="0 0 24 24" fill="none">
+                <path
+                  d="M4 12H20M20 12L16 8M20 12L16 16"
+                  strokeWidth="`1"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </styled.exportButton>
+            {/* <styled.exportButton onClick={() => generatePDF()}>
+              Exportar relatório{" "}
+              <svg width="30px" height="30px" viewBox="0 0 24 24" fill="none">
+                <path
+                  d="M4 12H20M20 12L16 8M20 12L16 16"
+                  strokeWidth="`1"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </styled.exportButton> */}
+          </styled.sideGrapchContainer>
           <styled.bigGraphContainer>
             <styled.graphTitle>HH Realizado x Orçado</styled.graphTitle>
             {importedData?.labels ? (
