@@ -48,6 +48,7 @@ const BarGraph = ({ importedData, chartRef }) => {
     scales: {
       y: {
         display: false,
+        grace: "40%",
       },
       x: {
         ticks: {

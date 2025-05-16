@@ -463,7 +463,7 @@ export const cardTitle = styled.div`
 `;
 
 export const cardValue = styled.div`
-  font-size: 48px;
+  font-size: ${(props) => (props.$single ? "27px" : "48px")};
   font-weight: 700;
   color: ${(props) => props.theme.fonts.color};
   position: relative;

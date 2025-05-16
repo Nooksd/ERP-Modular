@@ -1,38 +1,38 @@
-import { Line } from "react-chartjs-2";
+import { Bar } from "react-chartjs-2";
+import ChartDataLabels from "chartjs-plugin-datalabels";
 import {
   Chart as ChartJS,
   CategoryScale,
   LinearScale,
-  PointElement,
-  LineElement,
+  BarElement,
   Title,
   Tooltip,
   Legend,
 } from "chart.js";
 
 ChartJS.register(
+  ChartDataLabels,
   CategoryScale,
   LinearScale,
-  PointElement,
-  LineElement,
+  BarElement,
   Title,
   Tooltip,
   Legend
 );
 
-const LineGraph = ({ importedData }) => {
+const LineGraph = ({ importedData, chartRef }) => {
   const datasets = [
     {
-      label: "HH Utilizado",
-      data: importedData?.data,
+      label: "% Utilizado/Total",
+      data: importedData?.data3,
       backgroundColor: ["#2257A8"],
       borderWidth: 1,
     },
   ];
   if (importedData?.data2) {
     datasets.push({
-      label: "HH Orçado",
-      data: importedData?.data2,
+      label: "% Orçado/Total",
+      data: importedData?.data4,
       backgroundColor: ["#95C11F"],
       borderWidth: 1,
     });
@@ -48,6 +48,7 @@ const LineGraph = ({ importedData }) => {
     scales: {
       y: {
         display: false,
+        grace: "40%",
       },
       x: {
         ticks: {
@@ -61,7 +62,7 @@ const LineGraph = ({ importedData }) => {
     plugins: {
       legend: {
         labels: {
-          padding: 1,
+          padding: 5,
           color: "#172242",
         },
       },
@@ -70,12 +71,12 @@ const LineGraph = ({ importedData }) => {
         color: "#172242",
         align: "end",
         anchor: "end",
-        formatter: (value) => `${value} h`,
+        formatter: (value) => `${value}%`,
       },
     },
   };
 
-  return <Line data={data} options={options} />;
+  return <Bar data={data} options={options} ref={chartRef} />;
 };
 
 export default LineGraph;

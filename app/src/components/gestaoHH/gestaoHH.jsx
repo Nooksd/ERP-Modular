@@ -13,7 +13,6 @@ import LineGraph from "../../shared/includes/graphs/line/lineGraph.jsx";
 import BarGraph from "../../shared/includes/graphs/bar/barGraph.jsx";
 import GaugeGraph from "../../shared/includes/graphs/score metter/gaugeGraph.jsx";
 import DoughnutGraph from "../../shared/includes/graphs/doughnut/doughnutGraph.jsx";
-import PieGraph from "../../shared/includes/graphs/pie/pieGraph.jsx";
 import VerticalBarGraph from "../../shared/includes/graphs/verticalBar/verticalBar.jsx";
 
 import SVGFilter from "../../shared/icons/gestaoHH/Filter_icon.jsx";
@@ -37,6 +36,9 @@ export const GestaoHH = ({ windowHeight, toastMessage }) => {
   const [totalNormal, setTotalNormal] = useState(0);
   const [totalExtra1, setTotalExtra1] = useState(0);
   const [totalExtra2, setTotalExtra2] = useState(0);
+
+  const [totalNormalPredicted, setTotalNormalPredicted] = useState(0);
+  const [totalExtra2Predicted, setTotalExtra2Predicted] = useState(0);
 
   const [openWindow, setOpenWindow] = useState(false);
   const [filterType, setFilterType] = useState(0);
@@ -93,6 +95,7 @@ export const GestaoHH = ({ windowHeight, toastMessage }) => {
       organizeGraph();
       organizeSecondGraph();
       organizeValues();
+      calculatePredictedTotals();
       desvio();
     }
   }, [workData, predictedData, filter]);
@@ -155,6 +158,8 @@ export const GestaoHH = ({ windowHeight, toastMessage }) => {
     setTotalNormal(0);
     setTotalExtra1(0);
     setTotalExtra2(0);
+    setTotalNormalPredicted(0);
+    setTotalExtra2Predicted(0);
     setRecordDate([]);
     setActivities([]);
     setRoles([]);
@@ -293,7 +298,6 @@ export const GestaoHH = ({ windowHeight, toastMessage }) => {
     const data = [];
 
     realData.forEach((hhRecord) => {
-      const date = new Date(hhRecord.date);
       const year = hhRecord.date.substring(0, 4);
       const month = meses[parseInt(hhRecord.date.substring(5, 7)) - 1].slice(
         0,
@@ -385,9 +389,11 @@ export const GestaoHH = ({ windowHeight, toastMessage }) => {
   }
 
   function organizeGraph() {
-    const { labels, data } = processRealData(workData || []);
+    const { labels: realLabels, data: realDataArray } = processRealData(
+      workData || []
+    );
 
-    const sortedIndices = labels
+    const sortedRealIndices = realLabels
       .map((label, index) => {
         const [month, year] = label.split("-");
         return {
@@ -400,13 +406,14 @@ export const GestaoHH = ({ windowHeight, toastMessage }) => {
       .sort((a, b) => a.year - b.year || a.monthIndex - b.monthIndex)
       .map((item) => item.index);
 
-    const sortedLabels = sortedIndices.map((i) => labels[i]);
-    const sortedData = sortedIndices.map((i) => data[i]);
+    const sortedRealLabels = sortedRealIndices.map((i) => realLabels[i]);
+    const sortedRealData = sortedRealIndices.map((i) => realDataArray[i]);
 
     if (predictedData) {
-      const { labels2, data2 } = processPredictedData(predictedData || []);
+      const { labels2: predictedLabels, data2: predictedDataArray } =
+        processPredictedData(predictedData || []);
 
-      const sortedIndices2 = labels2
+      const sortedPredictedIndices = predictedLabels
         .map((label, index) => {
           const [month, year] = label.split("-");
           return {
@@ -419,18 +426,67 @@ export const GestaoHH = ({ windowHeight, toastMessage }) => {
         .sort((a, b) => a.year - b.year || a.monthIndex - b.monthIndex)
         .map((item) => item.index);
 
-      const sortedLabels2 = sortedIndices2.map((i) => labels2[i]);
-      const sortedData2 = sortedIndices2.map((i) => data2[i]);
+      const sortedPredictedLabels = sortedPredictedIndices.map(
+        (i) => predictedLabels[i]
+      );
+      const sortedPredictedData = sortedPredictedIndices.map(
+        (i) => predictedDataArray[i]
+      );
+
+      const allLabelsSet = new Set([
+        ...sortedRealLabels,
+        ...sortedPredictedLabels,
+      ]);
+      const mergedLabels = Array.from(allLabelsSet);
+
+      const sortedMergedLabels = mergedLabels
+        .map((label) => {
+          const [month, year] = label.includes("-")
+            ? [label.split("-")[0], label.split("-")[1]]
+            : [label, filter.year];
+          return {
+            label,
+            year: parseInt(year),
+            monthIndex: meses.findIndex((m) => m.startsWith(month)),
+          };
+        })
+        .sort((a, b) => a.year - b.year || a.monthIndex - b.monthIndex)
+        .map((item) => item.label);
+
+      const alignedRealData = sortedMergedLabels.map((label) => {
+        const index = sortedRealLabels.indexOf(label);
+        return index !== -1 ? sortedRealData[index] : 0;
+      });
+
+      const alignedPredictedData = sortedMergedLabels.map((label) => {
+        const index = sortedPredictedLabels.indexOf(label);
+        return index !== -1 ? sortedPredictedData[index] : 0;
+      });
+
+      // Calcular o total orçado
+      const totalOrcado = predictedDataArray.reduce((acc, val) => acc + val, 0);
+
+      // Calcular data3 e data4
+      const data3 = alignedRealData.map((real) =>
+        totalOrcado === 0 ? 0 : Math.round((real / totalOrcado) * 100)
+      );
+      const data4 = alignedPredictedData.map((pred) =>
+        totalOrcado === 0 ? 0 : Math.round((pred / totalOrcado) * 100)
+      );
+
+      console.log(data3, data4);
 
       setImportedData({
-        labels: sortedLabels2,
-        data: sortedData,
-        data2: sortedData2,
+        labels: sortedMergedLabels,
+        data: alignedRealData,
+        data2: alignedPredictedData,
+        data3: data3,
+        data4: data4, // Adicionando data4
       });
     } else {
       setImportedData({
-        labels: sortedLabels,
-        data: sortedData,
+        labels: sortedRealLabels,
+        data: sortedRealData,
       });
     }
   }
@@ -440,8 +496,6 @@ export const GestaoHH = ({ windowHeight, toastMessage }) => {
     const data = [];
 
     workData.forEach((hhRecord) => {
-      const date = new Date(hhRecord.date);
-      const dayOfWeek = date.getDay();
       const year = hhRecord.date.substring(0, 4);
       const monthNumber =
         hhRecord.date.substring(5, 6) == 0
@@ -516,6 +570,29 @@ export const GestaoHH = ({ windowHeight, toastMessage }) => {
     setTotalNormal(totalHHNormal);
     setTotalExtra1(totalHHExtra1);
     setTotalExtra2(totalHHExtra2);
+  };
+
+  const calculatePredictedTotals = () => {
+    if (!predictedData) return;
+
+    let normal = 0;
+    let extra2 = 0;
+
+    predictedData.forEach((record) => {
+      const year = record.date.substring(0, 4);
+      const monthNumber =
+        record.date.substring(5, 6) == 0
+          ? record.date.substring(6, 7)
+          : record.date.substring(5, 7);
+
+      if (timeFilter(year, monthNumber)) return;
+
+      normal += record.hours;
+      extra2 += record.extras;
+    });
+
+    setTotalNormalPredicted(normal);
+    setTotalExtra2Predicted(extra2);
   };
 
   function getActivities(predicted, actual) {
@@ -1086,11 +1163,30 @@ export const GestaoHH = ({ windowHeight, toastMessage }) => {
             </styled.IconContainer>
             <styled.cardContentContainer>
               <styled.cardTitle>Horas Totais</styled.cardTitle>
-              <styled.cardValue>
-                {totalNormal + totalExtra1 + totalExtra2}
+              <styled.cardValue
+                $single={predictedData && predictedData.length > 0}
+              >
+                {totalNormal + totalExtra1 + totalExtra2}{" "}
+                {predictedData &&
+                  predictedData.length > 0 &&
+                  " / " +
+                    (totalNormalPredicted + totalExtra2Predicted).toFixed(0)}
               </styled.cardValue>
-              <styled.smallCardValue>
-                {/* 30% <span> Utilizado</span> */}
+              <styled.smallCardValue
+                style={{
+                  display:
+                    predictedData && predictedData.length > 0
+                      ? "block"
+                      : "none",
+                }}
+              >
+                {(
+                  ((totalNormal + totalExtra1 + totalExtra2) /
+                    (totalNormalPredicted + totalExtra2Predicted)) *
+                  100
+                ).toFixed(0)}
+                {"%"}
+                <span> Utilizado</span>
               </styled.smallCardValue>
             </styled.cardContentContainer>
           </styled.summaryContainer>
@@ -1103,9 +1199,25 @@ export const GestaoHH = ({ windowHeight, toastMessage }) => {
             </styled.IconContainer>
             <styled.cardContentContainer>
               <styled.cardTitle>Horas Normais</styled.cardTitle>
-              <styled.cardValue>{totalNormal}</styled.cardValue>
-              <styled.smallCardValue>
-                {/* 30% <span> Utilizado</span> */}
+              <styled.cardValue
+                $single={predictedData && predictedData.length > 0}
+              >
+                {totalNormal}{" "}
+                {predictedData &&
+                  predictedData.length > 0 &&
+                  " / " + totalNormalPredicted.toFixed(0)}
+              </styled.cardValue>
+              <styled.smallCardValue
+                style={{
+                  display:
+                    predictedData && predictedData.length > 0
+                      ? "block"
+                      : "none",
+                }}
+              >
+                {((totalNormal / totalNormalPredicted) * 100).toFixed(0)}
+                {"%"}
+                <span> Utilizado</span>
               </styled.smallCardValue>
             </styled.cardContentContainer>
           </styled.summaryContainer>
@@ -1118,9 +1230,26 @@ export const GestaoHH = ({ windowHeight, toastMessage }) => {
             </styled.IconContainer>
             <styled.cardContentContainer>
               <styled.cardTitle>Horas Extras I</styled.cardTitle>
-              <styled.cardValue>{totalExtra1}</styled.cardValue>
-              <styled.smallCardValue>
-                {/* 10% <span> Utilizado</span> */}
+              <styled.cardValue
+                $single={predictedData && predictedData.length > 0}
+              >
+                {totalExtra1}{" "}
+                {predictedData && predictedData.length > 0 && " / 0"}
+              </styled.cardValue>
+              <styled.smallCardValue
+                style={{
+                  display:
+                    predictedData && predictedData.length > 0
+                      ? "block"
+                      : "none",
+                }}
+              >
+                {(totalExtra1 * 100 - 100 > 0
+                  ? totalExtra1 * 100 - 100
+                  : 0
+                ).toFixed(0)}
+                {"%"}
+                <span> Utilizado</span>
               </styled.smallCardValue>
             </styled.cardContentContainer>
           </styled.summaryContainer>
@@ -1133,27 +1262,29 @@ export const GestaoHH = ({ windowHeight, toastMessage }) => {
             </styled.IconContainer>
             <styled.cardContentContainer>
               <styled.cardTitle>Horas Extras II</styled.cardTitle>
-              <styled.cardValue>{totalExtra2}</styled.cardValue>
-              <styled.smallCardValue>
-                {/* 50% <span> Utilizado</span> */}
+              <styled.cardValue
+                $single={predictedData && predictedData.length > 0}
+              >
+                {totalExtra2}{" "}
+                {predictedData &&
+                  predictedData.length > 0 &&
+                  " / " + totalExtra2Predicted.toFixed(0)}
+              </styled.cardValue>
+              <styled.smallCardValue
+                style={{
+                  display:
+                    predictedData && predictedData.length > 0
+                      ? "block"
+                      : "none",
+                }}
+              >
+                {((totalExtra2 / totalExtra2Predicted) * 100).toFixed(0)}
+                {"%"}
+                <span> Utilizado</span>
               </styled.smallCardValue>
             </styled.cardContentContainer>
           </styled.summaryContainer>
           <styled.sideGrapchContainer>
-            {/* <styled.graphTitleBlue>
-              HH Normal x HH Extra I x HH Extra II
-              <styled.pieContainer>
-                {totalNormal || totalExtra1 || totalExtra2 ? (
-                  <PieGraph
-                    normal={totalNormal}
-                    extra1={totalExtra1}
-                    extra2={totalExtra2}
-                  />
-                ) : (
-                  "Usina não selecionada"
-                )}
-              </styled.pieContainer>
-            </styled.graphTitleBlue> */}
             <styled.graphTitleBlue>
               HH Utilizado x Função
               <styled.barContainer $position={importedDataRoles?.labels}>
@@ -1204,7 +1335,7 @@ export const GestaoHH = ({ windowHeight, toastMessage }) => {
             )}
           </styled.smallGraphContainer>
           <styled.bigGraphContainer>
-            <styled.graphTitle>HH Realizado x Orçado</styled.graphTitle>
+            <styled.graphTitle>% Mês/total</styled.graphTitle>
             {importedData?.labels ? (
               <LineGraph importedData={importedData} />
             ) : (
@@ -1213,7 +1344,9 @@ export const GestaoHH = ({ windowHeight, toastMessage }) => {
           </styled.bigGraphContainer>
           <styled.smallGraphContainer style={{ padding: "20px" }}>
             <styled.graphTitle>Progresso total</styled.graphTitle>
-            <styled.indicator>
+            <styled.indicator
+              style={{ display: importedData.data ? "block" : "none" }}
+            >
               {totalPrevisto !== 0
                 ? `${
                     Math.round(progressoTotal) > 100
