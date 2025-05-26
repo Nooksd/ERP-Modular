@@ -141,7 +141,18 @@ hhrecordSchema.statics.getHistoryByProjectId = async function (
                 in: {
                   $add: [
                     "$$value",
-                    { $multiply: ["$$this.hours", "$$this.quantity"] },
+                    {
+                      $multiply: [
+                        {
+                          $sum: [
+                            { $ifNull: ["$$this.hours", 0] },
+                            { $ifNull: ["$$this.extra", 0] },
+                            { $ifNull: ["$$this.extra2", 0] },
+                          ],
+                        },
+                        "$$this.quantity",
+                      ],
+                    },
                   ],
                 },
               },

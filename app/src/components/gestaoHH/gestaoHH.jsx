@@ -259,7 +259,6 @@ export const GestaoHH = ({ windowHeight, toastMessage }) => {
       workData.forEach((record) => {
         const date = new Date(record.date);
         const year = record.date.substring(0, 4);
-        const dayOfWeek = date.getDay();
         const monthNumber =
           record.date.substring(5, 6) == 0
             ? record.date.substring(6, 7)
@@ -743,30 +742,45 @@ export const GestaoHH = ({ windowHeight, toastMessage }) => {
   }
 
   function calculateHours(role, accumulators, comparison = false) {
+    console.log(role);
     if (!comparison) {
-      accumulators.normal(role.quantity * isNaN(role.hours) ? 0 : role.hours);
-      accumulators.extra1(role.quantity * isNaN(role.extra) ? 0 : role.extra);
-      accumulators.extra2(role.quantity * isNaN(role.extra2) ? 0 : role.extra2);
+      accumulators.normal(
+        role.quantity * isNaN(role.hours) ? 0 : role.quantity * role.hours
+      );
+      accumulators.extra1(
+        role.quantity * isNaN(role.extra) ? 0 : role.quantity * role.extra
+      );
+      accumulators.extra2(
+        role.quantity * isNaN(role.extra2) ? 0 : role.quantity * role.extra2
+      );
       return;
     }
     switch (filter.comparison) {
       case 1:
-        accumulators.normal(role.quantity * isNaN(role.hours) ? 0 : role.hours);
+        accumulators.normal(
+          role.quantity * isNaN(role.hours) ? 0 : role.quantity * role.hours
+        );
         break;
       case 2:
-        accumulators.extra1(role.quantity * isNaN(role.extra) ? 0 : role.extra);
+        accumulators.extra1(
+          role.quantity * isNaN(role.extra) ? 0 : role.quantity * role.extra
+        );
         break;
       case 3:
         accumulators.extra2(
-          role.quantity * isNaN(role.extra2) ? 0 : role.extra2
+          role.quantity * isNaN(role.extra2) ? 0 : role.quantity * role.extra2
         );
         break;
 
       default:
-        accumulators.normal(role.quantity * isNaN(role.hours) ? 0 : role.hours);
-        accumulators.extra1(role.quantity * isNaN(role.extra) ? 0 : role.extra);
+        accumulators.normal(
+          role.quantity * isNaN(role.hours) ? 0 : role.quantity * role.hours
+        );
+        accumulators.extra1(
+          role.quantity * isNaN(role.extra) ? 0 : role.quantity * role.extra
+        );
         accumulators.extra2(
-          role.quantity * isNaN(role.extra2) ? 0 : role.extra2
+          role.quantity * isNaN(role.extra2) ? 0 : role.quantity * role.extra2
         );
         break;
     }

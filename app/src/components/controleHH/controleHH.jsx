@@ -360,11 +360,28 @@ export const ControleHH = ({ toastMessage, windowHeight }) => {
   };
 
   const handleInputQuantity = (index, roleIndex, value) => {
-    let quantity = parseInt(value.replace(/[^0-9]/g, ""), 10);
+    let cleanedValue = value
+      .replace(/,/g, ".")
+      .replace(/[^0-9.]/g, "")
+      .replace(/(\..*)\./g, "$1")
+      .replace(/^0+(?=\d)/, "");
 
-    if (isNaN(quantity) || quantity < 0) quantity = "";
-    if (quantity > 100) quantity = 100;
+    if (cleanedValue.startsWith(".")) {
+      cleanedValue = "0" + cleanedValue;
+    }
 
+    const [integerPart, decimalPart] = cleanedValue.split(".");
+    const limitedDecimal = decimalPart ? `.${decimalPart.slice(0, 1)}` : "";
+    const finalValue =
+      integerPart === undefined ? "" : `${integerPart}${limitedDecimal}`;
+    let quantity = parseFloat(finalValue);
+
+    if (isNaN(quantity) || quantity < 0) {
+      quantity = "";
+    } else {
+      quantity = Math.round(quantity * 10) / 10;
+      if (quantity > 100) quantity = 100;
+    }
     const newHHRecords = hhRecords.map((activity, i) => {
       if (i === index) {
         return {
@@ -375,7 +392,7 @@ export const ControleHH = ({ toastMessage, windowHeight }) => {
               return {
                 ...role,
                 error: false,
-                quantity: quantity,
+                quantity: quantity === "" ? "" : Number(quantity.toFixed(1)),
               };
             }
             return role;

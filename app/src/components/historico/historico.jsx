@@ -199,9 +199,7 @@ export const Historico = ({
 
   async function deleteRecord() {
     try {
-      await innovaApi.delete(
-        `/hhcontroll/delete-record/${whatDelete.recordId}`
-      );
+      await innovaApi.delete(`/hhcontroll/delete/${whatDelete.recordId}`);
       toastMessage({
         danger: false,
         title: "Sucesso",
@@ -241,6 +239,11 @@ export const Historico = ({
           month: "2-digit",
           day: "2-digit",
         });
+        const totalTime = record.hours * 60;
+        const hours = Math.floor(totalTime / 60);
+        const minutes = totalTime % 60;
+        const formattedTimeHH =
+          minutes === 0 ? `${hours}h` : `${hours}h ${minutes.toFixed(0)}m`;
 
         return (
           <styled.recordWraperDiv key={index}>
@@ -255,9 +258,7 @@ export const Historico = ({
               <styled.Division />
               <styled.recordRolesDiv>{record.roles}</styled.recordRolesDiv>
               <styled.Division />
-              <styled.recordHoursDiv>
-                {record.hours + record.extra + record.extra2}
-              </styled.recordHoursDiv>
+              <styled.recordHoursDiv>{formattedTimeHH}</styled.recordHoursDiv>
               <styled.Division />
             </styled.RecordDiv>
             <styled.EditButton onClick={() => handleEditClick(record)}>
