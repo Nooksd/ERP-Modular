@@ -15,12 +15,11 @@ import WorkRoutes from "./src/Routes/WorkRoutes.js";
 import EmployeeRoutes from "./src/Routes/EmployeeRoutes.js";
 import ActivityRoutes from "./src/Routes/activityRoutes.js";
 import RoleRoutes from "./src/Routes/RoleRoutes.js";
-import PageRoutes from "./src/Routes/PagesRoutes.js";
 import PredictedRoutes from "./src/Routes/predictedRoutes.js";
 
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: "https://localhost:5173",
     credentials: true,
     methods: "GET, POST, PUT, DELETE",
     allowedHeaders: [
@@ -44,7 +43,6 @@ app.use("/api/predicted", PredictedRoutes);
 app.use("/api/employee", EmployeeRoutes);
 app.use("/api/activity", ActivityRoutes);
 app.use("/api/role", RoleRoutes);
-app.use("/api/page", PageRoutes);
 
 app.use("/*", (req, res) => {
   res.status(404).json({

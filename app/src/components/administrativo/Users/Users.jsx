@@ -154,7 +154,6 @@ const Users = ({ toastMessage, modalMessage, modalInfo, openPage }) => {
           <styled.userAvatarImg src={user.avatar} />
           <styled.userDataSpan>{user.name}</styled.userDataSpan>
           <styled.userDataSpan>{user.email}</styled.userDataSpan>
-          <styled.userDataSpan>{user.pages.length}</styled.userDataSpan>
           <styled.controllButtonsDiv>
             <styled.EditButton onClick={() => handleEditButtonClick(user._id)}>
               <SVGEdit width="20" height="20" />
@@ -234,7 +233,6 @@ const Users = ({ toastMessage, modalMessage, modalInfo, openPage }) => {
             <span>Foto</span>
             <span>Nome</span>
             <span>Email</span>
-            <span>Páginas</span>
             <span>Controles</span>
           </styled.infoPartDiv>
         </styled.filterAndInfoDiv>

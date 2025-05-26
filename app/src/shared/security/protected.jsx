@@ -59,6 +59,7 @@ const ProtectedRouter = () => {
       path: "home",
       name: "Home",
       isRestricted: false,
+      isAdmRequired: false,
       component: <Home />,
       icon: <SVGHome width="40" height="40" />,
       small: <SVGHome />,
@@ -68,6 +69,7 @@ const ProtectedRouter = () => {
       name: "Controle HH",
       group: "HH campo",
       isRestricted: true,
+      isAdmRequired: false,
       component: (
         <ControleHH
           toastMessage={setToastMessage}
@@ -82,6 +84,7 @@ const ProtectedRouter = () => {
       name: "Histórico HH",
       group: "HH campo",
       isRestricted: true,
+      isAdmRequired: false,
       component: (
         <Historico
           windowHeight={windowHeight}
@@ -98,6 +101,7 @@ const ProtectedRouter = () => {
       name: "Gestão HH",
       group: "HH campo",
       isRestricted: true,
+      isAdmRequired: true,
       component: (
         <GestaoHH
           windowHeight={windowHeight}
@@ -114,6 +118,7 @@ const ProtectedRouter = () => {
       name: "Administrativo",
       group: "Administração",
       isRestricted: true,
+      isAdmRequired: true,
       component: (
         <Adm
           windowHeight={windowHeight}
@@ -127,7 +132,6 @@ const ProtectedRouter = () => {
     },
   ];
 
-  // -Whachers de mudancas useEffect- >
   useEffect(() => {
     const handleResize = () => {
       setWindowHeight(window.innerHeight);
@@ -156,21 +160,13 @@ const ProtectedRouter = () => {
   }, [dispatch, isAuthenticated]);
 
   const renderPageContent = () => {
-    const currentPage = normalizeString(
-      location.pathname.substring(1).toLowerCase()
-    );
-
-    const page = pages.find((p) => normalizeString(p.path) === currentPage);
+    const page = getPageData();
 
     if (!page) return <Error404 />;
 
     if (!page.isRestricted) return page.component;
 
-    const allowedPages = user.pages.map((page) =>
-      normalizeString(page.toLowerCase())
-    );
-
-    if (!allowedPages.includes(currentPage)) {
+    if (page.isAdmRequired && !user.isManager) {
       return <Error404 />;
     }
 

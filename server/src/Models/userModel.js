@@ -35,10 +35,6 @@ const userSchema = new mongoose.Schema({
     type: Boolean,
     default: true,
   },
-  pages: {
-    type: [String],
-    default: [],
-  },
 });
 
 userSchema.pre("save", async function (next) {

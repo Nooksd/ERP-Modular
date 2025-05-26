@@ -7,13 +7,11 @@ import { fetchEmployees } from "../../../../store/slicers/employeeSlicer.js";
 
 const AddUser = ({ toastMessage, editData }) => {
   const employees = useSelector((state) => state.employees);
-  const [pages, setPages] = useState([]);
 
   const [nameError, setNameError] = useState(false);
   const [emailError, setEmailError] = useState(false);
   const [passwordError, setPasswordError] = useState(false);
   const [employeeIdError, setEmployeeIdError] = useState(false);
-  const [pagesError, setPagesError] = useState([]);
 
   const [userInfo, setUserInfo] = useState({
     name: "",
@@ -22,22 +20,15 @@ const AddUser = ({ toastMessage, editData }) => {
     password: "",
     employeeId: "",
     isManager: false,
-    pages: [],
   });
 
   const dispatch = useDispatch();
-
-  const addPageRef = useRef(null);
 
   useEffect(() => {
     if (!employees || employees.status !== "succeeded") {
       dispatch(fetchEmployees());
     }
   }, [dispatch]);
-
-  useEffect(() => {
-    getPages();
-  }, []);
 
   useEffect(() => {
     if (editData) {
@@ -48,30 +39,6 @@ const AddUser = ({ toastMessage, editData }) => {
   const handleInputChange = (event) => {
     const { name, value } = event.target;
     setUserInfo({ ...userInfo, [name]: value });
-  };
-
-  const handleRemovePage = (index) => {
-    setUserInfo((prevInfo) => ({
-      ...prevInfo,
-      pages: prevInfo.pages.filter((_, i) => i !== index),
-    }));
-  };
-
-  const handleAddNewEmpityPage = () => {
-    setUserInfo((prevInfo) => ({
-      ...prevInfo,
-      pages: [...prevInfo.pages, ""],
-    }));
-
-    setTimeout(() => {
-      addPageRef.current?.scrollIntoView({ behavior: "smooth" });
-    }, 10);
-  };
-
-  const handleSelectPage = (page, index) => {
-    const newPages = [...userInfo.pages];
-    newPages[index] = page;
-    setUserInfo({ ...userInfo, pages: newPages });
   };
 
   const handleSubmit = async () => {
@@ -133,25 +100,12 @@ const AddUser = ({ toastMessage, editData }) => {
       setEmployeeIdError(false);
     }
 
-    userInfo.pages.map((page, index) => {
-      if (page === "") {
-        const newPageErrors = [...pagesError];
-        newPageErrors[index] = true;
-        setPagesError(newPageErrors);
-        isValid = false;
-      } else {
-        const newPageErrors = [...pagesError];
-        newPageErrors[index] = false;
-        setPagesError(newPageErrors);
-      }
-    });
-
     return isValid;
   }
 
   async function getUserInfo() {
     try {
-      const response = await innovaApi.get(`/user/${editData}`);
+      const response = await innovaApi.get(`/user/get-one/${editData}`);
       const result = response.data.user;
 
       const newUserInfo = {
@@ -161,7 +115,6 @@ const AddUser = ({ toastMessage, editData }) => {
         email: result.email,
         password: "",
         isManager: result.isManager,
-        pages: result.pages,
       };
 
       setUserInfo(newUserInfo);
@@ -176,20 +129,6 @@ const AddUser = ({ toastMessage, editData }) => {
         danger: true,
         title: "Erro",
         message: "Erro ao buscar dados do usuário",
-      });
-    }
-  }
-
-  async function getPages() {
-    try {
-      const response = await innovaApi.get("/page/get-all");
-      const result = response.data.pages;
-      setPages(result);
-    } catch (e) {
-      toastMessage({
-        danger: true,
-        title: "Erro",
-        message: "Erro ao buscar páginas",
       });
     }
   }
@@ -270,49 +209,6 @@ const AddUser = ({ toastMessage, editData }) => {
           </styled.formDiv>
         </styled.formManagerAndSubmitButtonDiv>
         <styled.formManagerAndSubmitButtonDiv>
-          <styled.formManagerDiv>
-            {userInfo.pages.map((page, index) => (
-              <styled.managerAndButtonDiv key={index}>
-                <styled.formManagerSelect
-                  $error={pagesError[index]}
-                  value={page}
-                  onChange={(e) => handleSelectPage(e.target.value, index)}
-                >
-                  <option value="">Selecionar página</option>
-                  {pages.map((page) => {
-                    if (
-                      userInfo.pages.includes(page.title) &&
-                      userInfo.pages[index] !== page.title
-                    )
-                      return null;
-                    return (
-                      <option key={page.title} value={page.title}>
-                        {page.title}
-                      </option>
-                    );
-                  })}
-                </styled.formManagerSelect>
-                <styled.formManagerButton
-                  onClick={() => handleRemovePage(index)}
-                >
-                  -
-                </styled.formManagerButton>
-              </styled.managerAndButtonDiv>
-            ))}
-            <styled.managerAndButtonDiv>
-              {userInfo.pages.length === 0 && (
-                <styled.addNewText>Adicionar acesso a página</styled.addNewText>
-              )}
-              <styled.formManagerButton
-                style={{ borderRadius: "5pc" }}
-                $new={true}
-                onClick={() => handleAddNewEmpityPage()}
-                ref={addPageRef}
-              >
-                +
-              </styled.formManagerButton>
-            </styled.managerAndButtonDiv>
-          </styled.formManagerDiv>
           <styled.formSubmitButton onClick={(e) => handleSubmit(e)}>
             Enviar
           </styled.formSubmitButton>

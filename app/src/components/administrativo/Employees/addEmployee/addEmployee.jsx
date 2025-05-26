@@ -324,8 +324,8 @@ const AddEmployee = ({ toastMessage, editData }) => {
             >
               <option value="">Selecionar funcionário</option>
               {roles &&
-                roles.map((role) => (
-                  <option key={role.id} value={role.role}>
+                roles.map((role, index) => (
+                  <option key={index} value={role.role}>
                     {role.role}
                   </option>
                 ))}
