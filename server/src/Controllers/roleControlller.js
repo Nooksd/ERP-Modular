@@ -3,7 +3,7 @@ import Role from "../Models/roleModel.js";
 class RoleController {
   static async createRole(req, res) {
     try {
-      if (!req.user.user.pages.includes("Administrativo")) {
+      if (!req.user.user.isManager) {
         return res.status(403).json({
           message: "Sem permissão",
           status: false,
@@ -51,7 +51,7 @@ class RoleController {
 
   static async getRole(req, res) {
     try {
-      if (!req.user.user.pages.includes("Administrativo")) {
+      if (!req.user.user.isManager) {
         return res.status(403).json({
           message: "Sem permissão",
           status: false,
@@ -84,7 +84,7 @@ class RoleController {
 
   static async updateRole(req, res) {
     try {
-      if (!req.user.user.pages.includes("Administrativo")) {
+      if (!req.user.user.isManager) {
         return res.status(403).json({
           message: "Sem permissão",
           status: false,
@@ -141,7 +141,7 @@ class RoleController {
 
   static async getAllRoles(req, res) {
     try {
-      if (!req.user.user.pages.includes("Administrativo")) {
+      if (!req.user.user.isManager) {
         return res.status(403).json({
           message: "Sem permissão",
           status: false,
@@ -218,7 +218,7 @@ class RoleController {
 
   static async deleteRole(req, res) {
     try {
-      if (!req.user.user.pages.includes("Administrativo")) {
+      if (!req.user.user.isManager) {
         return res.status(403).json({
           message: "Sem permissão",
           status: false,
