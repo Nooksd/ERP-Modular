@@ -5,7 +5,7 @@ import { Fragment, useEffect, useState, useCallback, useRef } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { fetchUserWorks } from "../../store/slicers/worksSlicer.js";
 import { innovaApi } from "../../services/http.js";
-import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
+// import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
 
 import * as styled from "./gestaoHHStyles.js";
 
@@ -473,8 +473,6 @@ export const GestaoHH = ({ windowHeight, toastMessage }) => {
         totalOrcado === 0 ? 0 : Math.round((pred / totalOrcado) * 100)
       );
 
-      console.log(data3, data4);
-
       setImportedData({
         labels: sortedMergedLabels,
         data: alignedRealData,
@@ -742,7 +740,6 @@ export const GestaoHH = ({ windowHeight, toastMessage }) => {
   }
 
   function calculateHours(role, accumulators, comparison = false) {
-    console.log(role);
     if (!comparison) {
       accumulators.normal(
         role.quantity * isNaN(role.hours) ? 0 : role.quantity * role.hours

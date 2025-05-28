@@ -9,13 +9,14 @@ const app = express();
 const port = process.env.PORT;
 
 import "./db/database.js";
-import UserRoutes from "./src/Routes/UserRoutes.js";
-import HHControllerRoutes from "./src/Routes/ControleHHRoutes.js";
-import WorkRoutes from "./src/Routes/WorkRoutes.js";
-import EmployeeRoutes from "./src/Routes/EmployeeRoutes.js";
+import UserRoutes from "./src/Routes/userRoutes.js";
+import HHControllerRoutes from "./src/Routes/controleHHRoutes.js";
+import WorkRoutes from "./src/Routes/workRoutes.js";
+import EmployeeRoutes from "./src/Routes/employeeRoutes.js";
 import ActivityRoutes from "./src/Routes/activityRoutes.js";
-import RoleRoutes from "./src/Routes/RoleRoutes.js";
+import RoleRoutes from "./src/Routes/roleRoutes.js";
 import PredictedRoutes from "./src/Routes/predictedRoutes.js";
+import SliderRoutes from "./src/Routes/sliderRoutes.js";
 
 app.use(
   cors({
@@ -43,6 +44,8 @@ app.use("/api/predicted", PredictedRoutes);
 app.use("/api/employee", EmployeeRoutes);
 app.use("/api/activity", ActivityRoutes);
 app.use("/api/role", RoleRoutes);
+app.use("/api/slider", SliderRoutes);
+app.use("/api/slider", SliderRoutes);
 
 app.use("/*", (req, res) => {
   res.status(404).json({

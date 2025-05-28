@@ -1,6 +1,7 @@
 import express from "express";
 import JWT from "../Middlewares/jsonwebtoken.js";
 import SliderController from "../Controllers/sliderController.js";
+import multer from "multer";
 
 const SliderRoutes = express.Router();
 
@@ -12,7 +13,7 @@ SliderRoutes.post(
   JWT.validateAccessToken,
   SliderController.createSlider
 );
-SliderRoutes.get("/get", JWT.validateAccessToken, SliderController.getSlider);
+SliderRoutes.get("/", JWT.validateAccessToken, SliderController.getSlider);
 SliderRoutes.put(
   "/update",
   JWT.validateAccessToken,
@@ -24,8 +25,8 @@ SliderRoutes.post(
   upload.single("image"),
   SliderController.sendImage
 );
-SliderRoutes.post(
-  "/get-image",
+SliderRoutes.get(
+  "/get-image/:link",
   JWT.validateAccessToken,
   SliderController.getImage
 );

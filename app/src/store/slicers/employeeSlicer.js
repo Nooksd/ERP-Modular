@@ -9,7 +9,7 @@ export const fetchEmployees = createAsyncThunk(
   }
 );
 
-const employeeslicer = createSlice({
+const employeeSlicer = createSlice({
   name: "employees",
   initialState: { employees: [], status: "idle", error: null },
   reducers: {},
@@ -29,4 +29,4 @@ const employeeslicer = createSlice({
   },
 });
 
-export default employeeslicer.reducer;
+export default employeeSlicer.reducer;

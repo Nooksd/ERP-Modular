@@ -25,6 +25,7 @@ import SVGHHControll from "../icons/hamburguer/HHControll_icon";
 import SVGHistory from "../icons/hamburguer/History_icon";
 import SVGControll from "../icons/hamburguer/Controll_icon";
 import SVGPersonConfig from "../icons/hamburguer/PersonConfig_icon";
+import { Slider } from "../../components/slider/slider";
 
 const ProtectedRouter = () => {
   const [isLoading, setIsLoading] = useState(true);
@@ -58,8 +59,6 @@ const ProtectedRouter = () => {
     {
       path: "home",
       name: "Home",
-      isRestricted: false,
-      isAdmRequired: false,
       component: <Home />,
       icon: <SVGHome width="40" height="40" />,
       small: <SVGHome />,
@@ -67,9 +66,7 @@ const ProtectedRouter = () => {
     {
       path: "controlehh",
       name: "Controle HH",
-      group: "HH campo",
       isRestricted: true,
-      isAdmRequired: false,
       component: (
         <ControleHH
           toastMessage={setToastMessage}
@@ -82,9 +79,7 @@ const ProtectedRouter = () => {
     {
       path: "historicohh",
       name: "Histórico HH",
-      group: "HH campo",
       isRestricted: true,
-      isAdmRequired: false,
       component: (
         <Historico
           windowHeight={windowHeight}
@@ -99,7 +94,6 @@ const ProtectedRouter = () => {
     {
       path: "gestaohh",
       name: "Gestão HH",
-      group: "HH campo",
       isRestricted: true,
       isAdmRequired: true,
       component: (
@@ -116,7 +110,6 @@ const ProtectedRouter = () => {
     {
       path: "administrativo",
       name: "Administrativo",
-      group: "Administração",
       isRestricted: true,
       isAdmRequired: true,
       component: (
@@ -129,6 +122,13 @@ const ProtectedRouter = () => {
       ),
       icon: <SVGPersonConfig width="30" height="30" />,
       small: <SVGPersonConfig />,
+    },
+    {
+      path: "slider",
+      isRestricted: true,
+      isAdmRequired: true,
+      noHude: true,
+      component: <Slider windowHeight={windowHeight} />,
     },
   ];
 
@@ -164,9 +164,9 @@ const ProtectedRouter = () => {
 
     if (!page) return <Error404 />;
 
-    if (!page.isRestricted) return page.component;
+    if (!page?.isRestricted) return page.component;
 
-    if (page.isAdmRequired && !user.isManager) {
+    if (page?.isAdmRequired && !user.isManager) {
       return <Error404 />;
     }
 
@@ -189,6 +189,10 @@ const ProtectedRouter = () => {
   }
 
   const pageData = getPageData();
+
+  if (pageData && pageData.noHude) {
+    return pageData.component;
+  }
 
   return (
     <NavbarMenuContentContainer>

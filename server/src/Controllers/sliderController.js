@@ -3,10 +3,11 @@ import fs from "fs";
 import path from "path";
 import { v4 as uuidv4 } from "uuid";
 import { fileURLToPath } from "url";
+import mongoose from "mongoose";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const uploadDir = path.join(__dirname, "../uploads");
+const uploadDir = path.join(__dirname, "../../uploads");
 
 if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true });
@@ -111,17 +112,22 @@ class SliderController {
       const oldImageLinks = slider.items
         .filter((item) => item.type === "image")
         .map((item) => item.link);
+
       const newImageLinks = req.body.items
         .filter((item) => item.type === "image")
         .map((item) => item.link);
+
       const removedLinks = oldImageLinks.filter(
         (link) => !newImageLinks.includes(link)
       );
 
       slider.items = req.body.items;
+
       await slider.save();
 
-      await this.deleteUnusedImages(removedLinks);
+      if (removedLinks.length > 0) {
+        await this.deleteUnusedImages(removedLinks);
+      }
 
       res.status(200).json({
         message: "Slider atualizado com sucesso",
@@ -181,8 +187,8 @@ class SliderController {
 
   static async getImage(req, res) {
     try {
-      const { fileName } = req.body;
-      const imagePath = path.join(uploadDir, fileName);
+      const { link } = req.params;
+      const imagePath = path.join(uploadDir, link);
 
       if (!fs.existsSync(imagePath)) {
         return res.status(404).json({
@@ -201,4 +207,4 @@ class SliderController {
   }
 }
 
-export default SliderController();
+export default SliderController;

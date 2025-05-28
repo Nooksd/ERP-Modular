@@ -1,4 +1,4 @@
-import Predicted from "../Models/PredictedModel.js";
+import Predicted from "../Models/predictedModel.js";
 import Work from "../Models/workModel.js";
 import XLSX from "xlsx";
 
