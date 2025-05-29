@@ -13,7 +13,7 @@ const sliderItemSchema = new mongoose.Schema({
   time: {
     type: Number,
     required: true,
-    min: 5,
+    min: 2000,
   },
   link: {
     type: String,
@@ -21,6 +21,7 @@ const sliderItemSchema = new mongoose.Schema({
   },
   filter: {
     type: Boolean,
+    required: true,
     default: false,
   },
 });

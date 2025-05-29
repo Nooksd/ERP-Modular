@@ -113,7 +113,7 @@ class ActivityController {
 
   static async getActivity(req, res) {
     try {
-      if (!req.user.user.pages.includes("Administrativo")) {
+      if (!req.user.user.isManager) {
         return res.status(403).json({
           message: "Sem permissão",
           status: false,
@@ -146,7 +146,7 @@ class ActivityController {
 
   static async updateActivity(req, res) {
     try {
-      if (!req.user.user.pages.includes("Administrativo")) {
+      if (!req.user.user.isManager) {
         return res.status(403).json({
           message: "Sem permissão",
           status: false,
@@ -198,7 +198,7 @@ class ActivityController {
 
   static async deleteActivity(req, res) {
     try {
-      if (!req.user.user.pages.includes("Administrativo")) {
+      if (!req.user.user.isManager) {
         return res.status(403).json({
           message: "Sem permissão",
           status: false,

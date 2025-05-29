@@ -1,4 +1,4 @@
-import { Fragment, useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef } from "react";
 import { innovaApi } from "@/services/http.js";
 
 import * as styled from "../sliderStyles.js";
@@ -13,11 +13,10 @@ import SVGTime from "@/shared/icons/gestaoHH/Time_icon.jsx";
 import SVGTimeE1 from "@/shared/icons/gestaoHH/TimeE1_icon.jsx";
 import SVGTimeE2 from "@/shared/icons/gestaoHH/TimeE2.jsx";
 
-export const Dashboard = ({ selectedWork }) => {
+export const Dashboard = ({ selectedWork, toggleFilters, position }) => {
   const [workData, setWorkData] = useState();
   const [predictedData, setPredictedData] = useState();
 
-  const [recordDate, setRecordDate] = useState([]);
   const [importedData, setImportedData] = useState({});
   const [importedDataRoles, setImportedDataRoles] = useState({});
 
@@ -66,6 +65,14 @@ export const Dashboard = ({ selectedWork }) => {
   ];
 
   useEffect(() => {
+    if (position === 0) {
+      activateFilters();
+    } else if (position === 2) {
+      setFilter({ ...filter, comparison: 0 });
+    }
+  }, [position]);
+
+  useEffect(() => {
     if ((workData && predictedData) || workData) {
       organizeGraph();
       organizeSecondGraph();
@@ -97,22 +104,9 @@ export const Dashboard = ({ selectedWork }) => {
 
           setWorkData(real);
           setPredictedData(predicted);
-
-          getDate(predicted, real);
-          toastMessage({
-            danger: false,
-            title: "Sucesso",
-            message: realData.message,
-          });
         }
       } catch (e) {
-        if (isMounted) {
-          toastMessage({
-            danger: true,
-            title: "Erro",
-            message: e.message,
-          });
-        }
+        console.log(e);
       }
     }
 
@@ -132,14 +126,6 @@ export const Dashboard = ({ selectedWork }) => {
 
     if (predictedData) {
       predictedData.forEach((record) => {
-        const year = record.date.substring(0, 4);
-        const monthNumber =
-          record.date.substring(5, 6) == 0
-            ? record.date.substring(6, 7)
-            : record.date.substring(5, 7);
-
-        if (timeFilter(year, monthNumber)) return;
-
         if (filter?.comparison === 1 || filter?.comparison === 0)
           totalPrevisto += record.hours;
         if (filter?.comparison === 3 || filter?.comparison === 0)
@@ -147,15 +133,6 @@ export const Dashboard = ({ selectedWork }) => {
       });
 
       workData.forEach((record) => {
-        const date = new Date(record.date);
-        const year = record.date.substring(0, 4);
-        const monthNumber =
-          record.date.substring(5, 6) == 0
-            ? record.date.substring(6, 7)
-            : record.date.substring(5, 7);
-
-        if (timeFilter(year, monthNumber)) return;
-
         record.hhRecords.forEach((hhRecord) => {
           hhRecord.roles.forEach((role) => {
             calculateHours(
@@ -193,12 +170,6 @@ export const Dashboard = ({ selectedWork }) => {
         3
       );
       const fullMonth = meses[parseInt(hhRecord.date.substring(5, 7)) - 1];
-      const monthNumber =
-        hhRecord.date.substring(5, 6) == 0
-          ? hhRecord.date.substring(6, 7)
-          : hhRecord.date.substring(5, 7);
-
-      if (timeFilter(year, monthNumber)) return;
 
       const uniqueIndex = filter.year ? fullMonth : `${month}-${year}`;
 
@@ -240,12 +211,6 @@ export const Dashboard = ({ selectedWork }) => {
       );
 
       const fullMonth = meses[parseInt(record.date.substring(5, 7)) - 1];
-      const monthNumber =
-        record.date.substring(5, 6) == 0
-          ? record.date.substring(6, 7)
-          : record.date.substring(5, 7);
-
-      if (timeFilter(year, monthNumber)) return;
 
       const uniqueIndex = filter.year ? fullMonth : `${month}-${year}`;
 
@@ -345,10 +310,8 @@ export const Dashboard = ({ selectedWork }) => {
         return index !== -1 ? sortedPredictedData[index] : 0;
       });
 
-      // Calcular o total orçado
       const totalOrcado = predictedDataArray.reduce((acc, val) => acc + val, 0);
 
-      // Calcular data3 e data4
       const data3 = alignedRealData.map((real) =>
         totalOrcado === 0 ? 0 : Math.round((real / totalOrcado) * 100)
       );
@@ -376,14 +339,6 @@ export const Dashboard = ({ selectedWork }) => {
     const data = [];
 
     workData.forEach((hhRecord) => {
-      const year = hhRecord.date.substring(0, 4);
-      const monthNumber =
-        hhRecord.date.substring(5, 6) == 0
-          ? hhRecord.date.substring(6, 7)
-          : hhRecord.date.substring(5, 7);
-
-      if (timeFilter(year, monthNumber)) return;
-
       hhRecord.hhRecords.forEach((record) => {
         record.roles.forEach((role) => {
           let labelIndex = labels.indexOf(role.role);
@@ -419,14 +374,6 @@ export const Dashboard = ({ selectedWork }) => {
     let totalHHExtra2 = 0;
 
     workData.forEach((hhRecord) => {
-      const year = hhRecord.date.substring(0, 4);
-      const monthNumber =
-        hhRecord.date.substring(5, 6) == 0
-          ? hhRecord.date.substring(6, 7)
-          : hhRecord.date.substring(5, 7);
-
-      if (timeFilter(year, monthNumber)) return;
-
       hhRecord.hhRecords.forEach((record) => {
         record.roles.forEach((role) => {
           calculateHours(role, {
@@ -450,14 +397,6 @@ export const Dashboard = ({ selectedWork }) => {
     let extra2 = 0;
 
     predictedData.forEach((record) => {
-      const year = record.date.substring(0, 4);
-      const monthNumber =
-        record.date.substring(5, 6) == 0
-          ? record.date.substring(6, 7)
-          : record.date.substring(5, 7);
-
-      if (timeFilter(year, monthNumber)) return;
-
       normal += record.hours;
       extra2 += record.extras;
     });
@@ -465,59 +404,6 @@ export const Dashboard = ({ selectedWork }) => {
     setTotalNormalPredicted(normal);
     setTotalExtra2Predicted(extra2);
   };
-
-  function getDate(predicted, actual) {
-    let newRecordDate = [...recordDate];
-
-    if (predicted) {
-      predicted.forEach((hhRecord) => {
-        const year = hhRecord.date.substring(0, 4);
-        const month = meses[parseInt(hhRecord.date.substring(5, 7)) - 1];
-
-        let yearRecord = newRecordDate.find((date) => date.ano == year);
-
-        if (yearRecord) {
-          if (!yearRecord.meses.includes(month)) {
-            yearRecord.meses.push(month);
-            yearRecord.meses.sort(
-              (a, b) => meses.indexOf(a) - meses.indexOf(b)
-            );
-          }
-        } else {
-          newRecordDate.push({
-            ano: year,
-            meses: [month],
-          });
-        }
-      });
-    }
-
-    actual.forEach((hhRecord) => {
-      const year = hhRecord.date.substring(0, 4);
-      const month = meses[parseInt(hhRecord.date.substring(5, 7)) - 1];
-
-      let yearRecord = newRecordDate.find((date) => date.ano == year);
-
-      if (yearRecord) {
-        if (!yearRecord.meses.includes(month)) {
-          yearRecord.meses.push(month);
-          yearRecord.meses.sort((a, b) => meses.indexOf(a) - meses.indexOf(b));
-        }
-      } else {
-        newRecordDate.push({
-          ano: year,
-          meses: [month],
-        });
-      }
-    });
-
-    newRecordDate.sort((a, b) => a.ano - b.ano);
-
-    if (newRecordDate.length === 1)
-      setFilter({ ...filter, year: newRecordDate[0].ano });
-
-    setRecordDate(newRecordDate);
-  }
 
   function calculateHours(role, accumulators, comparison = false) {
     if (!comparison) {
@@ -563,36 +449,40 @@ export const Dashboard = ({ selectedWork }) => {
     }
   }
 
-  function timeFilter(year, monthNumber) {
-    if (filter.year && year !== filter.year) return true;
-    if (filter.startDate) {
-      const selectedMonth = recordDate.find(
-        (date) => date.ano === filter.startDate.slice(0, 4)
-      ).meses[filter.startDate.slice(5, 7)];
+  const [filterIndex, setFilterIndex] = useState(0);
+  const filterInterval = useRef(null);
 
-      if (year < filter.startDate.slice(0, 4)) return true;
+  function activateFilters() {
+    if (toggleFilters > 5000) {
+      const timePerFilter = toggleFilters / 4;
 
-      if (
-        year === filter.startDate.slice(0, 4) &&
-        monthNumber < meses.indexOf(selectedMonth) + 1
-      )
-        return true;
+      if (filterInterval.current) clearInterval(filterInterval.current);
+
+      filterInterval.current = setInterval(() => {
+        setFilterIndex((prev) => prev + 1);
+      }, timePerFilter);
     }
-    if (filter.endDate) {
-      const selectedMonth = recordDate.find(
-        (date) => date.ano === filter.endDate.slice(0, 4)
-      ).meses[filter.endDate.slice(5, 7)];
-
-      if (year > filter.endDate.slice(0, 4)) return true;
-      if (
-        year === filter.endDate.slice(0, 4) &&
-        monthNumber > meses.indexOf(selectedMonth) + 1
-      )
-        return true;
-    }
-
-    return false;
   }
+
+  useEffect(() => {
+    if (filterIndex === 0) return;
+    if (filterIndex >= 3) {
+      clearInterval(filterInterval.current);
+      setFilterIndex(0);
+    }
+
+    switch (filterIndex) {
+      case 1:
+        setFilter({ ...filter, comparison: 1 });
+        break;
+      case 2:
+        setFilter({ ...filter, comparison: 2 });
+        break;
+      case 3:
+        setFilter({ ...filter, comparison: 3 });
+        break;
+    }
+  }, [filterIndex]);
 
   return (
     <>
@@ -751,46 +641,6 @@ export const Dashboard = ({ selectedWork }) => {
           "Usina não selecionada"
         )}
       </styled.smallGraphContainer>
-      <styled.monthSelectorContainer>
-        {recordDate.map((date, dateIndex) => {
-          if (date.ano === filter.year || filter.year === "") {
-            return date.meses.map((mes, monthIndex) => {
-              const uniqueIndex = `${date.ano}-${monthIndex}`;
-              return (
-                <Fragment key={`month-select-${uniqueIndex}`}>
-                  <styled.monthSelect
-                    key={`month-select-${uniqueIndex}`}
-                    $selected={
-                      filter.startDate === uniqueIndex ||
-                      filter.endDate === uniqueIndex
-                    }
-                    $between={
-                      uniqueIndex > filter.startDate &&
-                      uniqueIndex < filter.endDate
-                    }
-                  >
-                    {filter.year ? mes : mes.slice(0, 3)}
-                  </styled.monthSelect>
-
-                  {(monthIndex + 1 !== date.meses.length ||
-                    (dateIndex + 1 !== recordDate.length && !filter.year)) && (
-                    <styled.monthLine
-                      key={`monthLine-${uniqueIndex}`}
-                      $between={
-                        (uniqueIndex > filter.startDate &&
-                          uniqueIndex < filter.endDate) ||
-                        (filter.startDate === uniqueIndex &&
-                          filter.endDate &&
-                          filter.startDate !== filter.endDate)
-                      }
-                    />
-                  )}
-                </Fragment>
-              );
-            });
-          }
-        })}
-      </styled.monthSelectorContainer>
     </>
   );
 };

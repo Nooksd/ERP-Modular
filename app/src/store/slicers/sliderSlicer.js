@@ -33,7 +33,7 @@ const sliderSlicer = createSlice({
       })
       .addCase(fetchSlider.fulfilled, (state, action) => {
         state.status = "succeeded";
-        state.items = action.payload.slider;
+        state.items = action.payload.slider.items;
       })
       .addCase(fetchSlider.rejected, (state, action) => {
         state.status = "failed";
@@ -46,7 +46,7 @@ const sliderSlicer = createSlice({
       })
       .addCase(updateSlider.fulfilled, (state, action) => {
         state.status = "succeeded";
-        state.items = action.payload.slider;
+        state.items = action.payload.slider.items;
       })
       .addCase(updateSlider.rejected, (state, action) => {
         state.status = "failed";

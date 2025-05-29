@@ -6,6 +6,7 @@ import activitySlicer from "./slicers/activitySlicer.js";
 import fieldRoleSlicer from "./slicers/fieldRoleSlicer.js";
 import appUsersSlicer from "./slicers/appUsersSlicer.js";
 import employeeSlicer from "./slicers/employeeSlicer.js";
+import sliderSlicer from "./slicers/sliderSlicer.js";
 
 const store = configureStore({
   reducer: {
@@ -16,6 +17,7 @@ const store = configureStore({
     fieldRoles: fieldRoleSlicer,
     appUsers: appUsersSlicer,
     employees: employeeSlicer,
+    slider: sliderSlicer,
   },
 });
 
