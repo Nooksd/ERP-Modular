@@ -12,10 +12,8 @@ class WorkController {
 
       const { workId } = req.params;
 
-      
       const work = await Work.findById(workId).exec();
 
-      
       if (!work) {
         return res.status(404).json({
           message: "Obra não encontrada",
@@ -38,9 +36,15 @@ class WorkController {
 
   static async getUserWorks(req, res) {
     try {
-      const userId = req.user.user._id;
+      const user = req.user.user;
 
-      const userWorks = await Work.find({ managerIds: userId, isActive: true });
+      let userWorks;
+
+      if (user.isManager) {
+        userWorks = await Work.find({ isActive: true });
+      } else {
+        userWorks = await Work.find({ managerIds: user._id, isActive: true });
+      }
 
       if (!userWorks.length) {
         return res.status(404).json({
@@ -127,7 +131,7 @@ class WorkController {
           status: false,
         });
       }
-      
+
       const {
         page = 1,
         limit = 10,

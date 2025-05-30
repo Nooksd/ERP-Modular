@@ -7,14 +7,16 @@ import { fileURLToPath } from "url";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-async function isManegerOnWork(projectId, userId) {
+async function isManegerOnWork(projectId, user) {
   try {
+    if (user.isManager) return true;
+
     const work = await Work.findById(projectId);
 
     if (!work) return false;
 
     const isManager = work.managerIds.some((managerId) =>
-      managerId.equals(userId)
+      managerId.equals(user._id)
     );
 
     if (!isManager) return false;
@@ -36,9 +38,9 @@ class HHControllController {
         });
       }
 
-      const userId = req.user.user._id;
+      const user = req.user.user;
 
-      const isManager = await isManegerOnWork(projectId, userId);
+      const isManager = await isManegerOnWork(projectId, user);
 
       if (!isManager) {
         return res.status(403).json({
@@ -103,7 +105,7 @@ class HHControllController {
       }
 
       HHrecords.create({
-        userId,
+        userId: user._id,
         projectId,
         hhRecords,
         date: new Date(date),
@@ -124,7 +126,7 @@ class HHControllController {
   static async getLastHHRecord(req, res) {
     try {
       const { projectId } = req.params;
-      const userId = req.user.user._id;
+      const user = req.user.user;
 
       if (!projectId) {
         return res.status(400).json({
@@ -133,7 +135,7 @@ class HHControllController {
         });
       }
 
-      const isManager = await isManegerOnWork(projectId, userId);
+      const isManager = await isManegerOnWork(projectId, user);
 
       if (!isManager) {
         return res.status(403).json({
@@ -170,7 +172,7 @@ class HHControllController {
   static async getHHRecordsByProject(req, res) {
     try {
       const { projectId } = req.params;
-      const userId = req.user.user._id;
+      const user = req.user.user;
 
       if (!projectId) {
         return res.status(400).json({
@@ -179,7 +181,7 @@ class HHControllController {
         });
       }
 
-      const isManager = await isManegerOnWork(projectId, userId);
+      const isManager = await isManegerOnWork(projectId, user);
 
       if (!isManager) {
         return res.status(403).json({
@@ -246,7 +248,7 @@ class HHControllController {
   static async deleteRecord(req, res) {
     try {
       const { recordId } = req.params;
-      const userId = req.user.user._id;
+      const user = req.user.user;
 
       if (!recordId) {
         return res.status(400).json({
@@ -259,7 +261,7 @@ class HHControllController {
         .select(" projectId ")
         .exec();
 
-      const isManager = await isManegerOnWork(projectId.projectId, userId);
+      const isManager = await isManegerOnWork(projectId.projectId, user);
 
       if (!isManager) {
         return res.status(403).json({
@@ -292,7 +294,7 @@ class HHControllController {
   static async getHHRecord(req, res) {
     try {
       const { recordId } = req.params;
-      const userId = req.user.user._id;
+      const user = req.user.user;
 
       if (!recordId) {
         return res.status(400).json({
@@ -305,7 +307,7 @@ class HHControllController {
         .select(" projectId ")
         .exec();
 
-      const isManager = await isManegerOnWork(projectId.projectId, userId);
+      const isManager = await isManegerOnWork(projectId.projectId, user);
 
       if (!isManager) {
         return res.status(403).json({
@@ -341,7 +343,7 @@ class HHControllController {
   static async updateRecord(req, res) {
     try {
       const { recordId } = req.params;
-      const userId = req.user.user._id;
+      const user = req.user.user;
       const { hhRecords } = req.body;
 
       if (!recordId) {
@@ -362,7 +364,7 @@ class HHControllController {
         .select(" projectId ")
         .exec();
 
-      const isManager = await isManegerOnWork(projectId.projectId, userId);
+      const isManager = await isManegerOnWork(projectId.projectId, user);
 
       if (!isManager) {
         return res.status(403).json({

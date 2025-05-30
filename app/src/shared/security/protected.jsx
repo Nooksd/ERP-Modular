@@ -26,6 +26,8 @@ import SVGHistory from "../icons/hamburguer/History_icon";
 import SVGControll from "../icons/hamburguer/Controll_icon";
 import SVGPersonConfig from "../icons/hamburguer/PersonConfig_icon";
 import { Slider } from "../../components/slider/slider";
+import SVGSlider from "../icons/slider/slider_icon";
+import { SliderManager } from "../../components/slider/sliderManager";
 
 const ProtectedRouter = () => {
   const [isLoading, setIsLoading] = useState(true);
@@ -106,6 +108,22 @@ const ProtectedRouter = () => {
       ),
       icon: <SVGControll width="35" height="35" />,
       small: <SVGControll />,
+    },
+    {
+      path: "contfigurar-slider",
+      name: "Slider",
+      isRestricted: true,
+      isAdmRequired: true,
+      component: (
+        <SliderManager
+          windowHeight={windowHeight}
+          toastMessage={setToastMessage}
+          modalMessage={setModalMessage}
+          modalInfo={modalMessage}
+        />
+      ),
+      icon: <SVGSlider width="30" height="30" />,
+      small: <SVGSlider />,
     },
     {
       path: "administrativo",

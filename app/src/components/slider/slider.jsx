@@ -21,14 +21,16 @@ export const Slider = ({ windowHeight }) => {
   const [currentSlide, setCurrentSlide] = useState(1);
 
   useEffect(() => {
-    dispatch(fetchSlider());
+    if (!items || items.length === 0) {
+      dispatch(fetchSlider());
+    }
   }, [dispatch]);
 
   useEffect(() => {
     if (items && items.length > 1) {
       setActiveSlide1({ ...items[0], position: 0, slider: 1 });
       setActiveSlide2({ ...items[1], position: 2, slider: 2 });
-      setCurrentIndex(0);
+      setCurrentIndex(1);
     }
   }, [items]);
 
@@ -130,8 +132,9 @@ export const Slider = ({ windowHeight }) => {
             $fullScreen={activeSlide1.filter}
           >
             <styled.image
-              src={`http://localhost:3000/api/slider/get-image/${activeSlide1.link}`}
+              src={`https://controll-api.innova-energy.com.br/api/slider/get-image/${activeSlide1.link}`}
               alt={activeSlide1.title}
+              $fullScreen={activeSlide1.filter}
             />
           </styled.imageContainer>
         )}
@@ -156,8 +159,9 @@ export const Slider = ({ windowHeight }) => {
             $fullScreen={activeSlide2.filter}
           >
             <styled.image
-              src={`http://localhost:3000/api/slider/get-image/${activeSlide2.link}`}
+              src={`https://controll-api.innova-energy.com.br/api/slider/get-image/${activeSlide2.link}`}
               alt={activeSlide2.title}
+              $fullScreen={activeSlide2.filter}
             />
           </styled.imageContainer>
         )}

@@ -2,14 +2,16 @@ import Predicted from "../Models/predictedModel.js";
 import Work from "../Models/workModel.js";
 import XLSX from "xlsx";
 
-async function isManagerOnWork(projectId, userId) {
+async function isManagerOnWork(projectId, user) {
   try {
+    if (user.isManager) return true;
+
     const work = await Work.findById(projectId);
 
     if (!work) return false;
 
     const isManager = work.managerIds.some((managerId) =>
-      managerId.equals(userId)
+      managerId.equals(user._id)
     );
 
     if (!isManager) return false;
@@ -25,7 +27,7 @@ const excelDateToJSDate = (excelDate) =>
 class PredictedController {
   static async sendPredicted(req, res) {
     try {
-      const userId = req.user.user._id;
+      const user = req.user.user;
       const { workId } = req.params;
 
       if (!req.file) {
@@ -36,7 +38,7 @@ class PredictedController {
         });
       }
 
-      const canManage = await isManagerOnWork(workId, userId);
+      const canManage = await isManagerOnWork(workId, user);
       if (!canManage) {
         return res.status(403).json({
           message: "Usuário não tem permissão para esta obra.",
@@ -96,7 +98,7 @@ class PredictedController {
 
   static async getPredicted(req, res) {
     try {
-      const userId = req.user.user._id;
+      const user = req.user.user;
       const { workId } = req.params;
 
       if (!workId) {
@@ -106,7 +108,7 @@ class PredictedController {
         });
       }
 
-      const canManage = await isManagerOnWork(workId, userId);
+      const canManage = await isManagerOnWork(workId, user);
       if (!canManage) {
         return res.status(403).json({
           message: "Usuário não tem permissão para esta obra.",
@@ -138,7 +140,7 @@ class PredictedController {
 
   static async deletePredicted(req, res) {
     try {
-      const userId = req.user.user._id;
+      const user = req.user.user;
       const { predictedId } = req.params;
 
       if (!predictedId) {
@@ -156,7 +158,7 @@ class PredictedController {
         });
       }
 
-      const canManage = await isManagerOnWork(predictedDoc.workId, userId);
+      const canManage = await isManagerOnWork(predictedDoc.workId, user);
       if (!canManage) {
         return res.status(403).json({
           message: "Usuário não tem permissão para excluir este registro.",

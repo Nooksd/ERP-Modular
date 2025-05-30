@@ -83,15 +83,6 @@ class SliderController {
     }
   }
 
-  static async deleteUnusedImages(removedLinks) {
-    removedLinks.forEach((link) => {
-      const imagePath = path.join(uploadDir, link);
-      if (fs.existsSync(imagePath)) {
-        fs.unlinkSync(imagePath);
-      }
-    });
-  }
-
   static async updateSlider(req, res) {
     try {
       if (!req.user.user.isManager) {
@@ -121,13 +112,19 @@ class SliderController {
         (link) => !newImageLinks.includes(link)
       );
 
+      if (removedLinks.length > 0) {
+        removedLinks.forEach((link) => {
+          const imagePath = path.join(uploadDir, link);
+
+          if (fs.existsSync(imagePath)) {
+            fs.unlinkSync(imagePath);
+          }
+        });
+      }
+
       slider.items = req.body.items;
 
       await slider.save();
-
-      if (removedLinks.length > 0) {
-        await this.deleteUnusedImages(removedLinks);
-      }
 
       res.status(200).json({
         message: "Slider atualizado com sucesso",

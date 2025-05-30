@@ -132,6 +132,7 @@ export const imageContainer = styled.div`
 
 export const image = styled.img`
   height: 100%;
+  ${(props) => props.$fullScreen && "width: 100%;"}
   z-index: 1000;
 `;
 

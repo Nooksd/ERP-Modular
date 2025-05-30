@@ -453,7 +453,7 @@ export const Dashboard = ({ selectedWork, toggleFilters, position }) => {
   const filterInterval = useRef(null);
 
   function activateFilters() {
-    if (toggleFilters > 5000) {
+    if (toggleFilters >= 2000) {
       const timePerFilter = toggleFilters / 4;
 
       if (filterInterval.current) clearInterval(filterInterval.current);
