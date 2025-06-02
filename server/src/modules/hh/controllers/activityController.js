@@ -1,4 +1,4 @@
-import Activity from "../Models/activityModel.js";
+import Activity from "../models/activityModel.js";
 
 class ActivityController {
   static async createActivity(req, res) {

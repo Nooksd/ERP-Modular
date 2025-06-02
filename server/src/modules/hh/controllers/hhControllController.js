@@ -1,5 +1,5 @@
-import HHrecords from "../Models/hhrecordsModel.js";
-import Work from "../Models/workModel.js";
+import HHrecords from "../models/hhrecordsModel.js";
+import Work from "../models/workModel.js";
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";

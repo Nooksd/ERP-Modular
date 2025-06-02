@@ -1,8 +1,8 @@
 // User Controller file
 
 import bcrypt from "bcrypt";
-import User from "../Models/userModel.js";
-import JWT from "../Middlewares/jsonwebtoken.js";
+import User from "../models/userModel.js";
+import JWT from "../../../core/middlewares/jsonwebtoken.js";
 
 class UserController {
   static async getProfile(req, res) {
@@ -43,6 +43,7 @@ class UserController {
       }
 
       const user = await User.findByEmail(email);
+      console.log(user);
       const isPasswordCorrect = await User.comparePassword(
         password,
         user?.password ?? ""

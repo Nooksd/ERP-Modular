@@ -14,6 +14,7 @@ export const userValidatorCheck = [
     .isLength({ min: 5, max: 16 })
     .withMessage("Senha prescisa ter entre 5 e 16 caracteres"),
 ];
+
 export const userLoginCheck = [
   check("email").normalizeEmail().isEmail().withMessage("Email Invalido"),
   check("password")

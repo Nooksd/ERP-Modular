@@ -1,8 +1,6 @@
 import mongoose from "mongoose";
 import bcrypt from "bcrypt";
 
-import Employee from "./employeesModel.js";
-
 const userSchema = new mongoose.Schema({
   name: {
     type: "string",
@@ -37,19 +35,9 @@ const userSchema = new mongoose.Schema({
   },
 });
 
-userSchema.pre("save", async function (next) {
-  if (this.isModified("employeeId")) {
-    const employee = await Employee.findById(this.employeeId);
-    if (employee) {
-      this.name = employee.name;
-    }
-  }
-  next();
-});
-
 userSchema.statics.isUnique = async function (email) {
   try {
-    if (!email) throw new Error("Dados invÃ¡lidos");
+    if (!email) throw new Error("Dados invalidos");
 
     const emailInDatabase = await this.findOne({ email });
 
@@ -63,15 +51,16 @@ userSchema.statics.isUnique = async function (email) {
 
 userSchema.statics.findByEmail = async function (email) {
   try {
+    console.log(await this.findOne({ email }).exec());
     return await this.findOne({ email }).exec();
   } catch (error) {
-    throw new Error(`Erro ao buscar usuÃ¡rio: ${error.message}`);
+    throw new Error(`Erro ao buscar usuario: ${error.message}`);
   }
 };
 
 userSchema.statics.comparePassword = async function (password, hashedPassword) {
   try {
-    if (!password) throw new Error("Senha invÃ¡lida");
+    if (!password) throw new Error("Senha invalida");
     const result = await bcrypt.compare(password, hashedPassword);
 
     return result;

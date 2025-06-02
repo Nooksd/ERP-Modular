@@ -1,7 +1,7 @@
-import Work from "../Models/workModel.js";
+import Employee from "../models/employeesModel.js";
 
-class WorkController {
-  static async getWork(req, res) {
+class EmployeeController {
+  static async getEmployee(req, res) {
     try {
       if (!req.user.user.isManager) {
         return res.status(403).json({
@@ -10,20 +10,20 @@ class WorkController {
         });
       }
 
-      const { workId } = req.params;
+      const { employeeId } = req.params;
 
-      const work = await Work.findById(workId).exec();
+      const employee = await Employee.findById(employeeId).exec();
 
-      if (!work) {
+      if (!employee) {
         return res.status(404).json({
-          message: "Obra não encontrada",
+          message: "Funcionário não encontrado",
           status: false,
         });
       }
 
       res.status(200).json({
-        message: "Obra encontrada com sucesso",
-        work,
+        message: "Funcionário encontrado com sucesso",
+        employee,
         status: true,
       });
     } catch (e) {
@@ -33,39 +33,7 @@ class WorkController {
       });
     }
   }
-
-  static async getUserWorks(req, res) {
-    try {
-      const user = req.user.user;
-
-      let userWorks;
-
-      if (user.isManager) {
-        userWorks = await Work.find({ isActive: true });
-      } else {
-        userWorks = await Work.find({ managerIds: user._id, isActive: true });
-      }
-
-      if (!userWorks.length) {
-        return res.status(404).json({
-          message: "Usuário Sem Obras",
-          status: false,
-        });
-      }
-
-      res.status(200).json({
-        message: "Obras do usuário encontradas com sucesso",
-        userWorks,
-        status: true,
-      });
-    } catch (e) {
-      res.status(500).json({
-        message: "Erro interno do servidor",
-        status: false,
-      });
-    }
-  }
-  static async createWork(req, res) {
+  static async createEmployee(req, res) {
     try {
       if (!req.user.user.isManager) {
         return res.status(403).json({
@@ -74,56 +42,45 @@ class WorkController {
         });
       }
 
-      const { name, location, cno, startDate, endDate, managerIds } = req.body;
+      const { name, cpf, role, email, startDate, managerId } = req.body;
 
-      if (!name || !location || !cno || !startDate) {
+      if (!name || !cpf || !role) {
         return res.status(400).json({
           message: "Todos os campos são obrigatórios",
           status: false,
         });
       }
 
-      const isUnique = await Work.isUnique(cno);
+      const isUnique = await Employee.isUnique(cpf);
 
       if (!isUnique) {
         return res.status(409).json({
-          message: "Obra já cadastrada",
+          message: "Funcionário já cadastrados",
           status: false,
         });
       }
 
-      if (endDate) {
-        Work.create({
-          name,
-          location,
-          cno,
-          startDate: new Date(startDate),
-          endDate: new Date(endDate),
-          managerIds,
-        });
-      } else {
-        Work.create({
-          name,
-          location,
-          cno,
-          startDate: new Date(startDate),
-          managerIds,
-        });
-      }
+      Employee.create({
+        name,
+        cpf,
+        role,
+        email,
+        startDate,
+        managerId,
+      });
 
       res.status(201).json({
-        message: "Obra criada com sucesso",
+        message: "Funcionário criado com sucesso",
         status: true,
       });
     } catch (e) {
       res.status(500).json({
-        message: "Erro interno do servidor",
+        message: "Erro interno do servidor " + e.message,
         status: false,
       });
     }
   }
-
-  static async getAllWorks(req, res) {
+  static async getAllEmployees(req, res) {
     try {
       if (!req.user.user.isManager) {
         return res.status(403).json({
@@ -134,10 +91,10 @@ class WorkController {
 
       const {
         page = 1,
-        limit = 10,
+        limit = 10000,
         name,
         order = true,
-        active = true,
+        active = "true",
       } = req.query;
 
       let filter = name ? { name: { $regex: name, $options: "i" } } : {};
@@ -146,20 +103,20 @@ class WorkController {
 
       const sortOrder = order ? 1 : -1;
 
-      const totalWorks = await Work.countDocuments(filter);
+      const totalEmployees = await Employee.countDocuments(filter);
 
-      const works = await Work.find(filter)
+      const employees = await Employee.find(filter)
         .sort({ ["name"]: sortOrder })
         .limit(limit * 1)
         .skip((page - 1) * limit)
         .exec();
 
       res.status(200).json({
-        message: "Obras listadas com sucesso",
-        works,
+        message: "Funcionários listados com sucesso",
+        employees,
         pagination: {
-          totalWorks,
-          totalPages: Math.ceil(totalWorks / limit),
+          totalEmployees,
+          totalPages: Math.ceil(totalEmployees / limit),
           currentPage: parseInt(page),
         },
         status: true,
@@ -171,7 +128,7 @@ class WorkController {
       });
     }
   }
-  static async updateWork(req, res) {
+  static async updateEmployee(req, res) {
     try {
       if (!req.user.user.isManager) {
         return res.status(403).json({
@@ -179,19 +136,20 @@ class WorkController {
           status: false,
         });
       }
-      const workId = req.params.workId;
-      const { name, location, cno, startDate, endDate, isActive, managerIds } =
+
+      const { employeeId } = req.params;
+      const { name, cpf, email, role, startDate, isActive, managerId } =
         req.body;
 
       if (
         !name &&
-        !location &&
-        !cno &&
+        !email &&
+        !cpf &&
+        !role &&
         !startDate &&
-        !endDate &&
-        !managerIds &&
         isActive !== true &&
-        isActive !== false
+        isActive !== false &&
+        !managerId
       ) {
         return res.status(400).json({
           message: "Nenhum dado para atualizar",
@@ -201,33 +159,33 @@ class WorkController {
 
       const updateData = {};
       if (name) updateData.name = name;
-      if (location) updateData.location = location;
-      if (cno) updateData.cno = cno;
-      if (startDate) updateData.startDate = startDate;
-      if (endDate) updateData.endDate = endDate;
+      if (email) updateData.email = email;
+      if (cpf) updateData.cpf = cpf;
+      if (role) updateData.role = role;
+      if (startDate) updateData.startDate = new Date(startDate);
       if (isActive === true || isActive === false)
         updateData.isActive = isActive;
-      if (managerIds && Array.isArray(managerIds))
-        updateData.managerIds = managerIds;
+      if (managerId && Array.isArray(managerId))
+        updateData.managerId = managerId;
 
-      const work = await Work.findByIdAndUpdate(
-        workId,
+      const employee = await Employee.findByIdAndUpdate(
+        employeeId,
         {
           $set: updateData,
         },
         { new: true }
       ).exec();
 
-      if (!work) {
+      if (!employee) {
         return res.status(404).json({
-          message: "Obra não encontrada",
+          message: "Funcionário não encontrado",
           status: false,
         });
       }
 
       res.status(200).json({
-        message: "Obra atualizada com sucesso",
-        work,
+        message: "Funcionário atualizado com sucesso",
+        employee,
         status: true,
       });
     } catch (e) {
@@ -237,7 +195,7 @@ class WorkController {
       });
     }
   }
-  static async deleteWork(req, res) {
+  static async deleteEmployee(req, res) {
     try {
       if (!req.user.user.isManager) {
         return res.status(403).json({
@@ -245,18 +203,16 @@ class WorkController {
           status: false,
         });
       }
-      const workId = req.params.workId;
-
-      const work = await Work.findByIdAndDelete(workId).exec();
-
-      if (!work) {
+      const { employeeId } = req.params;
+      const employee = await Employee.findByIdAndDelete(employeeId).exec();
+      if (!employee) {
         return res.status(404).json({
-          message: "Obra não encontrada",
+          message: "Funcionário não encontrado",
           status: false,
         });
       }
       res.status(200).json({
-        message: "Obra excluída com sucesso",
+        message: "Funcionário excluído com sucesso",
         status: true,
       });
     } catch (e) {
@@ -268,4 +224,4 @@ class WorkController {
   }
 }
 
-export default WorkController;
+export default EmployeeController;

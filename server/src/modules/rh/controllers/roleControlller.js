@@ -1,4 +1,4 @@
-import Role from "../Models/roleModel.js";
+import Role from "../models/roleModel.js";
 
 class RoleController {
   static async createRole(req, res) {

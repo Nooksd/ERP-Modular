@@ -1,7 +1,5 @@
 import mongoose from "mongoose";
 
-import User from "./userModel.js";
-
 const employeeSchema = new mongoose.Schema(
   {
     name: {
@@ -35,17 +33,6 @@ const employeeSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
-
-employeeSchema.post("save", async function (doc) {
-  try {
-    await User.updateMany(
-      { employeeId: doc._id },
-      { $set: { name: doc.name } }
-    );
-  } catch (error) {
-    console.error("Erro ao atualizar o nome do usuário:", error);
-  }
-});
 
 employeeSchema.statics.isUnique = async function (cpf) {
   try {

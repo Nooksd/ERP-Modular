@@ -1,6 +1,6 @@
 import express from "express";
-import JWT from "../Middlewares/jsonwebtoken.js";
-import ActivityController from "../Controllers/activityController.js";
+import JWT from "../../../core/middlewares/jsonwebtoken.js";
+import ActivityController from "../controllers/activityController.js";
 
 const ActivityRoutes = express.Router();
 

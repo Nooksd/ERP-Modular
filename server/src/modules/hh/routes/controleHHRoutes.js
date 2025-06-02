@@ -1,50 +1,33 @@
 import express from "express";
-import JWT from "../Middlewares/jsonwebtoken.js";
-import HHControllController from "../Controllers/hhControllController.js";
+import JWT from "../../../core/middlewares/jsonwebtoken.js";
+import HHControllController from "../controllers/hhControllController.js";
 
 const HHControllerRoutes = express.Router();
 
-HHControllerRoutes.post(
-  "/sendHH",
-  JWT.validateAccessToken,
-  HHControllController.sendHH
-);
+HHControllerRoutes.use(JWT.validateAccessToken);
+
+HHControllerRoutes.post("/sendHH", HHControllController.sendHH);
 HHControllerRoutes.get(
   "/get-record/:recordId",
-  JWT.validateAccessToken,
   HHControllController.getHHRecord
 );
 HHControllerRoutes.get(
   "/get-last-record/:projectId",
-  JWT.validateAccessToken,
   HHControllController.getLastHHRecord
 );
 HHControllerRoutes.get(
   "/get-history/:projectId",
-  JWT.validateAccessToken,
   HHControllController.getHHRecordsByProject
 );
-HHControllerRoutes.put(
-  "/update/:recordId",
-  JWT.validateAccessToken,
-  HHControllController.updateRecord
-);
+HHControllerRoutes.put("/update/:recordId", HHControllController.updateRecord);
 HHControllerRoutes.delete(
   "/delete/:recordId",
-  JWT.validateAccessToken,
   HHControllController.deleteRecord
 );
-
 HHControllerRoutes.get(
   "/get-statistics/:projectId",
-  JWT.validateAccessToken,
   HHControllController.getStatistics
 );
-
-HHControllerRoutes.get(
-  "/get-pdf-base",
-  JWT.validateAccessToken,
-  HHControllController.getPdf
-);
+HHControllerRoutes.get("/get-pdf-base", HHControllController.getPdf);
 
 export default HHControllerRoutes;

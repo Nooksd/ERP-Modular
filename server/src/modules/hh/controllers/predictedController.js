@@ -1,5 +1,5 @@
-import Predicted from "../Models/predictedModel.js";
-import Work from "../Models/workModel.js";
+import Predicted from "../models/predictedModel.js";
+import Work from "../models/workModel.js";
 import XLSX from "xlsx";
 
 async function isManagerOnWork(projectId, user) {

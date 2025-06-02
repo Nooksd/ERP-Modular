@@ -1,4 +1,4 @@
-import Slider from "../Models/sliderModel.js";
+import Slider from "../models/sliderModel.js";
 import fs from "fs";
 import path from "path";
 import { v4 as uuidv4 } from "uuid";
