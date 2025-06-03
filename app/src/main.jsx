@@ -3,7 +3,7 @@ import { Provider, useSelector } from "react-redux";
 import { ThemeProvider } from "styled-components";
 import { lightTheme, darkTheme } from "./styles/theme";
 import store from "./store";
-import Router from "./router";
+import Router from "./router/router";
 
 import "./styles/global.css";
 

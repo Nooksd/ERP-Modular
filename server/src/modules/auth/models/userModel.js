@@ -1,11 +1,8 @@
 import mongoose from "mongoose";
 import bcrypt from "bcrypt";
+import { PermissionLevels } from "../../../core/utils/permissionLevels.js";
 
 const userSchema = new mongoose.Schema({
-  name: {
-    type: "string",
-    required: true,
-  },
   employeeId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Employee",
@@ -20,18 +17,30 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  avatar: {
-    type: String,
-    default:
-      "https://relevium.com.br/wp-content/uploads/2015/09/default-avatar-300x300.png",
-  },
-  isManager: {
-    type: Boolean,
-    default: false,
-  },
   isActive: {
     type: Boolean,
     default: true,
+  },
+  globalPermission: {
+    type: Number,
+    enum: Object.values(PermissionLevels),
+    default: PermissionLevels.NONE,
+  },
+  modulePermissions: {
+    type: [
+      {
+        module: {
+          type: String,
+          required: true,
+        },
+        access: {
+          type: Number,
+          enum: Object.values(PermissionLevels),
+          default: PermissionLevels.NONE,
+        },
+      },
+    ],
+    default: [],
   },
 });
 
@@ -51,7 +60,6 @@ userSchema.statics.isUnique = async function (email) {
 
 userSchema.statics.findByEmail = async function (email) {
   try {
-    console.log(await this.findOne({ email }).exec());
     return await this.findOne({ email }).exec();
   } catch (error) {
     throw new Error(`Erro ao buscar usuario: ${error.message}`);

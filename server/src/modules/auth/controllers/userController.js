@@ -43,7 +43,7 @@ class UserController {
       }
 
       const user = await User.findByEmail(email);
-      console.log(user);
+
       const isPasswordCorrect = await User.comparePassword(
         password,
         user?.password ?? ""
@@ -64,13 +64,13 @@ class UserController {
 
       res.cookie("accessToken", accessToken, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
+        secure: true,
         sameSite: "None",
       });
 
       res.cookie("refreshToken", refreshToken, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
+        secure: true,
         sameSite: "None",
       });
 
@@ -128,7 +128,7 @@ class UserController {
 
       res.cookie("accessToken", newAccessToken, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
+        secure: true,
         sameSite: "Strict",
       });
       res.status(200).json({

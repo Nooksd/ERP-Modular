@@ -25,8 +25,6 @@ export async function loadModuleRoutes(app) {
         .replace(/Routes\.js$/i, "")
         .toLowerCase()}`;
 
-      console.log(routePrefix);
-
       app.use(routePrefix, route.default);
     }
   }
