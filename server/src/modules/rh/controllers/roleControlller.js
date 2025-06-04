@@ -3,13 +3,6 @@ import Role from "../models/roleModel.js";
 class RoleController {
   static async createRole(req, res) {
     try {
-      if (!req.user.user.isManager) {
-        return res.status(403).json({
-          message: "Sem permissão",
-          status: false,
-        });
-      }
-
       const { role, sector, baseSalary, additives, isField } = req.body;
 
       if (!role || !sector || !baseSalary) {
@@ -51,13 +44,6 @@ class RoleController {
 
   static async getRole(req, res) {
     try {
-      if (!req.user.user.isManager) {
-        return res.status(403).json({
-          message: "Sem permissão",
-          status: false,
-        });
-      }
-
       const { roleId } = req.params;
 
       const role = await Role.findById(roleId).exec();
@@ -84,13 +70,6 @@ class RoleController {
 
   static async updateRole(req, res) {
     try {
-      if (!req.user.user.isManager) {
-        return res.status(403).json({
-          message: "Sem permissão",
-          status: false,
-        });
-      }
-
       const { roleId } = req.params;
 
       const { role, sector, baseSalary, additives, isField } = req.body;
@@ -141,13 +120,6 @@ class RoleController {
 
   static async getAllRoles(req, res) {
     try {
-      if (!req.user.user.isManager) {
-        return res.status(403).json({
-          message: "Sem permissão",
-          status: false,
-        });
-      }
-
       const { page = 1, limit = 100000, name, order = true } = req.query;
 
       let filter = name ? { name: { $regex: name, $options: "i" } } : {};
@@ -156,13 +128,10 @@ class RoleController {
 
       const totalRoles = await Role.countDocuments(filter);
 
-      const baseSlary = req.user.user.isManager ? "" : "-baseSalary";
-
       const roles = await Role.find()
         .sort({ ["sector"]: sortOrder })
         .limit(limit * 1)
         .skip((page - 1) * limit)
-        .select(`${baseSlary} -additives`)
         .exec();
 
       if (!roles) {
@@ -218,13 +187,6 @@ class RoleController {
 
   static async deleteRole(req, res) {
     try {
-      if (!req.user.user.isManager) {
-        return res.status(403).json({
-          message: "Sem permissão",
-          status: false,
-        });
-      }
-
       const { roleId } = req.params;
 
       const deletedRole = await Role.findByIdAndDelete(roleId).exec();

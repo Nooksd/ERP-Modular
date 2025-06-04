@@ -3,13 +3,6 @@ import Activity from "../models/activityModel.js";
 class ActivityController {
   static async createActivity(req, res) {
     try {
-      if (!req.user.user.isManager) {
-        return res.status(403).json({
-          message: "Sem permissão",
-          status: false,
-        });
-      }
-
       const { area, activities } = req.body;
 
       if (!area || !activities) {
@@ -113,13 +106,6 @@ class ActivityController {
 
   static async getActivity(req, res) {
     try {
-      if (!req.user.user.isManager) {
-        return res.status(403).json({
-          message: "Sem permissão",
-          status: false,
-        });
-      }
-
       const { activityId } = req.params;
 
       const activity = await Activity.findById(activityId).exec();
@@ -146,13 +132,6 @@ class ActivityController {
 
   static async updateActivity(req, res) {
     try {
-      if (!req.user.user.isManager) {
-        return res.status(403).json({
-          message: "Sem permissão",
-          status: false,
-        });
-      }
-
       const { activityId } = req.params;
 
       const { area, activities } = req.body;
@@ -198,13 +177,6 @@ class ActivityController {
 
   static async deleteActivity(req, res) {
     try {
-      if (!req.user.user.isManager) {
-        return res.status(403).json({
-          message: "Sem permissão",
-          status: false,
-        });
-      }
-
       const { activityId } = req.params;
 
       const activity = await Activity.findByIdAndDelete(activityId).exec();

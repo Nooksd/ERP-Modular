@@ -3,13 +3,6 @@ import Employee from "../models/employeesModel.js";
 class EmployeeController {
   static async getEmployee(req, res) {
     try {
-      if (!req.user.user.isManager) {
-        return res.status(403).json({
-          message: "Sem permissão",
-          status: false,
-        });
-      }
-
       const { employeeId } = req.params;
 
       const employee = await Employee.findById(employeeId).exec();
@@ -35,13 +28,6 @@ class EmployeeController {
   }
   static async createEmployee(req, res) {
     try {
-      if (!req.user.user.isManager) {
-        return res.status(403).json({
-          message: "Sem permissão",
-          status: false,
-        });
-      }
-
       const { name, cpf, role, email, startDate, managerId } = req.body;
 
       if (!name || !cpf || !role) {
@@ -82,13 +68,6 @@ class EmployeeController {
   }
   static async getAllEmployees(req, res) {
     try {
-      if (!req.user.user.isManager) {
-        return res.status(403).json({
-          message: "Sem permissão",
-          status: false,
-        });
-      }
-
       const {
         page = 1,
         limit = 10000,
@@ -130,13 +109,6 @@ class EmployeeController {
   }
   static async updateEmployee(req, res) {
     try {
-      if (!req.user.user.isManager) {
-        return res.status(403).json({
-          message: "Sem permissão",
-          status: false,
-        });
-      }
-
       const { employeeId } = req.params;
       const { name, cpf, email, role, startDate, isActive, managerId } =
         req.body;
@@ -197,12 +169,6 @@ class EmployeeController {
   }
   static async deleteEmployee(req, res) {
     try {
-      if (!req.user.user.isManager) {
-        return res.status(403).json({
-          message: "Sem permissão",
-          status: false,
-        });
-      }
       const { employeeId } = req.params;
       const employee = await Employee.findByIdAndDelete(employeeId).exec();
       if (!employee) {

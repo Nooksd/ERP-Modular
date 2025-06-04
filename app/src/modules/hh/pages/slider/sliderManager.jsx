@@ -299,7 +299,7 @@ export const SliderManager = ({ toastMessage, windowHeight }) => {
     }
   };
 
-  const handleNavigate = () => navigate("/slider");
+  const handleNavigate = () => navigate("/hh/slider");
 
   return (
     <styled.Container $windowHeight={windowHeight}>

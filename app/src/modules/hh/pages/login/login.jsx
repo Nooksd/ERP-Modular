@@ -92,7 +92,7 @@ export const Login = () => {
       if (result.payload && result.payload.status) {
         setEmail("");
         setPassword("");
-        navigate("/home");
+        navigate("/hh/home");
       } else if (result.error) {
         setErrorMessage(result.error.message);
       }

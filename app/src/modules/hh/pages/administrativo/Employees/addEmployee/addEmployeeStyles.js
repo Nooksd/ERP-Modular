@@ -81,7 +81,8 @@ export const formInput = styled.input`
     margin: 0;
   }
 
-  &: [type=number] {
+  &[type="number"] {
+    appearance: textfield;
     -moz-appearance: textfield;
   }
 `;

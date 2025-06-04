@@ -145,13 +145,6 @@ class UserController {
 
   static async createUser(req, res) {
     try {
-      if (!req.user.user.isManager) {
-        return res.status(403).json({
-          message: "Sem permissão",
-          status: false,
-        });
-      }
-
       const { name, email, password, employeeId, avatar, isManager, pages } =
         req.body;
 
@@ -198,13 +191,6 @@ class UserController {
 
   static async updateUser(req, res) {
     try {
-      if (!req.user.user.isManager) {
-        return res.status(403).json({
-          message: "Sem permissão",
-          status: false,
-        });
-      }
-
       const { userId } = req.params;
       const {
         employeeId,
@@ -277,13 +263,6 @@ class UserController {
 
   static async getUserById(req, res) {
     try {
-      if (!req.user.user.isManager) {
-        return res.status(403).json({
-          message: "Sem permissão",
-          status: false,
-        });
-      }
-
       const { userId } = req.params;
 
       const user = await User.findById(userId).select("-password").exec();
@@ -310,13 +289,6 @@ class UserController {
 
   static async getAllUsers(req, res) {
     try {
-      if (!req.user.user.isManager) {
-        return res.status(403).json({
-          message: "Sem permissão",
-          status: false,
-        });
-      }
-
       const {
         page = 1,
         limit = 999,
@@ -360,13 +332,6 @@ class UserController {
 
   static async getManagers(req, res) {
     try {
-      if (!req.user.user.isManager) {
-        return res.status(403).json({
-          message: "Sem permissão",
-          status: false,
-        });
-      }
-
       const managers = await User.find({ isManager: true })
         .select("-password")
         .exec();
@@ -386,13 +351,6 @@ class UserController {
 
   static async deleteUser(req, res) {
     try {
-      if (!req.user.user.isManager) {
-        return res.status(403).json({
-          message: "Sem permissão",
-          status: false,
-        });
-      }
-
       const { userId } = req.params;
 
       const user = await User.findByIdAndDelete(userId).exec();

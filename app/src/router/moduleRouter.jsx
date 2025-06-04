@@ -1,4 +1,4 @@
-import { Suspense, lazy, useEffect, useState } from "react";
+import { Suspense, lazy, useEffect, useState, useMemo } from "react";
 import { Navigate, useLocation } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { hasModulePermission } from "../utils/permissions";
@@ -6,13 +6,21 @@ import { setUserFromStorage } from "../store/slicers/userSlicer";
 
 const ModuleRouter = () => {
   const [isLoading, setIsLoading] = useState(true);
-
   const location = useLocation();
   const dispatch = useDispatch();
-
   const { user, isAuthenticated, loading } = useSelector((state) => state.user);
 
   const moduleName = location.pathname.split("/")[1] || "";
+
+  const LazyModuleRouter = useMemo(
+    () =>
+      lazy(() =>
+        import(`../modules/${moduleName}/${moduleName}Router`).catch(() =>
+          import(`../modules/error/404`)
+        )
+      ),
+    [moduleName]
+  );
 
   useEffect(() => {
     const checkAuthStatus = async () => {
@@ -38,22 +46,13 @@ const ModuleRouter = () => {
   }
 
   const canAccessModule = hasModulePermission(user, moduleName, 1);
-
-  console.log(canAccessModule);
-
   if (!canAccessModule) {
     return <Navigate to="/login" replace />;
   }
 
-  const ModuleRouter = lazy(() =>
-    import(`../modules/${moduleName}/${moduleName}Router`).catch(() =>
-      import(`../modules/error/404`)
-    )
-  );
-
   return (
     <Suspense fallback={<LoadingSpinner />}>
-      <ModuleRouter />
+      <LazyModuleRouter />
     </Suspense>
   );
 };

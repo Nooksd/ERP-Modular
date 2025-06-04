@@ -38,17 +38,17 @@ const Header = ({ logged, page, icon, user }) => {
       <styled.NavItem2>
         {logged && (
           <>
-            <Link to="/report">
+            <Link to="/hh/report">
               <styled.RoundButton>
                 <SVGFlag width="11" height="16" />
               </styled.RoundButton>
             </Link>
-            <Link to="/help">
+            <Link to="/hh/help">
               <styled.RoundButton>
                 <SVGQuestionmark width="10" height="17" />
               </styled.RoundButton>
             </Link>
-            <Link to="/settings">
+            <Link to="/hh/settings">
               <styled.RoundButton>
                 <SVGEngine width="15" height="15" />
               </styled.RoundButton>
@@ -70,13 +70,13 @@ const Header = ({ logged, page, icon, user }) => {
                 onClick={() => setOpen((prev) => !prev)}
               />
               <styled.Menu $show={open}>
-                <Link to="/profile">
+                <Link to="/hh/profile">
                   <styled.MenuItem>
                     <SVGProfile width="15" height="15" />
                     Perfil
                   </styled.MenuItem>
                 </Link>
-                <Link to="/settings">
+                <Link to="/hh/settings">
                   <styled.MenuItem>
                     <SVGEngine width="15" height="15" />
                     Configuracoes
@@ -91,7 +91,7 @@ const Header = ({ logged, page, icon, user }) => {
             <styled.Division />
           </>
         )}
-        <Link to="/home">
+        <Link to="/hh/home">
           <SVGlogowhite width="170" fill="#fff" />
         </Link>
       </styled.NavItem2>

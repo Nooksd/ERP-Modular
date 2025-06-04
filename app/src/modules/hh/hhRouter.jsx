@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useState } from "react";
+import { useLocation, Navigate } from "react-router-dom";
 import { Provider, useSelector } from "react-redux";
 import store from "./store";
 
@@ -13,7 +13,6 @@ import Hamburger from "./components/hamburguer/hamburguer";
 import Toast from "./components/toast/toast";
 import Modal from "./components/modal/modal";
 
-import Error404 from "@/modules/error/404";
 import { Home } from "./pages/home/home";
 import { ControleHH } from "./pages/controleHH/controleHH";
 import { Historico } from "./pages/historico/historico";
@@ -32,8 +31,6 @@ import SVGSlider from "./assets/icons/slider/slider_icon";
 const HHRouter = () => {
   const [windowHeight, setWindowHeight] = useState(window.innerHeight);
   const { user } = useSelector((state) => state.user);
-
-  console.log(user);
 
   const [toastMessage, setToastMessage] = useState({
     danger: false,
@@ -60,116 +57,115 @@ const HHRouter = () => {
     {
       path: "home",
       name: "Home",
+      permissionRequired: 1,
       component: <Home />,
       icon: <SVGHome width="40" height="40" />,
       small: <SVGHome />,
     },
-    // {
-    //   path: "controlehh",
-    //   name: "Controle HH",
-    //   isRestricted: true,
-    //   component: (
-    //     <ControleHH
-    //       toastMessage={setToastMessage}
-    //       windowHeight={windowHeight}
-    //     />
-    //   ),
-    //   icon: <SVGHHControll width="35" height="35" />,
-    //   small: <SVGHHControll />,
-    // },
-    // {
-    //   path: "historicohh",
-    //   name: "Histórico HH",
-    //   isRestricted: true,
-    //   component: (
-    //     <Historico
-    //       windowHeight={windowHeight}
-    //       toastMessage={setToastMessage}
-    //       modalMessage={setModalMessage}
-    //       modalInfo={modalMessage}
-    //     />
-    //   ),
-    //   icon: <SVGHistory width="35" height="35" />,
-    //   small: <SVGHistory />,
-    // },
-    // {
-    //   path: "gestaohh",
-    //   name: "Gestão HH",
-    //   isRestricted: true,
-    //   isAdmRequired: true,
-    //   component: (
-    //     <GestaoHH
-    //       windowHeight={windowHeight}
-    //       toastMessage={setToastMessage}
-    //       modalMessage={setModalMessage}
-    //       modalInfo={modalMessage}
-    //     />
-    //   ),
-    //   icon: <SVGControll width="35" height="35" />,
-    //   small: <SVGControll />,
-    // },
-    // {
-    //   path: "contfigurar-slider",
-    //   name: "Slider",
-    //   isRestricted: true,
-    //   isAdmRequired: true,
-    //   component: (
-    //     <SliderManager
-    //       windowHeight={windowHeight}
-    //       toastMessage={setToastMessage}
-    //       modalMessage={setModalMessage}
-    //       modalInfo={modalMessage}
-    //     />
-    //   ),
-    //   icon: <SVGSlider width="30" height="30" />,
-    //   small: <SVGSlider />,
-    // },
-    // {
-    //   path: "administrativo",
-    //   name: "Administrativo",
-    //   isRestricted: true,
-    //   isAdmRequired: true,
-    //   component: (
-    //     <Adm
-    //       windowHeight={windowHeight}
-    //       toastMessage={setToastMessage}
-    //       modalMessage={setModalMessage}
-    //       modalInfo={modalMessage}
-    //     />
-    //   ),
-    //   icon: <SVGPersonConfig width="30" height="30" />,
-    //   small: <SVGPersonConfig />,
-    // },
-    // {
-    //   path: "slider",
-    //   isRestricted: true,
-    //   isAdmRequired: true,
-    //   noHude: true,
-    //   component: <Slider windowHeight={windowHeight} />,
-    // },
+    {
+      path: "controlehh",
+      name: "Controle HH",
+      permission: 2,
+      component: (
+        <ControleHH
+          toastMessage={setToastMessage}
+          windowHeight={windowHeight}
+        />
+      ),
+      icon: <SVGHHControll width="35" height="35" />,
+      small: <SVGHHControll />,
+    },
+    {
+      path: "historicohh",
+      name: "Histórico HH",
+      permission: 2,
+      component: (
+        <Historico
+          windowHeight={windowHeight}
+          toastMessage={setToastMessage}
+          modalMessage={setModalMessage}
+          modalInfo={modalMessage}
+        />
+      ),
+      icon: <SVGHistory width="35" height="35" />,
+      small: <SVGHistory />,
+    },
+    {
+      path: "gestaohh",
+      name: "Gestão HH",
+      permission: 1,
+      component: (
+        <GestaoHH
+          windowHeight={windowHeight}
+          toastMessage={setToastMessage}
+          modalMessage={setModalMessage}
+          modalInfo={modalMessage}
+        />
+      ),
+      icon: <SVGControll width="35" height="35" />,
+      small: <SVGControll />,
+    },
+    {
+      path: "contfigurar-slider",
+      name: "Slider",
+      permission: 1,
+      component: (
+        <SliderManager
+          windowHeight={windowHeight}
+          toastMessage={setToastMessage}
+          modalMessage={setModalMessage}
+          modalInfo={modalMessage}
+        />
+      ),
+      icon: <SVGSlider width="30" height="30" />,
+      small: <SVGSlider />,
+    },
+    {
+      path: "administrativo",
+      name: "Administrativo",
+      permission: 3,
+      component: (
+        <Adm
+          windowHeight={windowHeight}
+          toastMessage={setToastMessage}
+          modalMessage={setModalMessage}
+          modalInfo={modalMessage}
+        />
+      ),
+      icon: <SVGPersonConfig width="30" height="30" />,
+      small: <SVGPersonConfig />,
+    },
+    {
+      path: "slider",
+      permission: 1,
+      noHude: true,
+      component: <Slider windowHeight={windowHeight} />,
+    },
   ];
 
-  useEffect(() => {
-    const handleResize = () => {
-      setWindowHeight(window.innerHeight);
-    };
+  const handleResize = () => {
+    setWindowHeight(window.innerHeight);
+  };
 
-    window.addEventListener("resize", handleResize);
-
-    return () => {
-      window.removeEventListener("resize", handleResize);
-    };
-  }, []);
+  window.addEventListener("resize", handleResize);
 
   const renderPageContent = () => {
     const page = getPageData();
 
-    if (!page) return <Error404 />;
+    if (!page) return <Navigate to="/hh/home" replace />;
 
-    if (!page?.isRestricted) return page.component;
+    if (user.globalPermission >= page.permission) return page.component;
 
-    if (page?.isAdmRequired && !user.isManager) {
-      return <Error404 />;
+    const modulePermission = user?.modulePermissions.find(
+      (perm) => perm.module === "hh"
+    );
+
+    if (modulePermission && modulePermission.access >= page.permission) {
+      return page.component;
+    }
+
+    if (page.permission) {
+      return <Navigate to="/hh/home" replace />;
     }
 
     return page.component;
@@ -178,15 +174,13 @@ const HHRouter = () => {
   const getPageData = () => {
     const currentPage = location.pathname.split("/")[2];
 
-    console.log(currentPage);
-
     return pages.find((p) => normalizeString(p.path) === currentPage);
   };
 
   const pageData = getPageData();
 
   if (pageData && pageData.noHude) {
-    return pageData.component;
+    return <Provider store={store}>{pageData.component}</Provider>;
   }
 
   return (

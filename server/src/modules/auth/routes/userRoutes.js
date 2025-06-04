@@ -5,6 +5,7 @@ import {
   userLoginCheck,
   userValidator,
 } from "../../../core/middlewares/validateCredentials.js";
+import checkModulePermission from "../../../core/middlewares/checkModulePermission.js";
 
 const UserRoutes = express.Router();
 
@@ -15,6 +16,9 @@ UserRoutes.use(JWT.validateAccessToken);
 
 UserRoutes.post("/logout", UserController.logout);
 UserRoutes.get("/profile", UserController.getProfile);
+
+UserRoutes.use(checkModulePermission("ti", "admin"));
+
 UserRoutes.post("/create", UserController.createUser);
 UserRoutes.get("/get-all", UserController.getAllUsers);
 UserRoutes.get("/get-managers", UserController.getManagers);

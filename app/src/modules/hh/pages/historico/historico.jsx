@@ -130,7 +130,7 @@ export const Historico = ({
       date: localDate,
     };
 
-    navigate("/controlehh", { state: recordData });
+    navigate("/hh/controlehh", { state: recordData });
   };
 
   const handleDeleteClick = (record) => {

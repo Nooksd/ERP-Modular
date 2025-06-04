@@ -3,13 +3,6 @@ import Work from "../models/workModel.js";
 class WorkController {
   static async getWork(req, res) {
     try {
-      if (!req.user.user.isManager) {
-        return res.status(403).json({
-          message: "Sem permissão",
-          status: false,
-        });
-      }
-
       const { workId } = req.params;
 
       const work = await Work.findById(workId).exec();
@@ -40,7 +33,15 @@ class WorkController {
 
       let userWorks;
 
-      if (user.isManager) {
+      const globalPermission = user.globalPermission;
+      const hhPermission = user.modulePermissions.find(
+        (perm) => perm.module === "hh"
+      );
+
+      if (
+        globalPermission === 3 ||
+        (hhPermission && hhPermission?.access === 3)
+      ) {
         userWorks = await Work.find({ isActive: true });
       } else {
         userWorks = await Work.find({ managerIds: user._id, isActive: true });
@@ -67,13 +68,6 @@ class WorkController {
   }
   static async createWork(req, res) {
     try {
-      if (!req.user.user.isManager) {
-        return res.status(403).json({
-          message: "Sem permissão",
-          status: false,
-        });
-      }
-
       const { name, location, cno, startDate, endDate, managerIds } = req.body;
 
       if (!name || !location || !cno || !startDate) {
@@ -125,13 +119,6 @@ class WorkController {
 
   static async getAllWorks(req, res) {
     try {
-      if (!req.user.user.isManager) {
-        return res.status(403).json({
-          message: "Sem permissão",
-          status: false,
-        });
-      }
-
       const {
         page = 1,
         limit = 10,
@@ -173,12 +160,6 @@ class WorkController {
   }
   static async updateWork(req, res) {
     try {
-      if (!req.user.user.isManager) {
-        return res.status(403).json({
-          message: "Sem permissão",
-          status: false,
-        });
-      }
       const workId = req.params.workId;
       const { name, location, cno, startDate, endDate, isActive, managerIds } =
         req.body;
@@ -239,12 +220,6 @@ class WorkController {
   }
   static async deleteWork(req, res) {
     try {
-      if (!req.user.user.isManager) {
-        return res.status(403).json({
-          message: "Sem permissão",
-          status: false,
-        });
-      }
       const workId = req.params.workId;
 
       const work = await Work.findByIdAndDelete(workId).exec();

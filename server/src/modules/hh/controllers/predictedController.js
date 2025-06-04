@@ -4,7 +4,12 @@ import XLSX from "xlsx";
 
 async function isManagerOnWork(projectId, user) {
   try {
-    if (user.isManager) return true;
+    if (user.globalPermission === 3) return true;
+
+    const hhPermission = user.modulePermissions.find(
+      (perm) => perm.module === "hh"
+    );
+    if (hhPermission?.access === 3) return true;
 
     const work = await Work.findById(projectId);
 

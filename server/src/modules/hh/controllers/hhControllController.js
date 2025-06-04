@@ -7,9 +7,14 @@ import { fileURLToPath } from "url";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-async function isManegerOnWork(projectId, user) {
+async function isManagerOnWork(projectId, user) {
   try {
-    if (user.isManager) return true;
+    if (user.globalPermission === 3) return true;
+
+    const hhPermission = user.modulePermissions.find(
+      (perm) => perm.module === "hh"
+    );
+    if (hhPermission && hhPermission?.access === 3) return true;
 
     const work = await Work.findById(projectId);
 
@@ -40,7 +45,7 @@ class HHControllController {
 
       const user = req.user.user;
 
-      const isManager = await isManegerOnWork(projectId, user);
+      const isManager = await isManagerOnWork(projectId, user);
 
       if (!isManager) {
         return res.status(403).json({
@@ -135,7 +140,7 @@ class HHControllController {
         });
       }
 
-      const isManager = await isManegerOnWork(projectId, user);
+      const isManager = await isManagerOnWork(projectId, user);
 
       if (!isManager) {
         return res.status(403).json({
@@ -181,7 +186,7 @@ class HHControllController {
         });
       }
 
-      const isManager = await isManegerOnWork(projectId, user);
+      const isManager = await isManagerOnWork(projectId, user);
 
       if (!isManager) {
         return res.status(403).json({
@@ -261,7 +266,7 @@ class HHControllController {
         .select(" projectId ")
         .exec();
 
-      const isManager = await isManegerOnWork(projectId.projectId, user);
+      const isManager = await isManagerOnWork(projectId.projectId, user);
 
       if (!isManager) {
         return res.status(403).json({
@@ -307,7 +312,7 @@ class HHControllController {
         .select(" projectId ")
         .exec();
 
-      const isManager = await isManegerOnWork(projectId.projectId, user);
+      const isManager = await isManagerOnWork(projectId.projectId, user);
 
       if (!isManager) {
         return res.status(403).json({
@@ -364,7 +369,7 @@ class HHControllController {
         .select(" projectId ")
         .exec();
 
-      const isManager = await isManegerOnWork(projectId.projectId, user);
+      const isManager = await isManagerOnWork(projectId.projectId, user);
 
       if (!isManager) {
         return res.status(403).json({

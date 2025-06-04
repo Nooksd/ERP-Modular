@@ -13,19 +13,28 @@ const Hamburguer = ({ user, pageIcons }) => {
       console.error("Invalid pages array provided");
       return null;
     }
-    const isManager = user?.isManager || false;
+
+    let permission = user.modulePermissions.find(
+      (perm) => perm.module === "hh"
+    );
+    if (user.globalPermission > permission.access)
+      permission = { access: user.globalPermission };
 
     return (
       <>
         {pageIcons.map((page) => {
-          if (page.isAdmRequired && !isManager) return null;
-
+          if (
+            page.permission > permission.access ||
+            (page.permission === 1 && permission.access === 2)
+          ) {
+            return null;
+          }
           if (page.path === "home") return null;
 
           const isActive = location.pathname === `/${page.path}`;
 
           return (
-            <Link to={`/${page.path}`} key={page.path}>
+            <Link to={`/hh/${page.path}`} key={page.path}>
               <styled.MenuIten $isActive={isActive}>
                 <styled.IconWrapper>{page.small}</styled.IconWrapper>
                 <styled.ItenText $active={openMenu}>

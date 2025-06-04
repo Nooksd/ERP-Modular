@@ -13,5 +13,5 @@ export const PermissionLabels = {
 };
 
 export const getPermissionLevel = (label) => {
-  return PermissionLevels[label.toUpperCase()] || PermissionLevels.NONE;
+  return PermissionLevels[label.toUpperCase()] || 4;
 };

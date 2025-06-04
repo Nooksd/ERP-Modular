@@ -16,13 +16,6 @@ if (!fs.existsSync(uploadDir)) {
 class SliderController {
   static async createSlider(req, res) {
     try {
-      if (!req.user.user.isManager) {
-        return res.status(403).json({
-          message: "Sem permissão",
-          status: false,
-        });
-      }
-
       const existingSlider = await Slider.findOne();
       if (existingSlider) {
         return res.status(400).json({
@@ -85,13 +78,6 @@ class SliderController {
 
   static async updateSlider(req, res) {
     try {
-      if (!req.user.user.isManager) {
-        return res.status(403).json({
-          message: "Sem permissão",
-          status: false,
-        });
-      }
-
       const slider = await Slider.findOne();
       if (!slider) {
         return res.status(404).json({
@@ -150,13 +136,6 @@ class SliderController {
 
   static async sendImage(req, res) {
     try {
-      if (!req.user.user.isManager) {
-        return res.status(403).json({
-          message: "Sem permissão",
-          status: false,
-        });
-      }
-
       if (!req.file) {
         return res.status(400).json({
           message: "Nenhuma imagem enviada",
