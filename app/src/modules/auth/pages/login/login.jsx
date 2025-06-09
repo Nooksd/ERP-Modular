@@ -1,16 +1,17 @@
 import { useState, useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { loginUser } from "../../../../store/slicers/userSlicer.js";
-import { Link, useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+import { Link, useNavigate, useParams } from "react-router-dom";
 
 import * as styled from "./loginStyles.js";
 
 import SVGlogowhite from "../../assets/logo/innova_logo_white.jsx";
-import SVGLock from "../../assets/icons/login/Lock_icon.jsx";
-import SVGPerson from "../../assets/icons/login/Person_icon.jsx";
-import SVGSeePassword from "../../assets/icons/login/See_password_icon.jsx";
-import SVGWarning from "../../assets/icons/login/Warning_icon.jsx";
-import SVGArrowDown from "../../assets/icons/header/Arrow_icon.jsx";
+import SVGLock from "../../assets/icons/Lock_icon.jsx";
+import SVGPerson from "../../assets/icons/Person_icon.jsx";
+import SVGSeePassword from "../../assets/icons/See_password_icon.jsx";
+import SVGWarning from "../../assets/icons/Warning_icon.jsx";
+import SVGArrowDown from "../../assets/icons/Arrow_icon.jsx";
 
 export const Login = () => {
   const [isMobile, setIsMobile] = useState(false);
@@ -27,6 +28,8 @@ export const Login = () => {
   const navigate = useNavigate();
 
   const errorTimerRef = useRef(null);
+
+  const { module } = useParams();
 
   const checkScreenSize = () => {
     setIsMobile(window.innerWidth <= 768);
@@ -92,8 +95,10 @@ export const Login = () => {
       if (result.payload && result.payload.status) {
         setEmail("");
         setPassword("");
-        navigate("/hh/home");
+        toast.success("Login efetuado com sucesso");
+        navigate(`/${module}/home`);
       } else if (result.error) {
+        toast.error("Email ou senha inválida");
         setErrorMessage(result.error.message);
       }
     });

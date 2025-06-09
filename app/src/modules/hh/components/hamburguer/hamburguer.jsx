@@ -17,6 +17,8 @@ const Hamburguer = ({ user, pageIcons }) => {
     let permission = user.modulePermissions.find(
       (perm) => perm.module === "hh"
     );
+    if (!permission?.access) permission = { access: 0 };
+
     if (user.globalPermission > permission.access)
       permission = { access: user.globalPermission };
 

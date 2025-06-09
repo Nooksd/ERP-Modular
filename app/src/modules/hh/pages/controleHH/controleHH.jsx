@@ -8,6 +8,7 @@ import { innovaApi } from "@/services/http";
 import { fetchUserWorks } from "../../store/slicers/worksSlicer";
 import { fetchActivities } from "../../store/slicers/activitySlicer.js";
 import { fetchFieldRoles } from "../../store/slicers/fieldRoleSlicer.js";
+import { toast } from "react-toastify";
 
 // -imports Componentes- >
 import Calendar from "../../components/calendar/calendar.jsx";
@@ -30,7 +31,7 @@ const formatKey = (day, month, year) => {
   )}${year}`;
 };
 
-export const ControleHH = ({ toastMessage, windowHeight }) => {
+export const ControleHH = ({ windowHeight }) => {
   // -Declaracoes da página- >
   const works = useSelector((state) => state.works);
   const activities = useSelector((state) => state.activity);
@@ -201,17 +202,10 @@ export const ControleHH = ({ toastMessage, windowHeight }) => {
         const { data } = response;
 
         setHHRecords(data.hhRecord.hhRecords);
-        toastMessage({
-          danger: false,
-          title: "Sucesso",
-          message: data.message,
-        });
+
+        toast.success(data.message);
       } catch (e) {
-        toastMessage({
-          danger: true,
-          title: "Error",
-          message: "Erro ao buscar registro",
-        });
+        toast.error("Ocorreu um erro ao buscar o registro de horas.");
       }
     }
   };
@@ -509,39 +503,20 @@ export const ControleHH = ({ toastMessage, windowHeight }) => {
           await innovaApi.put(`/hh/hhcontroll/update/${recordData.recordId}`, {
             hhRecords: removeErrorAndOpen(hhRecords),
           });
-          toastMessage({
-            danger: false,
-            title: "Sucesso",
-            message: "Registro de horas atualizado com sucesso",
-          });
+
+          toast.success("Registro de horas atualizado com sucesso");
         } else {
           await innovaApi.post("/hh/hhcontroll/sendHH", dataBody);
 
-          toastMessage({
-            danger: false,
-            title: "Sucesso",
-            message: "Registro de horas feito com sucesso",
-          });
+          toast.success("Registro de horas feito com sucesso");
         }
       } catch (e) {
         if (e.response.status === 409) {
-          toastMessage({
-            danger: true,
-            title: "Error",
-            message: "Atividade já registrada",
-          });
+          toast.error("Atividade já registrada");
         } else if (e.response.status === 500) {
-          toastMessage({
-            danger: true,
-            title: "Error",
-            message: "Ocorreu um erro interno no servidor.",
-          });
+          toast.error("Ocorreu um erro interno no servidor.");
         } else {
-          toastMessage({
-            danger: true,
-            title: "Error",
-            message: "Ocorreu um erro ao enviar o registro de horas.",
-          });
+          toast.error("Ocorreu um erro ao enviar o registro de horas.");
         }
       }
     }

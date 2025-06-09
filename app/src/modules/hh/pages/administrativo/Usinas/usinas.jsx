@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { innovaApi } from "@/services/http.js";
+import { toast } from "react-toastify";
 import * as styled from "./usinasStyles.js";
 
 import SVGCheck from "../../../assets/icons/adm/usinas/Check_icon.jsx";
@@ -9,7 +10,7 @@ import SVGSearch from "../../../assets/icons/historyHH/Search_icon.jsx";
 import SVGEdit from "../../../assets/icons/historyHH/Edit_icon.jsx";
 import SVGDelete from "../../../assets/icons/controleHH/Delete_icon.jsx";
 
-const Usinas = ({ toastMessage, modalMessage, modalInfo, openPage }) => {
+const Usinas = ({ modalMessage, modalInfo, openPage }) => {
   const [usinas, setUsinas] = useState([]);
 
   const [activeMode, setActiveMode] = useState(true);
@@ -58,18 +59,10 @@ const Usinas = ({ toastMessage, modalMessage, modalInfo, openPage }) => {
       setUsinas(response.data.works);
       setTotalPages(response.data.pagination.totalPages);
       if (click) {
-        toastMessage({
-          danger: false,
-          title: "Sucesso",
-          message: "Usinas encontradas com sucesso",
-        });
+        toast.success("Usinas encontradas com sucesso");
       }
     } catch (e) {
-      toastMessage({
-        danger: true,
-        title: "Error",
-        message: "Erro ao buscar Usinas",
-      });
+      toast.error("Ocorreu um erro ao buscar Usinas");
     }
   };
 
@@ -103,19 +96,13 @@ const Usinas = ({ toastMessage, modalMessage, modalInfo, openPage }) => {
   async function deleteUsina() {
     try {
       await innovaApi.delete(`/hh/work/delete/${whatDelete}`);
-      toastMessage({
-        danger: false,
-        title: "Sucesso",
-        message: "Usina excluída com sucesso",
-      });
+
+      toast.success("Usina excluída com sucesso");
+
       setWhatDelete("");
       handleSearch();
     } catch (e) {
-      toastMessage({
-        danger: true,
-        title: "Error",
-        message: "Não foi possível excluir a usina",
-      });
+      toast.error("Ocorreu um erro ao excluir a usina");
     }
   }
 
@@ -127,19 +114,12 @@ const Usinas = ({ toastMessage, modalMessage, modalInfo, openPage }) => {
 
       const action = activeMode ? "desabilitada" : "habilitada";
 
-      toastMessage({
-        danger: false,
-        title: "Sucesso",
-        message: `Usina ${action} com sucesso`,
-      });
+      toast.success(`Usina ${action} com sucesso`);
+
       setWhatDisable("");
       setActiveMode((prev) => !prev);
     } catch (e) {
-      toastMessage({
-        danger: true,
-        title: "Error",
-        message: "Não foi possível desabilitar a usina",
-      });
+      toast.error("Ocorreu um erro ao desabilitar a usina");
     }
   }
 

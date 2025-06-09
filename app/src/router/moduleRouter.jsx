@@ -2,7 +2,10 @@ import { Suspense, lazy, useEffect, useState, useMemo } from "react";
 import { Navigate, useLocation } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { hasModulePermission } from "../utils/permissions";
+import { toast } from "react-toastify";
 import { setUserFromStorage } from "../store/slicers/userSlicer";
+import loadignAnimation from "@/assets/loading.json";
+import Lottie from "lottie-react";
 
 const ModuleRouter = () => {
   const [isLoading, setIsLoading] = useState(true);
@@ -42,12 +45,13 @@ const ModuleRouter = () => {
   }
 
   if (!isAuthenticated) {
-    return <Navigate to="/login" replace />;
+    toast.error("Você precisa estar logado para acessar essa página.");
+    return <Navigate to="/" />;
   }
 
   const canAccessModule = hasModulePermission(user, moduleName, 1);
   if (!canAccessModule) {
-    return <Navigate to="/login" replace />;
+    return <Navigate to="/" />;
   }
 
   return (
@@ -58,10 +62,29 @@ const ModuleRouter = () => {
 };
 
 const LoadingSpinner = () => {
+  const [dots, setDots] = useState("");
+
+  useEffect(() => {
+    setInterval(() => {
+      setDots((prevDots) => (prevDots === "..." ? "" : prevDots + "."));
+    }, 300);
+  }, []);
+
   return (
-    <>
-      <h1>Loading...</h1>
-    </>
+    <div
+      style={{
+        width: "100vw",
+        height: "100vh",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+      }}
+    >
+      <div style={{ width: "500px", height: "500px" }}>
+        <Lottie animationData={loadignAnimation} loop={true} />
+        <h1 style={{ textAlign: "center", color: "#172242" }}>Loading{dots}</h1>
+      </div>
+    </div>
   );
 };
 

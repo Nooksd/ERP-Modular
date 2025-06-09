@@ -5,6 +5,7 @@ import { Fragment, useEffect, useState, useCallback, useRef } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { fetchUserWorks } from "../../store/slicers/worksSlicer.js";
 import { innovaApi } from "@/services/http";
+import { toast } from "react-toastify";
 // import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
 
 import * as styled from "./gestaoHHStyles.js";
@@ -22,7 +23,7 @@ import SVGTimeE1 from "../../assets/icons/gestaoHH/TimeE1_icon.jsx";
 import SVGTimeE2 from "../../assets/icons/gestaoHH/TimeE2.jsx";
 import SVGArrowDown from "../../assets/icons/header/Arrow_icon.jsx";
 
-export const GestaoHH = ({ windowHeight, toastMessage }) => {
+export const GestaoHH = ({ windowHeight }) => {
   const works = useSelector((state) => state.works);
   const [workData, setWorkData] = useState();
   const [predictedData, setPredictedData] = useState();
@@ -126,19 +127,12 @@ export const GestaoHH = ({ windowHeight, toastMessage }) => {
           getDate(predicted, real);
           getActivities(predicted, real);
           getRoles(predicted, real);
-          toastMessage({
-            danger: false,
-            title: "Sucesso",
-            message: realData.message,
-          });
+
+          toast.success(realData.message);
         }
       } catch (e) {
         if (isMounted) {
-          toastMessage({
-            danger: true,
-            title: "Erro",
-            message: e.message,
-          });
+          toast.error(e.message);
         }
       }
     }
@@ -949,11 +943,7 @@ export const GestaoHH = ({ windowHeight, toastMessage }) => {
         if (!file) return;
 
         if (!selectedWork) {
-          toastMessage({
-            danger: true,
-            title: "Erro",
-            message: "Selecione uma usina primeiro",
-          });
+          toast.error("Selecione uma usina primeiro");
           return;
         }
 
@@ -971,30 +961,20 @@ export const GestaoHH = ({ windowHeight, toastMessage }) => {
             }
           );
 
-          toastMessage({
-            danger: false,
-            title: "Sucesso",
-            message: response.data.message,
-          });
+          toast.success(response.data.message);
 
           const { data } = await innovaApi.get(`/hh/predicted/${selectedWork}`);
           setPredictedData(data.predicted.data);
         } catch (error) {
-          toastMessage({
-            danger: true,
-            title: "Erro",
-            message: error.response?.data?.message || "Falha ao enviar arquivo",
-          });
+          toast.error(
+            error.response?.data?.message || "Falha ao enviar arquivo"
+          );
         }
       };
 
       input.click();
     } catch (e) {
-      toastMessage({
-        danger: true,
-        title: "Erro",
-        message: e.message,
-      });
+      toast.error(e.message);
     }
   };
 

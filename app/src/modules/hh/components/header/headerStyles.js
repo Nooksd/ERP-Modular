@@ -67,8 +67,13 @@ export const RoundButton = styled.button`
   cursor: pointer;
 
   &:hover {
-    transform: scale(1.1);
-    animation: ${rotateAnimation} 0.5s linear;
+    transform: scale(1.05);
+    background-color: ${(props) => props.theme.colors.danger};
+
+    path {
+      stroke: ${(props) => props.theme.fonts.color};
+      fill: ${(props) => props.theme.fonts.color};
+    }
   }
 `;
 

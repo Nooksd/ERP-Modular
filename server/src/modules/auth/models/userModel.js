@@ -60,7 +60,12 @@ userSchema.statics.isUnique = async function (email) {
 
 userSchema.statics.findByEmail = async function (email) {
   try {
-    return await this.findOne({ email }).exec();
+    return await this.findOne({ email })
+      .populate({
+        path: "employeeId",
+        select: "name cpf role",
+      })
+      .exec();
   } catch (error) {
     throw new Error(`Erro ao buscar usuario: ${error.message}`);
   }

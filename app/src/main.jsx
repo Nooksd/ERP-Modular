@@ -1,6 +1,7 @@
 import { createRoot } from "react-dom/client";
 import { Provider, useSelector } from "react-redux";
 import { ThemeProvider } from "styled-components";
+import { ToastContainer } from "react-toastify";
 import { lightTheme, darkTheme } from "./styles/theme";
 import store from "./store";
 import Router from "./router/router";
@@ -14,6 +15,18 @@ const ThemedApp = () => {
   return (
     <ThemeProvider theme={theme}>
       <Router />
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop
+        closeOnClick={false}
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover={false}
+        theme="light"
+      />
     </ThemeProvider>
   );
 };

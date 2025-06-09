@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { innovaApi } from "@/services/http.js";
+import { toast } from "react-toastify";
 import * as styled from "./addUsinaStyles.js";
 
 import Calendar from "../../../../components/calendar/calendar.jsx";
@@ -9,7 +10,7 @@ import SVGCalendar from "../../../../assets/icons/controleHH/calendar_icon.jsx";
 import SVGDelete from "../../../../assets/icons/controleHH/Delete_icon.jsx";
 import { fetchAppUsers } from "../../../../store/slicers/appUsersSlicer.js";
 
-const AddUsina = ({ toastMessage, editData }) => {
+const AddUsina = ({ editData }) => {
   const appUsers = useSelector((state) => state.appUsers);
 
   const [openCalendarStart, setOpenCalendarStart] = useState(false);
@@ -147,24 +148,12 @@ const AddUsina = ({ toastMessage, editData }) => {
           response = await innovaApi.post("/work/create", newUsinaInfo);
         }
 
-        toastMessage({
-          danger: false,
-          title: "Sucesso",
-          message: response.data.message,
-        });
+        toast.success(response.data.message);
       } catch (e) {
-        toastMessage({
-          danger: true,
-          title: "Error",
-          message: e.response.data.message,
-        });
+        toast.error(e.response.data.message);
       }
     } else {
-      toastMessage({
-        danger: true,
-        title: "Aviso",
-        message: "Campos necessários não preenchidos",
-      });
+      toast.error("Campos necessários não preenchidos");
     }
   };
 
@@ -236,17 +225,9 @@ const AddUsina = ({ toastMessage, editData }) => {
 
       setUsinaInfo(newUsinaInfo);
 
-      toastMessage({
-        danger: false,
-        title: "Sucesso",
-        message: response.data.message,
-      });
+      toast.success("Usina carregada com sucesso");
     } catch (e) {
-      toastMessage({
-        danger: true,
-        title: "Erro",
-        message: "Erro ao buscar dados da usina",
-      });
+      toast.error("Erro ao buscar dados da usina");
     }
   }
 

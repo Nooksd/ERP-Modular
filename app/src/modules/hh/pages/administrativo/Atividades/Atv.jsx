@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { innovaApi } from "@/services/http.js";
+import { toast } from "react-toastify";
 
 import * as styled from "./AtvStyles.js";
 
@@ -8,7 +9,7 @@ import SVGSearch from "../../../assets/icons/historyHH/Search_icon.jsx";
 import SVGEdit from "../../../assets/icons/historyHH/Edit_icon.jsx";
 import SVGDelete from "../../../assets/icons/controleHH/Delete_icon.jsx";
 
-const Atividades = ({ toastMessage, modalMessage, modalInfo, openPage }) => {
+const Atividades = ({ modalMessage, modalInfo, openPage }) => {
   const [activities, setActivities] = useState([]);
 
   const [order, setOrder] = useState(true);
@@ -60,18 +61,10 @@ const Atividades = ({ toastMessage, modalMessage, modalInfo, openPage }) => {
       setActivities(response.data.activities);
       setTotalPages(response.data.pagination.totalPages);
       if (click) {
-        toastMessage({
-          danger: false,
-          title: "Sucesso",
-          message: "Funcões encontradas com sucesso",
-        });
+        toast.success("Funções encontradas com sucesso");
       }
     } catch (e) {
-      toastMessage({
-        danger: true,
-        title: "Error",
-        message: "Erro ao buscar as funções",
-      });
+      toast.error("Ocorreu um erro ao buscar as funções");
     }
   };
 
@@ -125,22 +118,14 @@ const Atividades = ({ toastMessage, modalMessage, modalInfo, openPage }) => {
     try {
       await innovaApi.delete(`/hh/activity/delete/${whatDeleteArea}`);
 
-      toastMessage({
-        danger: false,
-        title: "Sucesso",
-        message: "Área excluída com sucesso",
-      });
+      toast.success("Área excluida com sucesso");
 
       setWhatDeleteArea("");
       setActivities((prev) =>
         prev.filter((area) => area._id !== whatDeleteArea)
       );
     } catch (e) {
-      toastMessage({
-        danger: true,
-        title: "Error",
-        message: "Não foi possível excluir a área",
-      });
+      toast.error("Não foi possível excluir a área");
     }
   }
 
@@ -167,22 +152,15 @@ const Atividades = ({ toastMessage, modalMessage, modalInfo, openPage }) => {
 
         await innovaApi.put(`/hh/activity/update/${whatDeleteArea}`, newArea);
 
-        toastMessage({
-          danger: false,
-          title: "Sucesso",
-          message: "Atividade excluída com sucesso",
-        });
+        toast.success("Atividade excluída com sucesso");
+
         setWhatDeleteArea("");
         setActivities((prev) =>
           prev.map((area) => (area._id === whatDeleteArea ? newArea : area))
         );
       }
     } catch (e) {
-      toastMessage({
-        danger: true,
-        title: "Error",
-        message: "Não foi possível excluir a atividade",
-      });
+      toast.error("Não foi possível excluir a atividade");
     }
   }
 
@@ -224,11 +202,7 @@ const Atividades = ({ toastMessage, modalMessage, modalInfo, openPage }) => {
 
           await innovaApi.put(`/hh/activity/update/${whatDeleteArea}`, newArea);
 
-          toastMessage({
-            danger: false,
-            title: "Sucesso",
-            message: "Sub-Atividade excluída com sucesso",
-          });
+          toast.success("Sub-Atividade excluída com sucesso");
 
           setWhatDeleteArea("");
           setActivities((prev) =>
@@ -237,11 +211,7 @@ const Atividades = ({ toastMessage, modalMessage, modalInfo, openPage }) => {
         }
       }
     } catch (e) {
-      toastMessage({
-        danger: true,
-        title: "Error",
-        message: "Não foi possível excluir a sub-atividade",
-      });
+      toast.error("Ocorreu um erro ao excluir a sub-atividade.");
     }
   }
 

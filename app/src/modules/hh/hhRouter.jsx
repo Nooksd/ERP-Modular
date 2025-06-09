@@ -1,6 +1,7 @@
 import { useState } from "react";
-import { useLocation, Navigate } from "react-router-dom";
-import { Provider, useSelector } from "react-redux";
+import { useLocation, Navigate, useNavigate } from "react-router-dom";
+import { Provider, useSelector, useDispatch } from "react-redux";
+import { logoutUser } from "../../store/slicers/userSlicer";
 import store from "./store";
 
 import {
@@ -10,7 +11,6 @@ import {
 
 import Header from "./components/header/header";
 import Hamburger from "./components/hamburguer/hamburguer";
-import Toast from "./components/toast/toast";
 import Modal from "./components/modal/modal";
 
 import { Home } from "./pages/home/home";
@@ -32,11 +32,6 @@ const HHRouter = () => {
   const [windowHeight, setWindowHeight] = useState(window.innerHeight);
   const { user } = useSelector((state) => state.user);
 
-  const [toastMessage, setToastMessage] = useState({
-    danger: false,
-    message: "",
-    title: "",
-  });
   const [modalMessage, setModalMessage] = useState({
     response: null,
     event: null,
@@ -45,6 +40,8 @@ const HHRouter = () => {
   });
 
   const location = useLocation();
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const normalizeString = (str) => {
     return str
@@ -66,12 +63,7 @@ const HHRouter = () => {
       path: "controlehh",
       name: "Controle HH",
       permission: 2,
-      component: (
-        <ControleHH
-          toastMessage={setToastMessage}
-          windowHeight={windowHeight}
-        />
-      ),
+      component: <ControleHH windowHeight={windowHeight} />,
       icon: <SVGHHControll width="35" height="35" />,
       small: <SVGHHControll />,
     },
@@ -82,7 +74,6 @@ const HHRouter = () => {
       component: (
         <Historico
           windowHeight={windowHeight}
-          toastMessage={setToastMessage}
           modalMessage={setModalMessage}
           modalInfo={modalMessage}
         />
@@ -94,14 +85,7 @@ const HHRouter = () => {
       path: "gestaohh",
       name: "Gestão HH",
       permission: 1,
-      component: (
-        <GestaoHH
-          windowHeight={windowHeight}
-          toastMessage={setToastMessage}
-          modalMessage={setModalMessage}
-          modalInfo={modalMessage}
-        />
-      ),
+      component: <GestaoHH windowHeight={windowHeight} />,
       icon: <SVGControll width="35" height="35" />,
       small: <SVGControll />,
     },
@@ -109,14 +93,7 @@ const HHRouter = () => {
       path: "contfigurar-slider",
       name: "Slider",
       permission: 1,
-      component: (
-        <SliderManager
-          windowHeight={windowHeight}
-          toastMessage={setToastMessage}
-          modalMessage={setModalMessage}
-          modalInfo={modalMessage}
-        />
-      ),
+      component: <SliderManager windowHeight={windowHeight} />,
       icon: <SVGSlider width="30" height="30" />,
       small: <SVGSlider />,
     },
@@ -127,7 +104,6 @@ const HHRouter = () => {
       component: (
         <Adm
           windowHeight={windowHeight}
-          toastMessage={setToastMessage}
           modalMessage={setModalMessage}
           modalInfo={modalMessage}
         />
@@ -183,15 +159,20 @@ const HHRouter = () => {
     return <Provider store={store}>{pageData.component}</Provider>;
   }
 
+  const logout = async () => {
+    try {
+      await dispatch(logoutUser()).unwrap();
+      navigate("/login/hh");
+    } catch (e) {
+      console.error("Falha no Logout", e);
+    }
+  };
+
   return (
     <Provider store={store}>
       <NavbarMenuContentContainer>
         <Hamburger user={user} pageIcons={pages} />
         <NavbarContentContainer>
-          <Toast
-            toastContent={toastMessage}
-            setToastContent={setToastMessage}
-          />
           <Modal
             modalMessage={modalMessage}
             setModalMessage={setModalMessage}
@@ -200,7 +181,7 @@ const HHRouter = () => {
             user={user}
             page={pageData && pageData.name}
             icon={pageData && pageData.icon}
-            logged={true}
+            onLogout={logout}
           />
           <NavbarContentContainer>{renderPageContent()}</NavbarContentContainer>
         </NavbarContentContainer>

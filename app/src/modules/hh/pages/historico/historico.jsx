@@ -6,6 +6,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { innovaApi } from "@/services/http";
 import { useNavigate } from "react-router-dom";
 import { fetchUserWorks } from "../../store/slicers/worksSlicer";
+import { toast } from "react-toastify";
 
 // -imports Componentes- >
 import Calendar from "../../components/calendar/calendar.jsx";
@@ -20,12 +21,7 @@ import SVGSearch from "../../assets/icons/historyHH/Search_icon.jsx";
 import SVGDelete from "../../assets/icons/controleHH/Delete_icon.jsx";
 import SVGEdit from "../../assets/icons/historyHH/Edit_icon.jsx";
 
-export const Historico = ({
-  toastMessage,
-  modalMessage,
-  modalInfo,
-  windowHeight,
-}) => {
+export const Historico = ({ modalMessage, modalInfo, windowHeight }) => {
   // -Declaracoes da página- >
   const works = useSelector((state) => state.works);
   const navigate = useNavigate();
@@ -97,24 +93,12 @@ export const Historico = ({
         );
         setHHRecords(response.data.hhRecords);
         setPages(response.data.pagination.totalPages);
-        toastMessage({
-          danger: false,
-          title: "Sucesso",
-          message: "Registros de hh encontrados",
-        });
+        toast.success("Registros de hh encontrados");
       } catch (e) {
-        toastMessage({
-          danger: true,
-          title: "Error",
-          message: "Registros de hh não encontrados",
-        });
+        toast.error("Ocorreu um erro ao buscar os registros de horas.");
       }
     } else {
-      toastMessage({
-        danger: true,
-        title: "Error",
-        message: "Campo de Obra não pode estar vazio",
-      });
+      toast.error("Campo de Obra não pode estar vazio");
     }
   };
 
@@ -200,19 +184,13 @@ export const Historico = ({
   async function deleteRecord() {
     try {
       await innovaApi.delete(`/hh/hhcontroll/delete/${whatDelete.recordId}`);
-      toastMessage({
-        danger: false,
-        title: "Sucesso",
-        message: "Registro de hh excluído com sucesso",
-      });
+
+      toast.success("Registro de horas excluído com sucesso");
+
       setWhatDelete("");
       handleSearchHHRecords();
     } catch (e) {
-      toastMessage({
-        danger: true,
-        title: "Error",
-        message: "Não foi possível excluir o registro de hh",
-      });
+      toast.error("Ocorreu um erro ao excluir o registro de horas.");
     }
   }
 

@@ -9,7 +9,13 @@ class UserController {
     try {
       const userId = req.user.user._id;
 
-      const user = await User.findById(userId).select("-password").exec();
+      const user = await User.findById(userId)
+        .populate({
+          path: "employeeId",
+          select: "name cpf role",
+        })
+        .select("-password")
+        .exec();
 
       if (!user) {
         return res.status(404).json({

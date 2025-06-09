@@ -2,6 +2,7 @@ import { useEffect, useState, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { fetchUserWorks } from "../../store/slicers/worksSlicer";
+import { toast } from "react-toastify";
 import {
   fetchSlider,
   updateSlider,
@@ -15,7 +16,7 @@ import * as styled from "./sliderManagerStyles.js";
 import SVGDelete from "../../assets/icons/controleHH/Delete_icon.jsx";
 import SVGPlaySlides from "../../assets/icons/slider/Play_slides_icon.jsx";
 
-export const SliderManager = ({ toastMessage, windowHeight }) => {
+export const SliderManager = ({ windowHeight }) => {
   const works = useSelector((state) => state.works);
   const { items, link } = useSelector((state) => state.slider);
 
@@ -101,17 +102,9 @@ export const SliderManager = ({ toastMessage, windowHeight }) => {
         console.log(result);
 
         if (result.meta.requestStatus === "fulfilled") {
-          toastMessage({
-            danger: false,
-            title: "Sucesso",
-            message: "Slides atualizados com sucesso",
-          });
+          toast.success("Slides atualizados com sucesso");
         } else {
-          toastMessage({
-            danger: true,
-            title: "Error",
-            message: "Ocorreu um erro ao atualizar os slides",
-          });
+          toast.error("Ocorreu um erro ao atualizar os slides");
         }
       });
     }
