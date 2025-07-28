@@ -5,7 +5,7 @@ import { useEffect, useState, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useLocation } from "react-router-dom";
 import { innovaApi } from "@/services/http";
-import { fetchUserWorks } from "../../store/slicers/worksSlicer";
+import { fetchUserWorks } from "../../store/slicers/worksSlicer.js";
 import { fetchActivities } from "../../store/slicers/activitySlicer.js";
 import { fetchFieldRoles } from "../../store/slicers/fieldRoleSlicer.js";
 import { toast } from "react-toastify";

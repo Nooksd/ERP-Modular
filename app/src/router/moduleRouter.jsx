@@ -18,7 +18,7 @@ const ModuleRouter = () => {
   const LazyModuleRouter = useMemo(
     () =>
       lazy(() =>
-        import(`../modules/${moduleName}/${moduleName}Router`).catch(() =>
+        import(`../modules/${moduleName}/${moduleName}Router.jsx`).catch(() =>
           import(`../modules/error/404`)
         )
       ),

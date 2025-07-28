@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { fetchUserWorks } from "../../store/slicers/worksSlicer";
+import { fetchUserWorks } from "../../store/slicers/worksSlicer.js";
 import { toast } from "react-toastify";
 import {
   fetchSlider,

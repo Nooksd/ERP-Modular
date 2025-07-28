@@ -3,26 +3,11 @@ import { useLocation, Navigate } from "react-router-dom";
 import { Provider, useSelector } from "react-redux";
 import store from "./store";
 
-import {
-  NavbarContentContainer,
-  NavbarMenuContentContainer,
-} from "../../styles/global";
+import { Home } from "./pages/home/home";
+import { Aside } from "./components/aside/aside";
 
-const HHRouter = () => {
-  const [windowHeight, setWindowHeight] = useState(window.innerHeight);
+const RHRouter = () => {
   const { user } = useSelector((state) => state.user);
-
-  const [toastMessage, setToastMessage] = useState({
-    danger: false,
-    message: "",
-    title: "",
-  });
-  const [modalMessage, setModalMessage] = useState({
-    response: null,
-    event: null,
-    message: "",
-    title: "",
-  });
 
   const location = useLocation();
 
@@ -33,13 +18,14 @@ const HHRouter = () => {
       .replace(/\s+/g, "");
   };
 
-  const pages = [];
-
-  const handleResize = () => {
-    setWindowHeight(window.innerHeight);
-  };
-
-  window.addEventListener("resize", handleResize);
+  const pages = [
+    {
+      path: "home",
+      name: "Home",
+      permissionRequired: 1,
+      component: <Home />,
+    },
+  ];
 
   const renderPageContent = () => {
     const page = getPageData();
@@ -58,8 +44,6 @@ const HHRouter = () => {
   const getPageData = () => {
     const currentPage = location.pathname.split("/")[2];
 
-    console.log(currentPage);
-
     return pages.find((p) => normalizeString(p.path) === currentPage);
   };
 
@@ -71,14 +55,37 @@ const HHRouter = () => {
 
   return (
     <Provider store={store}>
-      <NavbarMenuContentContainer>
-        <NavbarContentContainer>
-          teste
-          <NavbarContentContainer>{renderPageContent()}</NavbarContentContainer>
-        </NavbarContentContainer>
-      </NavbarMenuContentContainer>
+      <div
+        style={{
+          minHeight: "100vh",
+          display: "flex",
+          backgroundColor: "#F9FAFB",
+        }}
+      >
+        <Aside user={user} />
+        <div style={{ width: "255px" }}></div>
+        <main
+          style={{
+            flex: 1,
+            padding: "1.25rem",
+          }}
+        >
+          <div
+            style={{
+              borderRadius: "20px",
+              overflow: "hidden",
+              minHeight: "100%",
+              display: "flex",
+              backgroundColor: "#FFFFFF",
+              boxShadow: "0px 8px 16px rgba(23, 34, 66, 0.25)",
+            }}
+          >
+            {renderPageContent()}
+          </div>
+        </main>
+      </div>
     </Provider>
   );
 };
 
-export default HHRouter;
+export default RHRouter;

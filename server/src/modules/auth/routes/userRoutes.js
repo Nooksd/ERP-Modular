@@ -1,11 +1,11 @@
 import express from "express";
 import UserController from "../controllers/userController.js";
 import JWT from "../../../core/middlewares/jsonwebtoken.js";
+import checkModulePermission from "../../../core/middlewares/checkModulePermission.js";
 import {
   userLoginCheck,
   userValidator,
-} from "../../../core/middlewares/validateCredentials.js";
-import checkModulePermission from "../../../core/middlewares/checkModulePermission.js";
+} from "../middlewares/validateCredentials.js";
 
 const UserRoutes = express.Router();
 
