@@ -6,6 +6,10 @@ const daySummarySchema = new mongoose.Schema({
     ref: "Employee",
     required: true,
   },
+  registrationNumber: {
+    type: String,
+    required: true,
+  },
   date: {
     type: Date,
     required: true,
@@ -16,12 +20,10 @@ const daySummarySchema = new mongoose.Schema({
       ref: "Punch",
     },
   ],
-  adjustments: [
-    {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Adjustment",
-    },
-  ],
+  adjustment: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Adjustment",
+  },
   workedMinutes: {
     type: Number,
     default: 0,
@@ -34,13 +36,14 @@ const daySummarySchema = new mongoose.Schema({
     type: Number,
     default: 0,
   },
-  irregular: {
-    type: Boolean,
-    default: false,
-  },
-  registrationNumber: {
+  status: {
     type: String,
-    required: true,
+    enum: ["original", "irregular", "corrected", "calculated"],
+    default: "original",
+  },
+  version: {
+    type: Number,
+    default: 1,
   },
   updatedAt: {
     type: Date,

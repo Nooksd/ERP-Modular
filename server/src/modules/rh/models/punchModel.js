@@ -39,7 +39,7 @@ const punchSchema = new mongoose.Schema({
       return this.punchType === "facial";
     },
   },
-  metadata: mongoose.Mixed,
+  metadata: mongoose.Schema.Types.Mixed,
   createdAt: {
     type: Date,
     default: Date.now,

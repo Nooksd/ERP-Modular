@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-const pontoConfigSchema = new mongoose.Schema({
+const punchConfigSchema = new mongoose.Schema({
   title: {
     type: String,
     default: "Configuração de Ponto",
@@ -193,4 +193,4 @@ const pontoConfigSchema = new mongoose.Schema({
   },
 });
 
-export default mongoose.model("PontoConfig", pontoConfigSchema);
+export default mongoose.model("PunchConfig", punchConfigSchema);
