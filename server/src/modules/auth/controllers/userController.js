@@ -2,7 +2,7 @@
 
 import bcrypt from "bcrypt";
 import User from "../models/userModel.js";
-import JWT from "../../../core/middlewares/jsonwebtoken.js";
+import JWT from "../../../middlewares/jsonwebtoken.js";
 
 class UserController {
   static async getProfile(req, res) {

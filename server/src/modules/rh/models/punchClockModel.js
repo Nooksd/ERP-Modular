@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-const timeClockDeviceSchema = new mongoose.Schema(
+const punchClockSchema = new mongoose.Schema(
   {
     name: {
       type: String,
@@ -152,12 +152,12 @@ const timeClockDeviceSchema = new mongoose.Schema(
   }
 );
 
-timeClockDeviceSchema.index({ serialNumber: 1 });
-timeClockDeviceSchema.index({ status: 1 });
-timeClockDeviceSchema.index({ "connection.ipAddress": 1 });
-timeClockDeviceSchema.index({ isActive: 1 });
+punchClockSchema.index({ serialNumber: 1 });
+punchClockSchema.index({ status: 1 });
+punchClockSchema.index({ "connection.ipAddress": 1 });
+punchClockSchema.index({ isActive: 1 });
 
-timeClockDeviceSchema.methods.testConnection = async function () {
+punchClockSchema.methods.testConnection = async function () {
   try {
     // TODO: Implementar lógica de conexão aqui
     this.status = "online";
@@ -176,7 +176,7 @@ timeClockDeviceSchema.methods.testConnection = async function () {
   }
 };
 
-timeClockDeviceSchema.methods.syncUsers = async function () {
+punchClockSchema.methods.syncUsers = async function () {
   try {
     // TODO: Implementar sincronização de usuários
     this.syncConfig.lastUserSync = new Date();
@@ -187,7 +187,7 @@ timeClockDeviceSchema.methods.syncUsers = async function () {
   }
 };
 
-timeClockDeviceSchema.methods.collectPunches = async function () {
+punchClockSchema.methods.collectPunches = async function () {
   try {
     // TODO: Implementar coleta de registros de ponto
     this.syncConfig.lastPunchSync = new Date();
@@ -198,7 +198,7 @@ timeClockDeviceSchema.methods.collectPunches = async function () {
   }
 };
 
-timeClockDeviceSchema.methods.reboot = async function () {
+punchClockSchema.methods.reboot = async function () {
   try {
     // TODO: Implementar comando de reinicialização
     this.statistics.lastReboot = new Date();
@@ -210,14 +210,14 @@ timeClockDeviceSchema.methods.reboot = async function () {
   }
 };
 
-timeClockDeviceSchema.statics.findOfflineDevices = function () {
+punchClockSchema.statics.findOfflineDevices = function () {
   return this.find({
     status: { $in: ["offline", "error"] },
     isActive: true,
   });
 };
 
-timeClockDeviceSchema.statics.findNeedingSync = function () {
+punchClockSchema.statics.findNeedingSync = function () {
   const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
   return this.find({
     "syncConfig.autoSync": true,
@@ -229,7 +229,7 @@ timeClockDeviceSchema.statics.findNeedingSync = function () {
   });
 };
 
-timeClockDeviceSchema.pre("save", function (next) {
+punchClockSchema.pre("save", function (next) {
   if (
     this.isModified("syncConfig.lastUserSync") ||
     this.isModified("syncConfig.lastPunchSync")
@@ -239,4 +239,4 @@ timeClockDeviceSchema.pre("save", function (next) {
   next();
 });
 
-export default mongoose.model("TimeClockDevice", timeClockDeviceSchema);
+export default mongoose.model("PunchClock", punchClockSchema);

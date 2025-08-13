@@ -18,21 +18,50 @@ const jobSchema = new mongoose.Schema({
     type: Number,
     required: true,
   },
-  salary: {
-    type: String,
-    required: false,
-  },
-  period: {
-    type: String,
-    required: false,
-  },
-  tags: {
-    type: [String],
-    required: false,
-  },
+  salary: String,
+  period: String,
+  tags: [String],
   recruitment: {
     type: [String],
     required: true,
+  },
+  candidates: {
+    type: [
+      {
+        candidate: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "Candidate",
+          immutable: true,
+          required: true,
+        },
+        recruitmentStage: {
+          type: String,
+          required: true,
+        },
+        commentary: {
+          type: String,
+          required: false,
+        },
+        status: {
+          type: String,
+          enum: ["aprovado", "reprovado", "pendente"],
+          default: "pendente",
+          required: true,
+        },
+        apliedAt: {
+          type: Date,
+          default: Date.now,
+          immutable: true,
+          required: true,
+        },
+        updatedAt: {
+          type: Date,
+          default: Date.now,
+          required: true,
+        },
+      },
+    ],
+    required: false,
   },
   isActive: {
     type: Boolean,

@@ -1,7 +1,7 @@
 import express from "express";
-import JWT from "../../../core/middlewares/jsonwebtoken.js";
+import JWT from "../../../middlewares/jsonwebtoken.js";
 import PredictedController from "../controllers/predictedController.js";
-import checkModulePermission from "../../../core/middlewares/checkModulePermission.js";
+import checkModulePermission from "../../../middlewares/checkModulePermission.js";
 import multer from "multer";
 
 const PredictedRoutes = express.Router();

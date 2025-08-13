@@ -1,7 +1,7 @@
 import express from "express";
-import JWT from "../../../core/middlewares/jsonwebtoken.js";
+import JWT from "../../../middlewares/jsonwebtoken.js";
 import HHControllController from "../controllers/hhControllController.js";
-import checkModulePermission from "../../../core/middlewares/checkModulePermission.js";
+import checkModulePermission from "../../../middlewares/checkModulePermission.js";
 
 const HHControllerRoutes = express.Router();
 

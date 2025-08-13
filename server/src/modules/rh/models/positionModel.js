@@ -16,12 +16,12 @@ const positionSchema = new mongoose.Schema(
     level: {
       type: String,
       enum: [
-        "Operacional",
-        "Técnico",
-        "Supervisão",
-        "Coordenação",
-        "Gerência",
-        "Diretoria",
+        "Estagio",
+        "Assistente",
+        "Analista",
+        "Coordenador",
+        "Gerênte",
+        "Diretor",
       ],
       required: true,
     },

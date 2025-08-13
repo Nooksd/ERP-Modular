@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 import bcrypt from "bcrypt";
-import { PermissionLevels } from "../../../core/utils/permissionLevels.js";
+import { PermissionLevels } from "../../../utils/permissionLevels.js";
 
 const userSchema = new mongoose.Schema({
   employeeId: {

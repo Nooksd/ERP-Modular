@@ -4,7 +4,7 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import { loadModuleRoutes } from "./moduleLoader.js";
 import mongoose from "mongoose";
-import "./src/core/db/database.js";
+import "./src/db/database.js";
 
 dotenv.config();
 

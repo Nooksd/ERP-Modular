@@ -57,7 +57,6 @@ const employeeSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-employeeSchema.index({ "documents.CPF": 1 });
 employeeSchema.index({ modality: 1 });
 employeeSchema.index({ "allocation.department": 1 });
 

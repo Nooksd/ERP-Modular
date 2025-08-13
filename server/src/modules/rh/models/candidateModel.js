@@ -13,14 +13,16 @@ const candidateSchema = new mongoose.Schema({
     maxlength: 100,
   },
   apliedIn: {
-    type: [mongoose.Schema.Types.ObjectId],
-    ref: "Job",
-    required: true,
-  },
-  description: {
-    type: String,
-    required: true,
-    maxlength: 500,
+    type: {
+      job: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Job",
+      },
+      date: {
+        type: Date,
+        default: Date.now,
+      },
+    },
   },
   isActive: {
     type: Boolean,
