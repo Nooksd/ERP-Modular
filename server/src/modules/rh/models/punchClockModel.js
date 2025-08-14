@@ -66,7 +66,7 @@ const punchClockSchema = new mongoose.Schema(
         type: Number,
         min: 1,
         max: 65535,
-        default: 3570, // Porta padrão ControlID
+        default: 3570,
         required: function () {
           return ["tcp", "udp", "http", "https"].includes(this.connection.type);
         },

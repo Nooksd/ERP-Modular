@@ -13,10 +13,6 @@ const documentSchema = new mongoose.Schema({
     required: true,
     immutable: true,
   },
-  requiredDocument: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "RequiredDocument",
-  },
   document: {
     type: [
       {
@@ -36,6 +32,10 @@ const documentSchema = new mongoose.Schema({
       },
     ],
     required: true,
+  },
+  requiredDocument: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "RequiredDocument",
   },
   status: {
     type: String,

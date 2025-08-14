@@ -9,13 +9,47 @@ import {
   allocationSchema,
 } from "./schemas.js";
 
+const employmentStatusSchema = new mongoose.Schema(
+  {
+    status: {
+      type: String,
+      enum: ["incompleto", "ativo", "demitido", "afastado"],
+      default: "incompleto",
+      required: true,
+    },
+    terminationDate: Date,
+    terminationReason: String,
+    terminationNotes: String,
+  },
+  { _id: false }
+);
+
+const changeHistorySchema = new mongoose.Schema(
+  {
+    changedBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
+    changedAt: {
+      type: Date,
+      default: Date.now,
+    },
+    field: String,
+    oldValue: mongoose.Schema.Types.Mixed,
+    newValue: mongoose.Schema.Types.Mixed,
+  },
+  { _id: false }
+);
+
 const employeeSchema = new mongoose.Schema(
   {
-    firstName: { type: String, required: true },
-    lastName: { type: String, required: true },
+    firstName: { type: String, required: true, immutable: true },
+    lastName: { type: String, required: true, immutable: true },
     registrationNumber: {
       type: String,
       required: true,
+      immutable: true,
       unique: true,
     },
     modality: {
@@ -53,8 +87,23 @@ const employeeSchema = new mongoose.Schema(
     },
     bankDetails: bankDetailsSchema,
     allocation: allocationSchema,
+    employmentStatus: employmentStatusSchema,
+    changeHistory: [changeHistorySchema],
+    isActive: {
+      type: Boolean,
+      default: true,
+    },
+    createdAt: {
+      type: Date,
+      default: Date.now,
+      immutable: true,
+    },
+    updatedAt: {
+      type: Date,
+      default: Date.now,
+    },
   },
-  { timestamps: true }
+  { timestamps: true, strict: true }
 );
 
 employeeSchema.index({ modality: 1 });

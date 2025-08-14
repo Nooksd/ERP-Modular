@@ -1,7 +1,7 @@
 import express from "express";
-import * as DepartmentController from "../controllers/departmentController.js";
 import JWT from "../../../middlewares/jsonwebtoken.js";
 import checkModulePermission from "../../../middlewares/checkModulePermission.js";
+import * as DepartmentController from "../controllers/departmentController.js";
 
 const departmentRoutes = express.Router();
 

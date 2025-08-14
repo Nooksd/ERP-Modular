@@ -46,24 +46,15 @@ export const create = async (req, res) => {
       "Temporário",
     ];
 
-    if (Array.isArray(req.body.requiredFor)) {
-      const invalidTypes = req.body.requiredFor.filter(
-        (type) => !validEmploymentTypes.includes(type)
-      );
+    const invalidTypes = req.body.requiredFor.filter(
+      (type) => !validEmploymentTypes.includes(type)
+    );
 
-      if (invalidTypes.length > 0) {
-        return res.status(400).json({
-          message: `Tipos de contratação inválidos: ${invalidTypes.join(", ")}`,
-          validTypes: validEmploymentTypes,
-        });
-      }
-    } else {
-      if (validEmploymentTypes.indexOf(req.body.requiredFor) === -1) {
-        return res.status(400).json({
-          message: `Tipo de contratação inválido: ${req.body.requiredFor}`,
-          validTypes: validEmploymentTypes,
-        });
-      }
+    if (invalidTypes.length > 0) {
+      return res.status(400).json({
+        message: `Tipos de contratação inválidos: ${invalidTypes.join(", ")}`,
+        validTypes: validEmploymentTypes,
+      });
     }
 
     const newDocument = new RequiredDocument(req.body);

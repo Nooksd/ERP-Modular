@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-const AgreementSchema = new mongoose.Schema({
+const agreementSchema = new mongoose.Schema({
   title: {
     type: String,
     required: true,
@@ -23,4 +23,4 @@ const AgreementSchema = new mongoose.Schema({
   },
 });
 
-export default mongoose.model("Agreement", AgreementSchema);
+export default mongoose.model("Agreement", agreementSchema);
