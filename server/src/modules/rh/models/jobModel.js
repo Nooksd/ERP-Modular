@@ -14,6 +14,11 @@ const jobSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  modality: {
+    type: String,
+    enum: ["CLT", "PJ", "Estágio", "Aprendiz", "Temporário"],
+    required: true,
+  },
   quantity: {
     type: Number,
     required: true,

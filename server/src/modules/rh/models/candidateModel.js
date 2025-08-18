@@ -1,10 +1,15 @@
 import mongoose from "mongoose";
 
 const candidateSchema = new mongoose.Schema({
-  name: {
+  firstName: {
     type: String,
     required: true,
-    maxlength: 100,
+    maxlength: 20,
+  },
+  lastName: {
+    type: String,
+    required: true,
+    maxlength: 20,
   },
   email: {
     type: String,
@@ -12,7 +17,19 @@ const candidateSchema = new mongoose.Schema({
     unique: true,
     maxlength: 100,
   },
-  apliedIn: {
+  birthDate: {
+    type: Date,
+    required: true,
+  },
+  nationality: {
+    type: String,
+    required: true,
+  },
+  naturalidade: {
+    type: String,
+    required: true,
+  },
+  appliedIn: {
     type: {
       job: {
         type: mongoose.Schema.Types.ObjectId,
@@ -23,10 +40,6 @@ const candidateSchema = new mongoose.Schema({
         default: Date.now,
       },
     },
-  },
-  isActive: {
-    type: Boolean,
-    default: true,
   },
   phone: {
     type: String,
@@ -52,6 +65,10 @@ const candidateSchema = new mongoose.Schema({
   salaryExpectation: {
     type: String,
     required: false,
+  },
+  isActive: {
+    type: Boolean,
+    default: true,
   },
   createdAt: {
     type: Date,

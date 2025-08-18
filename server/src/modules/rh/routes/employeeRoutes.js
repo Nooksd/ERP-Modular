@@ -1,14 +1,26 @@
 import express from "express";
 import JWT from "../../../middlewares/jsonwebtoken.js";
-import * as EmployeeController from "../controllers/employeeController.js";
 import checkModulePermission from "../../../middlewares/checkModulePermission.js";
+import * as EmployeeController from "../controllers/employeeController.js";
 
-const router = express.Router();
+const employeeRoutes = express.Router();
 
-router.use(JWT.validateAccessToken);
+employeeRoutes.use(JWT.validateAccessToken);
+employeeRoutes.use(checkModulePermission("rh", "viewer"));
 
-router.use(checkModulePermission("rh", "viewer"));
-router.use(checkModulePermission("rh", "editor"));
-router.use(checkModulePermission("rh", "admin"));
+employeeRoutes.get("/get-all", EmployeeController.getAll);
+employeeRoutes.get("/get-one/:employeeId", EmployeeController.getOne);
 
-export default router;
+employeeRoutes.use(checkModulePermission("rh", "editor"));
+
+employeeRoutes.patch(
+  "/update-allocation/:employeeId",
+  EmployeeController.updateAllocation
+);
+
+employeeRoutes.use(checkModulePermission("rh", "admin"));
+
+employeeRoutes.post("/create", EmployeeController.create);
+employeeRoutes.put("/update/:employeeId", EmployeeController.update);
+
+export default employeeRoutes;

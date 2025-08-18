@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 
 const positionSchema = new mongoose.Schema(
   {
-    title: {
+    name: {
       type: String,
       required: true,
       trim: true,
@@ -78,6 +78,7 @@ const positionSchema = new mongoose.Schema(
 );
 
 positionSchema.index({ department: 1 });
+positionSchema.index({ name: 1 });
 positionSchema.index({ level: 1 });
 positionSchema.index({ isActive: 1 });
 

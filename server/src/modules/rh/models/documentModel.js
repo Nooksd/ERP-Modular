@@ -48,10 +48,6 @@ const documentSchema = new mongoose.Schema({
     required: true,
     default: 0,
   },
-  isActive: {
-    type: Boolean,
-    default: true,
-  },
   createdAt: {
     type: Date,
     default: Date.now,

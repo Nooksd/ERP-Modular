@@ -6,7 +6,7 @@ export const getAll = async (req, res) => {
     const activeFilter = req.query.active === "false" ? false : true;
     const positions = await Position.find({ isActive: activeFilter })
       .populate("department", "name")
-      .sort({ title: 1 });
+      .sort({ name: 1 });
     res.json(positions);
   } catch (error) {
     res.status(500).json({ message: error.message });

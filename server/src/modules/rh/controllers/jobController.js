@@ -99,7 +99,7 @@ export const apply = async (req, res) => {
     } else {
       candidate = new Candidate({
         ...candidateData,
-        apliedIn: {
+        appliedIn: {
           job: jobId,
           date: new Date(),
         },
@@ -111,7 +111,7 @@ export const apply = async (req, res) => {
       candidate: candidate._id,
       recruitmentStage: job.recruitment[0] || "Triagem inicial",
       status: "pendente",
-      apliedAt: new Date(),
+      appliedAt: new Date(),
     });
 
     await job.save();
