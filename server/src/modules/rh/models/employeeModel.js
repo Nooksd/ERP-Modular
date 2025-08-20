@@ -155,7 +155,7 @@ const employeeSchema = new mongoose.Schema(
     changeHistory: [changeHistorySchema],
     status: {
       type: String,
-      enum: ["Em contratação", "Ativo", "Em desligamento", "Desligado"],
+      enum: ["Em contratação", "Ativo", "Aviso Prévio", "Desligado"],
       default: "Em contratação",
       required: true,
     },

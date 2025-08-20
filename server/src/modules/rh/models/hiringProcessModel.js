@@ -4,13 +4,7 @@ const hiringStepSchema = new mongoose.Schema(
   {
     stepName: {
       type: String,
-      enum: [
-        "Cadastro de Funcionário",
-        "Documentação",
-        "Cadastro eSocial",
-        "Exames Médicos",
-        "Integração",
-      ],
+      enum: ["Cadastro de Funcionário", "Documentação", "Cadastro eSocial"],
       required: true,
     },
     completed: { type: Boolean, default: false },
@@ -41,7 +35,9 @@ const hiringProcessSchema = new mongoose.Schema(
       enum: ["andamento", "completo", "cancelado"],
       default: "andamento",
     },
+    initiatedAt: Date,
     completedAt: Date,
+    metadata: mongoose.Schema.Types.Mixed,
   },
   { timestamps: true }
 );

@@ -8,14 +8,11 @@ const terminationStepSchema = new mongoose.Schema(
         "Aviso Prévio",
         "Devolução de Equipamentos",
         "Acertos Financeiros",
-        "Baixa eSocial",
       ],
       required: true,
     },
     completed: { type: Boolean, default: false },
-    completedBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
     completedAt: Date,
-    notes: String,
   },
   { _id: false }
 );
@@ -30,20 +27,28 @@ const terminationProcessSchema = new mongoose.Schema(
     steps: [terminationStepSchema],
     status: {
       type: String,
-      enum: ["Pending", "InProgress", "Completed", "Canceled"],
-      default: "Pending",
+      enum: ["andamento", "completo", "cancelado"],
+      default: "andamento",
     },
-    terminationDate: { type: Date, required: true },
     reason: {
       type: String,
-      enum: ["Resignation", "Dismissal", "Retirement", "EndOfContract"],
+      enum: [
+        "Pedido de Demissão",
+        "Justa Causa",
+        "Acordo",
+        "Fim de Contrato",
+        "Outro",
+      ],
       required: true,
     },
-    createdBy: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
-      required: true,
+    tempoAvisoPrevio: {
+      type: Number,
+      default: 0,
     },
+    comment: String,
+    initiatedAt: Date,
+    completedAt: Date,
+    metadata: mongoose.Schema.Types.Mixed,
   },
   { timestamps: true }
 );

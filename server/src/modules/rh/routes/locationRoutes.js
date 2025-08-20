@@ -3,23 +3,23 @@ import JWT from "../../../middlewares/jsonwebtoken.js";
 import checkModulePermission from "../../../middlewares/checkModulePermission.js";
 import * as LocationController from "../controllers/locationController.js";
 
-const router = express.Router();
+const locationRoutes = express.Router();
 
-router.use(JWT.validateAccessToken);
-router.use(checkModulePermission("rh", "viewer"));
+locationRoutes.use(JWT.validateAccessToken);
+locationRoutes.use(checkModulePermission("rh", "viewer"));
 
-router.get("/get-all", LocationController.getAll);
-router.get("/get-one/:locationId", LocationController.getOne);
+locationRoutes.get("/get-all", LocationController.getAll);
+locationRoutes.get("/get-one/:locationId", LocationController.getOne);
 
-router.use(checkModulePermission("rh", "editor"));
+locationRoutes.use(checkModulePermission("rh", "editor"));
 
-router.post("/create", LocationController.create);
-router.put("/update/:locationId", LocationController.update);
-router.patch("/disable/:locationId", LocationController.disable);
-router.patch("/enable/:locationId", LocationController.enable);
+locationRoutes.post("/create", LocationController.create);
+locationRoutes.put("/update/:locationId", LocationController.update);
+locationRoutes.patch("/disable/:locationId", LocationController.disable);
+locationRoutes.patch("/enable/:locationId", LocationController.enable);
 
-router.use(checkModulePermission("rh", "admin"));
+locationRoutes.use(checkModulePermission("rh", "admin"));
 
-router.delete("/delete/:locationId", LocationController.deleteOne);
+locationRoutes.delete("/delete/:locationId", LocationController.deleteOne);
 
-export default router;
+export default locationRoutes;

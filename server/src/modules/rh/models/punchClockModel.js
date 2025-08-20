@@ -1,4 +1,65 @@
 import mongoose from "mongoose";
+import axios from "axios";
+import https from "https";
+import Employee from "./employeeModel.js";
+// import Punch from "./punchModel.js";
+
+const connectionSchema = new mongoose.Schema(
+  {
+    type: {
+      type: String,
+      enum: ["tcp", "https"],
+      required: true,
+      default: "https",
+    },
+    ipAddress: {
+      type: String,
+      required: true,
+      validate: {
+        validator: function (ip) {
+          return /^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$/.test(ip);
+        },
+        message: "IP address inválido",
+      },
+    },
+    port: {
+      type: Number,
+      min: 1,
+      max: 65535,
+      default: 443,
+      required: true,
+    },
+    timeout: {
+      type: Number,
+      default: 10000,
+      min: 1000,
+      max: 30000,
+    },
+  },
+  { _id: false }
+);
+
+const authenticationSchema = new mongoose.Schema(
+  {
+    username: {
+      type: String,
+      required: true,
+    },
+    password: {
+      type: String,
+      required: true,
+    },
+    session: {
+      type: String,
+      default: null,
+    },
+    sessionExpires: {
+      type: Date,
+      default: null,
+    },
+  },
+  { _id: false }
+);
 
 const punchClockSchema = new mongoose.Schema(
   {
@@ -41,63 +102,8 @@ const punchClockSchema = new mongoose.Schema(
       required: true,
       immutable: true,
     },
-    connection: {
-      type: {
-        type: String,
-        enum: ["tcp", "udp", "http", "https", "serial"],
-        required: true,
-        default: "tcp",
-      },
-      ipAddress: {
-        type: String,
-        required: function () {
-          return ["tcp", "udp", "http", "https"].includes(this.connection.type);
-        },
-        validate: {
-          validator: function (ip) {
-            if (!["tcp", "udp", "http", "https"].includes(this.connection.type))
-              return true;
-            return /^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$/.test(ip);
-          },
-          message: "IP address inválido",
-        },
-      },
-      port: {
-        type: Number,
-        min: 1,
-        max: 65535,
-        default: 3570,
-        required: function () {
-          return ["tcp", "udp", "http", "https"].includes(this.connection.type);
-        },
-      },
-      baudRate: {
-        type: Number,
-        enum: [9600, 19200, 38400, 57600, 115200],
-        default: 115200,
-        required: function () {
-          return this.connection.type === "serial";
-        },
-      },
-      comPort: {
-        type: String,
-        required: function () {
-          return this.connection.type === "serial";
-        },
-      },
-      timeout: {
-        type: Number,
-        default: 5000,
-        min: 1000,
-        max: 30000,
-      },
-    },
-    authentication: {
-      username: String,
-      password: String,
-      apiKey: String,
-      securityKey: String,
-    },
+    connection: connectionSchema,
+    authentication: authenticationSchema,
     status: {
       type: String,
       enum: ["online", "offline", "error", "maintenance", "unknown"],
@@ -118,8 +124,8 @@ const punchClockSchema = new mongoose.Schema(
       },
       syncInterval: {
         type: Number,
-        default: 300000,
-        min: 60000,
+        default: 600000, // 10 minutos
+        min: 300000, // 5 minuto
       },
       syncUsers: {
         type: Boolean,
@@ -143,81 +149,191 @@ const punchClockSchema = new mongoose.Schema(
   }
 );
 
-punchClockSchema.index({ serialNumber: 1 });
 punchClockSchema.index({ status: 1 });
 punchClockSchema.index({ "connection.ipAddress": 1 });
 punchClockSchema.index({ isActive: 1 });
 
 punchClockSchema.methods.testConnection = async function () {
   try {
-    // TODO: Implementar lógica de conexão aqui
-    this.status = "online";
-    this.lastConnection = new Date();
-    await this.save();
-    return true;
+    const protocol = this.connection.type;
+    const url = `${protocol}://${this.connection.ipAddress}:${this.connection.port}/login.fcgi`;
+
+    console.log("Tentando conectar em:", url);
+
+    // Configuração do agente HTTPS para ignorar certificados autoassinados
+    const agent =
+      protocol === "https"
+        ? new https.Agent({ rejectUnauthorized: false })
+        : undefined;
+
+    const requestData = {
+      login: this.authentication.username,
+      password: this.authentication.password,
+    };
+
+    const response = await axios.post(url, requestData, {
+      httpsAgent: agent,
+      timeout: this.connection.timeout,
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    console.log("Resposta do equipamento:", response.data);
+
+    if (response.data && response.data.session) {
+      this.status = "online";
+      this.lastConnection = new Date();
+      this.authentication.session = response.data.session;
+      this.authentication.sessionExpires = new Date(Date.now() + 3600000);
+      await this.save();
+
+      return {
+        success: true,
+        session: response.data.session,
+        message: "Conexão bem-sucedida",
+      };
+    } else {
+      throw new Error("Falha na autenticação: sessão não recebida");
+    }
   } catch (error) {
+    console.error("Erro na conexão:", error.message);
+
     this.status = "error";
-    this.lastError = {
-      message: error.message,
-      timestamp: new Date(),
+    this.lastConnection = new Date();
+    this.authentication.session = null;
+    this.authentication.sessionExpires = null;
+
+    await this.save();
+
+    let errorMessage = error.message;
+    if (error.code === "ECONNREFUSED") {
+      errorMessage = "Conexão recusada. Verifique o IP e porta do equipamento.";
+    } else if (error.code === "ETIMEDOUT") {
+      errorMessage = "Tempo de conexão excedido. Verifique a rede.";
+    } else if (error.response) {
+      errorMessage = `Erro ${error.response.status}: ${error.response.data}`;
+    }
+
+    return {
+      success: false,
+      message: errorMessage,
       code: error.code || "CONNECTION_ERROR",
     };
-    await this.save();
-    return false;
   }
 };
 
-punchClockSchema.methods.syncUsers = async function () {
+punchClockSchema.methods.collectPunches = async function (startDate) {
   try {
-    // TODO: Implementar sincronização de usuários
-    this.syncConfig.lastUserSync = new Date();
-    await this.save();
-    return { success: true, message: "Usuários sincronizados com sucesso" };
+    if (
+      !this.authentication.session ||
+      !this.authentication.sessionExpires ||
+      this.authentication.sessionExpires < new Date()
+    ) {
+      const connectionResult = await this.testConnection();
+      if (!connectionResult.success) {
+        throw new Error("Falha na autenticação: " + connectionResult.message);
+      }
+    }
+
+    // Formatar data
+    const dateObj = startDate ? new Date(startDate) : new Date();
+    const day = dateObj.getDate();
+    const month = dateObj.getMonth() + 1;
+    const year = dateObj.getFullYear();
+
+    // Buscar registros AFD
+    const response = await axios.post(
+      `https://${this.connection.ipAddress}:${this.connection.port}/get_afd.fcgi`,
+      {
+        session: this.authentication.session,
+        initial_date: {
+          day: day,
+          month: month,
+          year: year,
+        },
+      }
+    );
+
+    if (response.data) {
+      this.syncConfig.lastPunchSync = new Date();
+      this.lastSync = new Date();
+      await this.save();
+
+      return {
+        success: true,
+        data: response.data,
+        processed: await this.processAFDData(response.data),
+      };
+    } else {
+      throw new Error("Nenhum dado recebido do equipamento");
+    }
   } catch (error) {
-    return { success: false, message: error.message };
+    this.status = "error";
+    await this.save();
+
+    return {
+      success: false,
+      message: error.message,
+      code: error.code || "SYNC_ERROR",
+    };
   }
 };
 
-punchClockSchema.methods.collectPunches = async function () {
+punchClockSchema.methods.processAFDData = async function (afdData) {
   try {
-    // TODO: Implementar coleta de registros de ponto
-    this.syncConfig.lastPunchSync = new Date();
-    await this.save();
-    return { success: true, punches: [] };
+    const lines = afdData.split("\n");
+    const processedPunches = [];
+    const errors = [];
+
+    for (const line of lines) {
+      if (line.length < 24) continue;
+
+      const nsr = line.substring(0, 9);
+      const type = line.substring(9, 10);
+
+      if (type !== "3") continue;
+
+      const dateStr = line.substring(10, 18);
+      const timeStr = line.substring(18, 24);
+      const pis = line.substring(24, 35);
+
+      const day = dateStr.substring(0, 2);
+      const month = dateStr.substring(2, 4);
+      const year = dateStr.substring(4, 8);
+      const hours = timeStr.substring(0, 2);
+      const minutes = timeStr.substring(2, 4);
+      const seconds = timeStr.substring(4, 6);
+
+      const timestamp = new Date(
+        `${year}-${month}-${day}T${hours}:${minutes}:${seconds}`
+      );
+
+      const employee = await Employee.findOne({ "documents.PIS": pis });
+
+      if (employee) {
+        // const punch = await Punch.create({
+        //   employee: employee._id,
+        //   timestamp: timestamp,
+        //   eventCode: "1", // Entrada (ajuste conforme necessário)
+        //   punchType: "fingerprint", // Modo de captura
+        //   metadata: {
+        //     nsr: nsr,
+        //     equipment: this._id,
+        //     rawLine: line,
+        //   },
+        // });
+        // processedPunches.push(punch);
+      } else {
+        errors.push(`Funcionário com PIS ${pis} não encontrado`);
+      }
+    }
+
+    return processedPunches;
   } catch (error) {
-    return { success: false, message: error.message };
+    console.error("Erro ao processar dados AFD:", error);
+    throw error;
   }
-};
-
-punchClockSchema.methods.reboot = async function () {
-  try {
-    // TODO: Implementar comando de reinicialização
-    this.statistics.lastReboot = new Date();
-    this.status = "offline";
-    await this.save();
-    return { success: true, message: "Dispositivo reiniciado" };
-  } catch (error) {
-    return { success: false, message: error.message };
-  }
-};
-
-punchClockSchema.statics.findOfflineDevices = function () {
-  return this.find({
-    status: { $in: ["offline", "error"] },
-    isActive: true,
-  });
-};
-
-punchClockSchema.statics.findNeedingSync = function () {
-  const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
-  return this.find({
-    "syncConfig.autoSync": true,
-    isActive: true,
-    $or: [
-      { "syncConfig.lastPunchSync": { $lt: fiveMinutesAgo } },
-      { "syncConfig.lastPunchSync": null },
-    ],
-  });
 };
 
 punchClockSchema.pre("save", function (next) {

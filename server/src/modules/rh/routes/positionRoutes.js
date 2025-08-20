@@ -3,23 +3,23 @@ import JWT from "../../../middlewares/jsonwebtoken.js";
 import checkModulePermission from "../../../middlewares/checkModulePermission.js";
 import * as PositionController from "../controllers/positionController.js";
 
-const router = express.Router();
+const positionRoutes = express.Router();
 
-router.use(JWT.validateAccessToken);
-router.use(checkModulePermission("rh", "viewer"));
+positionRoutes.use(JWT.validateAccessToken);
+positionRoutes.use(checkModulePermission("rh", "viewer"));
 
-router.get("/get-all", PositionController.getAll);
-router.get("/get-one/:positionId", PositionController.getOne);
+positionRoutes.get("/get-all", PositionController.getAll);
+positionRoutes.get("/get-one/:positionId", PositionController.getOne);
 
-router.use(checkModulePermission("rh", "editor"));
+positionRoutes.use(checkModulePermission("rh", "editor"));
 
-router.post("/create", PositionController.create);
-router.put("/update/:positionId", PositionController.update);
-router.patch("/disable/:positionId", PositionController.disable);
-router.patch("/enable/:positionId", PositionController.enable);
+positionRoutes.post("/create", PositionController.create);
+positionRoutes.put("/update/:positionId", PositionController.update);
+positionRoutes.patch("/disable/:positionId", PositionController.disable);
+positionRoutes.patch("/enable/:positionId", PositionController.enable);
 
-router.use(checkModulePermission("rh", "admin"));
+positionRoutes.use(checkModulePermission("rh", "admin"));
 
-router.delete("/delete/:positionId", PositionController.deleteOne);
+positionRoutes.delete("/delete/:positionId", PositionController.deleteOne);
 
-export default router;
+export default positionRoutes;

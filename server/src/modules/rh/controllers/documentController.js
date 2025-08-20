@@ -161,7 +161,7 @@ export const createOrUpdateDocument = async (req, res) => {
   }
 };
 
-export const requestDocument = async (req, res) => {
+export const requestFile = async (req, res) => {
   try {
     const { employeeId, title, expirationTime } = req.body;
 
@@ -198,7 +198,7 @@ export const requestDocument = async (req, res) => {
   }
 };
 
-export const sendRequestedDocument = async (req, res) => {
+export const sendRequestedFile = async (req, res) => {
   try {
     const documentId = req.params.documentId;
 

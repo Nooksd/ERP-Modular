@@ -3,29 +3,38 @@ import JWT from "../../../middlewares/jsonwebtoken.js";
 import checkModulePermission from "../../../middlewares/checkModulePermission.js";
 import * as RequiredDocumentController from "../controllers/requiredDocumentController.js";
 
-const router = express.Router();
+const requiredDocumentRoutes = express.Router();
 
-router.use(JWT.validateAccessToken);
-router.use(checkModulePermission("rh", "viewer"));
+requiredDocumentRoutes.use(JWT.validateAccessToken);
+requiredDocumentRoutes.use(checkModulePermission("rh", "viewer"));
 
-router.get("/get-all", RequiredDocumentController.getAll);
-router.get("/get-one/:requiredDocumentId", RequiredDocumentController.getOne);
+requiredDocumentRoutes.get("/get-all", RequiredDocumentController.getAll);
+requiredDocumentRoutes.get(
+  "/get-one/:requiredDocumentId",
+  RequiredDocumentController.getOne
+);
 
-router.use(checkModulePermission("rh", "editor"));
+requiredDocumentRoutes.use(checkModulePermission("rh", "editor"));
 
-router.post("/create", RequiredDocumentController.create);
-router.put("/update/:requiredDocumentId", RequiredDocumentController.update);
-router.patch(
+requiredDocumentRoutes.post("/create", RequiredDocumentController.create);
+requiredDocumentRoutes.put(
+  "/update/:requiredDocumentId",
+  RequiredDocumentController.update
+);
+requiredDocumentRoutes.patch(
   "/disable/:requiredDocumentId",
   RequiredDocumentController.disable
 );
-router.patch("/enable/:requiredDocumentId", RequiredDocumentController.enable);
+requiredDocumentRoutes.patch(
+  "/enable/:requiredDocumentId",
+  RequiredDocumentController.enable
+);
 
-router.use(checkModulePermission("rh", "admin"));
+requiredDocumentRoutes.use(checkModulePermission("rh", "admin"));
 
-router.delete(
+requiredDocumentRoutes.delete(
   "/delete/:requiredDocumentId",
   RequiredDocumentController.deleteOne
 );
 
-export default router;
+export default requiredDocumentRoutes;

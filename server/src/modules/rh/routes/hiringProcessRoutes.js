@@ -14,8 +14,8 @@ hiringProcessRoutes.get("/get-all", HiringProcessController.getAll);
 hiringProcessRoutes.use(checkModulePermission("rh", "editor"));
 
 hiringProcessRoutes.post(
-  "/create/:candidateId",
-  HiringProcessController.create
+  "/create-from-candidate/:candidateId",
+  HiringProcessController.createFromCandidate
 );
 hiringProcessRoutes.patch(
   "/create-employee/:processId",

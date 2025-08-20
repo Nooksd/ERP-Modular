@@ -4,32 +4,32 @@ import checkModulePermission from "../../../middlewares/checkModulePermission.js
 import * as AgreementController from "../controllers/agreementController.js";
 import multer from "multer";
 
-const router = express.Router();
+const agreementRoutes = express.Router();
 const upload = multer();
 
-router.use(JWT.validateAccessToken);
+agreementRoutes.use(JWT.validateAccessToken);
 
-router.get("/document/:filename", AgreementController.getDocument);
+agreementRoutes.get("/document/:filename", AgreementController.getDocument);
 
-router.use(checkModulePermission("rh", "viewer"));
+agreementRoutes.use(checkModulePermission("rh", "viewer"));
 
-router.get("/get-all", AgreementController.getAll);
-router.get("/get-one/:agreementId", AgreementController.getOne);
+agreementRoutes.get("/get-all", AgreementController.getAll);
+agreementRoutes.get("/get-one/:agreementId", AgreementController.getOne);
 
-router.use(checkModulePermission("rh", "editor"));
+agreementRoutes.use(checkModulePermission("rh", "editor"));
 
-router.post(
+agreementRoutes.post(
   "/upload",
   upload.single("document"),
   AgreementController.uploadDocument
 );
-router.post("/create", AgreementController.createAgreement);
-router.put("/update/:agreementId", AgreementController.update);
-router.patch("/disable/:agreementId", AgreementController.disable);
-router.patch("/enable/:agreementId", AgreementController.enable);
+agreementRoutes.post("/create", AgreementController.createAgreement);
+agreementRoutes.put("/update/:agreementId", AgreementController.update);
+agreementRoutes.patch("/disable/:agreementId", AgreementController.disable);
+agreementRoutes.patch("/enable/:agreementId", AgreementController.enable);
 
-router.use(checkModulePermission("rh", "admin"));
+agreementRoutes.use(checkModulePermission("rh", "admin"));
 
-router.delete("/delete/:agreementId", AgreementController.deleteOne);
+agreementRoutes.delete("/delete/:agreementId", AgreementController.deleteOne);
 
-export default router;
+export default agreementRoutes;

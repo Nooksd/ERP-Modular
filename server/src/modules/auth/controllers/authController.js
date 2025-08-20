@@ -60,7 +60,7 @@ class AuthController {
       }
 
       const userObject = user.toObject();
-      delete userObject.password;
+      userObject.password = undefined;
 
       const accessToken = JWT.generateAccessToken(user);
       const refreshToken = JWT.generateRefreshToken(user, keepConnection);

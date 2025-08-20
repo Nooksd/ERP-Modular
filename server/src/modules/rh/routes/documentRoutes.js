@@ -12,7 +12,7 @@ documentRoutes.use(JWT.validateAccessToken);
 documentRoutes.post(
   "/send-requested-file/:documentId",
   upload.single("file"),
-  DocumentController.sendRequestedDocument
+  DocumentController.sendRequestedFile
 );
 
 documentRoutes.use(checkModulePermission("rh", "viewer"));
@@ -31,7 +31,7 @@ documentRoutes.post(
   "/create-or-update",
   DocumentController.createOrUpdateDocument
 );
-documentRoutes.post("/request", DocumentController.requestDocument);
+documentRoutes.post("/request-file", DocumentController.requestFile);
 
 documentRoutes.use(checkModulePermission("rh", "admin"));
 

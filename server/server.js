@@ -5,11 +5,16 @@ import cookieParser from "cookie-parser";
 import { loadModuleRoutes } from "./moduleLoader.js";
 import mongoose from "mongoose";
 import "./src/db/database.js";
+// import { requestLogger, errorLogger } from "./src/utils/logger.js";
 
 dotenv.config();
 
 const app = express();
 const port = process.env.PORT;
+
+// app.set("trust proxy", true);
+
+// app.use(requestLogger);
 
 app.use(
   cors({
@@ -37,6 +42,8 @@ loadModuleRoutes(app).then(() => {
       status: false,
     });
   });
+
+  // app.use(errorLogger);
 
   app.use((err, req, res, next) => {
     if (err instanceof mongoose.Error && err.name === "MongooseError") {

@@ -27,7 +27,7 @@ const checkDocumentationComplete = async (employeeId, modality) => {
   }
 };
 
-export const create = async (req, res) => {
+export const createFromCandidate = async (req, res) => {
   try {
     const candidate = await Candidate.findOne({
       _id: req.params.candidateId,
@@ -52,6 +52,7 @@ export const create = async (req, res) => {
 
     const hiringProcess = new HiringProcess({
       candidate: candidate._id,
+      initiatedAt: new Date(),
       modality,
       steps,
     });
@@ -67,9 +68,18 @@ export const create = async (req, res) => {
       hiringProcess,
     });
   } catch (error) {
+    if (error instanceof mongoose.Error.ValidationError) {
+      const errors = Object.values(error.errors).map((err) => err.message);
+      return res.status(400).json({
+        status: false,
+        message: "Erro de validação",
+        errors,
+      });
+    }
+
     res.status(500).json({
       status: false,
-      message: "Erro ao criar funcionário",
+      message: "Erro ao iniciar processo de contratação",
       error: error.message,
     });
   }
@@ -377,7 +387,7 @@ export const cancel = async (req, res) => {
       });
     }
 
-    hiringProcess.status = "Cancelado";
+    hiringProcess.status = "cancelado";
     await hiringProcess.save();
 
     await Employee.findByIdAndDelete(hiringProcess.employee);
