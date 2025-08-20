@@ -1,40 +1,34 @@
 import mongoose from "mongoose";
 
-const requiredDocumentSchema = new mongoose.Schema({
-  title: {
-    type: String,
-    required: true,
-    maxlength: 30,
+const requiredDocumentSchema = new mongoose.Schema(
+  {
+    title: {
+      type: String,
+      required: true,
+      maxlength: 30,
+    },
+    requiredFor: {
+      type: [
+        {
+          type: String,
+          enum: ["CLT", "PJ", "Estágio", "Aprendiz", "Temporário"],
+          required: true,
+        },
+      ],
+      required: true,
+    },
+    expirationTime: {
+      type: Number,
+      required: true,
+      default: 0,
+    },
+    isActive: {
+      type: Boolean,
+      default: true,
+    },
   },
-  requiredFor: {
-    type: [
-      {
-        type: String,
-        enum: ["CLT", "PJ", "Estágio", "Aprendiz", "Temporário"],
-        required: true,
-      },
-    ],
-    required: true,
-  },
-  expirationTime: {
-    type: Number,
-    required: true,
-    default: 0,
-  },
-  isActive: {
-    type: Boolean,
-    default: true,
-  },
-  createdAt: {
-    type: Date,
-    default: Date.now,
-    immutable: true,
-  },
-  updatedAt: {
-    type: Date,
-    default: Date.now,
-  },
-});
+  { timestamps: true }
+);
 
 requiredDocumentSchema.index({ isActive: 1 });
 requiredDocumentSchema.index({ title: 1 });

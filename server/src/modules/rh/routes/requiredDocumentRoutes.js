@@ -15,8 +15,11 @@ router.use(checkModulePermission("rh", "editor"));
 
 router.post("/create", RequiredDocumentController.create);
 router.put("/update/:requiredDocumentId", RequiredDocumentController.update);
-router.put("/disable/:requiredDocumentId", RequiredDocumentController.disable);
-router.put("/enable/:requiredDocumentId", RequiredDocumentController.enable);
+router.patch(
+  "/disable/:requiredDocumentId",
+  RequiredDocumentController.disable
+);
+router.patch("/enable/:requiredDocumentId", RequiredDocumentController.enable);
 
 router.use(checkModulePermission("rh", "admin"));
 

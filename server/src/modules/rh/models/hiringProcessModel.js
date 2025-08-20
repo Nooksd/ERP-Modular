@@ -41,6 +41,7 @@ const hiringProcessSchema = new mongoose.Schema(
       enum: ["andamento", "completo", "cancelado"],
       default: "andamento",
     },
+    completedAt: Date,
   },
   { timestamps: true }
 );

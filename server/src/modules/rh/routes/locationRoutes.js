@@ -15,8 +15,8 @@ router.use(checkModulePermission("rh", "editor"));
 
 router.post("/create", LocationController.create);
 router.put("/update/:locationId", LocationController.update);
-router.put("/disable/:locationId", LocationController.disable);
-router.put("/enable/:locationId", LocationController.enable);
+router.patch("/disable/:locationId", LocationController.disable);
+router.patch("/enable/:locationId", LocationController.enable);
 
 router.use(checkModulePermission("rh", "admin"));
 

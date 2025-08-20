@@ -137,15 +137,6 @@ const punchClockSchema = new mongoose.Schema(
       default: true,
     },
     metadata: mongoose.Schema.Types.Mixed,
-    createdAt: {
-      type: Date,
-      default: Date.now,
-      immutable: true,
-    },
-    updatedAt: {
-      type: Date,
-      default: Date.now,
-    },
   },
   {
     timestamps: true,

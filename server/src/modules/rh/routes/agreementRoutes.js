@@ -25,8 +25,8 @@ router.post(
 );
 router.post("/create", AgreementController.createAgreement);
 router.put("/update/:agreementId", AgreementController.update);
-router.put("/disable/:agreementId", AgreementController.disable);
-router.put("/enable/:agreementId", AgreementController.enable);
+router.patch("/disable/:agreementId", AgreementController.disable);
+router.patch("/enable/:agreementId", AgreementController.enable);
 
 router.use(checkModulePermission("rh", "admin"));
 

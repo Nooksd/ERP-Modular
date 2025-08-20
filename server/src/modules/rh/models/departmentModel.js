@@ -13,15 +13,6 @@ const departmentSchema = new mongoose.Schema(
       type: Boolean,
       default: true,
     },
-    createdAt: {
-      type: Date,
-      default: Date.now,
-      immutable: true,
-    },
-    updatedAt: {
-      type: Date,
-      default: Date.now,
-    },
   },
   {
     timestamps: true,

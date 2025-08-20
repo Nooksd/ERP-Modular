@@ -9,7 +9,7 @@ import mongoose from "mongoose";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const uploadDir = path.join(__dirname, "../../uploads/rh/documents");
+const uploadDir = path.join(__dirname, "../../../uploads/rh/documents");
 
 if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true });
@@ -37,7 +37,7 @@ export const uploadDocumentFile = async (req, res) => {
         originalName: req.file.originalname,
         mimetype: req.file.mimetype,
         size: req.file.size,
-        path: `/documents/file/${fileName}`,
+        path: `/document/file/${fileName}`,
       },
     });
   } catch (error) {
@@ -87,9 +87,8 @@ export const createOrUpdateDocument = async (req, res) => {
         isExpired: false,
       });
 
-      // Atualizar data de expiração se fornecida
       if (req.body.expirationTime) {
-        existingDoc.expirationTime = req.body.expirationTime;
+        existingDoc.expirationTime = existingDoc.expirationTime || 0;
       }
 
       existingDoc.status = "enviado";
@@ -104,8 +103,26 @@ export const createOrUpdateDocument = async (req, res) => {
       });
     }
 
+    const requiredDocument = await RequiredDocument.findById(
+      requiredDocumentId
+    );
+    if (!requiredDocument) {
+      return res.status(404).json({
+        status: false,
+        message: "Documento obrigatório não encontrado",
+      });
+    }
+
+    const employee = await Employee.findById(employeeId);
+    if (!employee) {
+      return res.status(404).json({
+        status: false,
+        message: "Funcionário não encontrado",
+      });
+    }
+
     const newDocument = new Document({
-      title: req.body.title,
+      title: requiredDocument.title,
       employee: employeeId,
       requiredDocument: requiredDocumentId,
       document: [
@@ -115,7 +132,7 @@ export const createOrUpdateDocument = async (req, res) => {
           isExpired: false,
         },
       ],
-      expirationTime: req.body.expirationTime || 0,
+      expirationTime: requiredDocument.expirationTime || 0,
       status: "enviado",
     });
 
@@ -144,18 +161,121 @@ export const createOrUpdateDocument = async (req, res) => {
   }
 };
 
-// Listar documentos
-export const getAllDocuments = async (req, res) => {
+export const requestDocument = async (req, res) => {
   try {
-    const { employeeId, status, isExpired } = req.query;
+    const { employeeId, title, expirationTime } = req.body;
+
+    const newDocument = new Document({
+      title: title,
+      employee: employeeId,
+      expirationTime: expirationTime || 0,
+      isRequested: true,
+      status: "vazio",
+    });
+
+    await newDocument.save();
+
+    res.status(201).json({
+      status: true,
+      message: "Documento criado com sucesso",
+      document: newDocument,
+    });
+  } catch (error) {
+    if (error instanceof mongoose.Error.ValidationError) {
+      const errors = Object.values(error.errors).map((err) => err.message);
+      return res.status(400).json({
+        status: false,
+        message: "Erro de validação",
+        errors,
+      });
+    }
+
+    res.status(500).json({
+      status: false,
+      message: "Erro ao salvar documento",
+      error: error.message,
+    });
+  }
+};
+
+export const sendRequestedDocument = async (req, res) => {
+  try {
+    const documentId = req.params.documentId;
+
+    if (!req.file) {
+      return res.status(400).json({
+        status: false,
+        message: "Nenhum arquivo enviado",
+      });
+    }
+
+    const document = await Document.findOne({
+      _id: documentId,
+      employee: req.user.user.employeeId,
+      isRequested: true,
+      status: "vazio",
+    });
+    if (!document) {
+      return res.status(404).json({
+        status: false,
+        message: "Documento não encontrado",
+      });
+    }
+
+    const fileName = `${uuidv4()}${path.extname(req.file.originalname)}`;
+    const filePath = path.join(uploadDir, fileName);
+
+    fs.writeFileSync(filePath, req.file.buffer);
+
+    document.document.push({
+      filename: fileName,
+      originalName: req.file.originalname,
+      mimetype: req.file.mimetype,
+      size: req.file.size,
+      path: `/document/file/${fileName}`,
+      uploadedAt: new Date(),
+      isExpired: false,
+    });
+
+    document.status = "enviado";
+    document.updatedAt = new Date();
+
+    await document.save();
+
+    res.json({
+      status: true,
+      message: "Documento enviado com sucesso",
+      document,
+    });
+  } catch (error) {
+    if (error instanceof mongoose.Error.ValidationError) {
+      const errors = Object.values(error.errors).map((err) => err.message);
+      return res.status(400).json({
+        status: false,
+        message: "Erro de validação",
+        errors,
+      });
+    }
+
+    res.status(500).json({
+      status: false,
+      message: "Erro ao salvar documento",
+      error: error.message,
+    });
+  }
+};
+
+export const getAll = async (req, res) => {
+  try {
+    const { employee, status, expired } = req.query;
     const filter = {};
 
-    if (employeeId) filter.employee = employeeId;
+    if (employee) filter.employee = employee;
     if (status) filter.status = status;
 
-    if (isExpired === "true") {
+    if (expired === "true") {
       filter["document.isExpired"] = true;
-    } else if (isExpired === "false") {
+    } else if (expired === "false") {
       filter["document.isExpired"] = false;
     }
 
@@ -172,6 +292,35 @@ export const getAllDocuments = async (req, res) => {
     res.status(500).json({
       status: false,
       message: "Erro ao listar documentos",
+      error: error.message,
+    });
+  }
+};
+
+export const deleteDocument = async (req, res) => {
+  try {
+    const documentId = req.params.documentId;
+
+    const document = await Document.findById(documentId);
+    if (!document) {
+      return res.status(404).json({
+        status: false,
+        message: "Documento não encontrado",
+      });
+    }
+
+    fs.unlinkSync(path.join(uploadDir, document.filename));
+
+    await Document.findByIdAndDelete(documentId);
+
+    res.json({
+      status: true,
+      message: "Documento deletado com sucesso",
+    });
+  } catch (error) {
+    res.status(500).json({
+      status: false,
+      message: "Erro ao deletar documento",
       error: error.message,
     });
   }

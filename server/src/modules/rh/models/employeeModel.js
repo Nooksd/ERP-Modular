@@ -59,7 +59,6 @@ const bankDetailsSchema = new mongoose.Schema(
 
 const allocationSchema = new mongoose.Schema(
   {
-    entryDate: { type: Date, default: Date.now },
     salary: { type: Number, required: true },
     department: {
       type: mongoose.Schema.Types.ObjectId,
@@ -108,6 +107,7 @@ const employeeSchema = new mongoose.Schema(
   {
     firstName: { type: String, required: true, immutable: true },
     lastName: { type: String, required: true, immutable: true },
+    entryDate: Date,
     esocial: {
       type: String,
       required: function () {
@@ -163,17 +163,6 @@ const employeeSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
       required: true,
-    },
-    createdAt: {
-      type: Date,
-      default: Date.now,
-      required: true,
-      immutable: true,
-    },
-    updatedAt: {
-      type: Date,
-      required: true,
-      default: Date.now,
     },
   },
   { timestamps: true, strict: true }

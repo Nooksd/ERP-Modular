@@ -1,41 +1,35 @@
 import mongoose from "mongoose";
 
-const signedAgreementSchema = new mongoose.Schema({
-  employee: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Employee",
-    required: true,
+const signedAgreementSchema = new mongoose.Schema(
+  {
+    employee: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Employee",
+      required: true,
+    },
+    agreement: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Agreement",
+      required: true,
+    },
+    requestDate: {
+      type: Date,
+      default: Date.now,
+      immutable: true,
+    },
+    isSigned: {
+      type: Boolean,
+      default: false,
+      required: true,
+    },
+    signedAt: {
+      type: Date,
+      required: () => this.isSigned,
+    },
+    metadata: mongoose.Schema.Types.Mixed,
   },
-  agreement: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Agreement",
-    required: true,
-  },
-  requestDate: {
-    type: Date,
-    default: Date.now,
-    immutable: true,
-  },
-  isSigned: {
-    type: Boolean,
-    default: false,
-    required: true,
-  },
-  signedAt: {
-    type: Date,
-    required: () => this.isSigned,
-  },
-  metadata: mongoose.Schema.Types.Mixed,
-  createdAt: {
-    type: Date,
-    default: Date.now,
-    immutable: true,
-  },
-  updatedAt: {
-    type: Date,
-    default: Date.now,
-  },
-});
+  { timestamps: true }
+);
 
 signedAgreementSchema.index({ employee: 1, agreement: 1 }, { unique: true });
 

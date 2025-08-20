@@ -1,7 +1,13 @@
 import Employee from "../models/employeeModel.js";
 import mongoose from "mongoose";
 
-const IMMUTABLE_FIELDS = ["firstName", "lastName", "esocial", "documents"];
+const IMMUTABLE_FIELDS = [
+  "firstName",
+  "lastName",
+  "esocial",
+  "documents",
+  "entryDate",
+];
 
 export const create = async (req, res) => {
   try {

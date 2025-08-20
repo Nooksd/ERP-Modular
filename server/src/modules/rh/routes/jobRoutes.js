@@ -21,9 +21,9 @@ JobRoutes.use(checkModulePermission("rh", "editor"));
 
 JobRoutes.post("/create", JobController.createJob);
 JobRoutes.put("/update/:jobId", JobController.updateJob);
-JobRoutes.put("/disable/:jobId", JobController.disableJob);
-JobRoutes.put("/enable/:jobId", JobController.enableJob);
-JobRoutes.put(
+JobRoutes.patch("/disable/:jobId", JobController.disableJob);
+JobRoutes.patch("/enable/:jobId", JobController.enableJob);
+JobRoutes.patch(
   "/candidate/update/:jobId/:candidateId",
   JobController.updateCandidate
 );

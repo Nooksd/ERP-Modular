@@ -15,8 +15,8 @@ departmentRoutes.use(checkModulePermission("rh", "editor"));
 
 departmentRoutes.post("/create", DepartmentController.create);
 departmentRoutes.put("/update/:departmentId", DepartmentController.update);
-departmentRoutes.put("/disable/:departmentId", DepartmentController.disable);
-departmentRoutes.put("/enable/:departmentId", DepartmentController.enable);
+departmentRoutes.patch("/disable/:departmentId", DepartmentController.disable);
+departmentRoutes.patch("/enable/:departmentId", DepartmentController.enable);
 
 departmentRoutes.use(checkModulePermission("rh", "admin"));
 

@@ -17,8 +17,8 @@ router.use(checkModulePermission("rh", "editor"));
 
 router.post("/create", HolidayController.create);
 router.put("/update/:holidayId", HolidayController.update);
-router.put("/disable/:holidayId", HolidayController.disable);
-router.put("/enable/:holidayId", HolidayController.enable);
+router.patch("/disable/:holidayId", HolidayController.disable);
+router.patch("/enable/:holidayId", HolidayController.enable);
 
 router.use(checkModulePermission("rh", "admin"));
 

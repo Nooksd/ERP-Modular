@@ -14,7 +14,6 @@ const checkDocumentationComplete = async (employeeId, modality) => {
     const sentDocs = await Document.find({
       employee: employeeId,
       status: "enviado",
-      isActive: true,
     });
 
     return requiredDocs.every((requiredDoc) =>
@@ -30,10 +29,10 @@ const checkDocumentationComplete = async (employeeId, modality) => {
 
 export const create = async (req, res) => {
   try {
-    const candidate = await Candidate.findById(req.params.candidateId).populate(
-      "appliedIn.job",
-      "modality"
-    );
+    const candidate = await Candidate.findOne({
+      _id: req.params.candidateId,
+      isActive: true,
+    }).populate("appliedIn.job", "modality");
     if (!candidate) {
       return res.status(404).json({
         status: false,
@@ -263,16 +262,31 @@ export const completeProcess = async (req, res) => {
       });
     }
 
-    hiringProcess.steps.forEach((step) => {
-      if (!step.completed) {
-        return res.status(400).json({
-          status: false,
-          message: "Um ou mais processos estão incompletos",
-        });
-      }
-    });
+    const incompleteStep = hiringProcess.steps.find(
+      (s) => s.completed === false
+    );
+    if (incompleteStep) {
+      return res.status(400).json({
+        status: false,
+        message: "Um ou mais processos estão incompletos",
+      });
+    }
+
+    const employee = await Employee.findById(hiringProcess.employee);
+    if (!employee) {
+      return res.status(404).json({
+        status: false,
+        message: "Funcionário associado não encontrado",
+      });
+    }
+
+    employee.isActive = true;
+    employee.status = "Ativo";
+    employee.entryDate = new Date();
+    await employee.save();
 
     hiringProcess.status = "completo";
+    hiringProcess.completedAt = new Date();
     await hiringProcess.save();
 
     res.status(200).json({

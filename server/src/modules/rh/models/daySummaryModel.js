@@ -1,55 +1,54 @@
 import mongoose from "mongoose";
 
-const daySummarySchema = new mongoose.Schema({
-  employee: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Employee",
-    required: true,
-  },
-  registrationNumber: {
-    type: String,
-    required: true,
-  },
-  date: {
-    type: Date,
-    required: true,
-  },
-  punches: [
-    {
+const daySummarySchema = new mongoose.Schema(
+  {
+    employee: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Punch",
+      ref: "Employee",
+      required: true,
     },
-  ],
-  adjustment: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Adjustment",
+    registrationNumber: {
+      type: String,
+      required: true,
+    },
+    date: {
+      type: Date,
+      required: true,
+    },
+    punches: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Punch",
+      },
+    ],
+    adjustment: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Adjustment",
+    },
+    workedMinutes: {
+      type: Number,
+      default: 0,
+    },
+    overtimeMinutes: {
+      type: Number,
+      default: 0,
+    },
+    missingMinutes: {
+      type: Number,
+      default: 0,
+    },
+    status: {
+      type: String,
+      enum: ["original", "irregular", "corrected", "calculated"],
+      default: "original",
+    },
+    version: {
+      type: Number,
+      default: 1,
+    },
   },
-  workedMinutes: {
-    type: Number,
-    default: 0,
-  },
-  overtimeMinutes: {
-    type: Number,
-    default: 0,
-  },
-  missingMinutes: {
-    type: Number,
-    default: 0,
-  },
-  status: {
-    type: String,
-    enum: ["original", "irregular", "corrected", "calculated"],
-    default: "original",
-  },
-  version: {
-    type: Number,
-    default: 1,
-  },
-  updatedAt: {
-    type: Date,
-    default: Date.now,
-  },
-});
+  { timestamps: true }
+);
 
 daySummarySchema.index({ employee: 1, date: 1 }, { unique: true });
 

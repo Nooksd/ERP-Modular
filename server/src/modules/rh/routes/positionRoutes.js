@@ -15,8 +15,8 @@ router.use(checkModulePermission("rh", "editor"));
 
 router.post("/create", PositionController.create);
 router.put("/update/:positionId", PositionController.update);
-router.put("/disable/:positionId", PositionController.disable);
-router.put("/enable/:positionId", PositionController.enable);
+router.patch("/disable/:positionId", PositionController.disable);
+router.patch("/enable/:positionId", PositionController.enable);
 
 router.use(checkModulePermission("rh", "admin"));
 

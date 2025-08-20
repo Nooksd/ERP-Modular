@@ -1,29 +1,19 @@
 import express from "express";
-import UserController from "../controllers/userController.js";
+import AuthController from "../controllers/authController.js";
 import JWT from "../../../middlewares/jsonwebtoken.js";
-import checkModulePermission from "../../../middlewares/checkModulePermission.js";
 import {
   userLoginCheck,
   userValidator,
 } from "../middlewares/validateCredentials.js";
 
-const UserRoutes = express.Router();
+const AuthRoutes = express.Router();
 
-UserRoutes.post("/login", userLoginCheck, userValidator, UserController.Login);
-UserRoutes.get("/refresh-token", UserController.refreshToken);
+AuthRoutes.post("/login", userLoginCheck, userValidator, AuthController.Login);
+AuthRoutes.get("/refresh-token", AuthController.refreshToken);
 
-UserRoutes.use(JWT.validateAccessToken);
+AuthRoutes.use(JWT.validateAccessToken);
 
-UserRoutes.post("/logout", UserController.logout);
-UserRoutes.get("/profile", UserController.getProfile);
+AuthRoutes.post("/logout", AuthController.logout);
+AuthRoutes.get("/profile", AuthController.getProfile);
 
-UserRoutes.use(checkModulePermission("ti", "admin"));
-
-UserRoutes.post("/create", UserController.createUser);
-UserRoutes.get("/get-all", UserController.getAllUsers);
-UserRoutes.get("/get-managers", UserController.getManagers);
-UserRoutes.get("/get-one/:userId", UserController.getUserById);
-UserRoutes.put("/update/:userId", UserController.updateUser);
-UserRoutes.delete("/delete/:userId", UserController.deleteUser);
-
-export default UserRoutes;
+export default AuthRoutes;

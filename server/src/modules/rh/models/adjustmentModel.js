@@ -80,15 +80,6 @@ const adjustmentSchema = new mongoose.Schema(
       default: null,
     },
     metadata: mongoose.Schema.Types.Mixed,
-    createdAt: {
-      type: Date,
-      default: Date.now,
-      immutable: true,
-    },
-    updatedAt: {
-      type: Date,
-      default: Date.now,
-    },
   },
   {
     timestamps: true,
